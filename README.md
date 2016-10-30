@@ -33,6 +33,112 @@ You will also need a valid API Application on Iconfinder.com. You can request an
 
 Iconfinder Portfolio uses shortcodes to display content that you specify anywhere on your site.
 
+The most basic version of the shortcode will display up to 100 iconsets from your Iconfinder account. Simply add this token to any blog post or page on your site:
+
+`[iconfinder_portfolio]`
+
+You can also filter content to match the following parameters:
+
+#### style
+
+You can show only iconsets that are a particular style by including the 'style' parameter.
+
+`[iconfinder_portfolio style=outline]`
+
+Valid Style Values:
+
+- 3d
+- cartoon
+- flat
+- glyph
+- handdrawn
+- outline
+- photorealistic
+- pixel
+- smooth
+
+#### type (premium or free icons)
+
+You can show only free or premium iconsets by including the 'type' parameter.
+
+`[iconfinder_portfolio style=outline]`
+
+Valid Type Values:
+
+- premium
+- free
+
+#### sets (a comma-separated list of specific iconset ids)
+
+You can show specific sets by including a comma-separated list of iconset IDS. You can find the iconset ID by ... TBD
+
+`[iconfinder_portfolio sets=18389,16747,16745]`
+
+Note that if you specify a list of iconset IDs, all other filters will be ignored.
+
+#### categories (a comma-separated list of category identifiers)
+
+You can show iconsets from specific categories by including the 'categories' parameter.
+
+`[iconfinder_portfolio categories=christmas,halloween,easter]`
+
+Valid Category Values:
+
+- abstract
+- animal
+- arrow
+- avatars-smiley
+- business-finance
+- christmas
+- clothes-accessory
+- computer-hardware
+- desktop-app
+- easter
+- education-science
+- events-and-entertainment
+- fall
+- family-home
+- file-folder
+- flag
+- food-drinks
+- gaming-gambling
+- halloween
+- health-beauty-and-fashion
+- healthcare-medical
+- interior-building
+- ios7-optimized
+- maps-navigation
+- mixed
+- mobile-app
+- music-multimedia
+- nature-outdoor
+- network-communication
+- nsfw
+- photography-graphic-design
+- real-estate
+- recreation-hobby
+- romance
+- seasons
+- security
+- seo-web
+- shipping-delivery-and-fulfillment
+- shopping-ecommerce
+- sign-symbol
+- social-media
+- sports-award
+- spring
+- summer
+- touch-gesture
+- transportation
+- travel-hotel
+- ui
+- weather
+- winter
+
+## Known Issues
+
+* None as of October 30, 2016
+
 ## Changelog
 
 = 1.0 =
