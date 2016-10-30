@@ -118,6 +118,9 @@ class Iconfinder_Portfolio_Public {
 	 public static function iconfinder_portfolio_shortcode( $attrs ) {
 	 
 	    $iconsets = array();
+	    $valid_sort_fields = array('published_at', 'identifier', 'iconset_id');
+	    $valid_sort_orders = array(SORT_ASC, SORT_DESC);
+	    $valid_license_types = array(ICONFINDER_TYPE_PREMIUM, ICONFINDER_TYPE_FREE);
 
 		$_options = get_option('iconfinder-portfolio');
 		
@@ -129,13 +132,16 @@ class Iconfinder_Portfolio_Public {
 		$attrs = shortcode_atts(
 			array(
 				'userid'  => $user_id,
-				'count'   => 20,
+				'count'   => 0,
 				'channel' => 'iconsets',
 				'style'   => '',
 				'type'    => '',
 				'collection' => '',
 				'sets' => '',
-				'categories' => ''
+				'categories' => '',
+				'theme' => '',
+				'sort_by' => '',
+				'sort_order' => SORT_DESC
 	    ), $attrs );
 	    
 	    $id         = $attrs['id'];
@@ -146,19 +152,35 @@ class Iconfinder_Portfolio_Public {
 	    $sets       = ! empty($attrs['sets']) ? explode(',', $attrs['sets']) : array();
 	    $categories = ! empty($attrs['categories']) ? explode(',', $attrs['categories']) : array();
 	    $collection = $attrs['collection'];
+	    $theme      = $attrs['theme'];
+	    $sort_by    = strtolower($attrs['sort_by']);
+	    $sort_order = strtoupper($attrs['sort_order']) == "ASC" ? SORT_ASC : SORT_DESC;
+	    
+	    /*
+	    Coerce-user-friendly values to DB field names. This is just a nicety to make the shortcode values 
+	    easier to remember and to type.
+	    */
+	    
+	    switch ($sort_by) {
+	    	case "date":
+	    		$sort_by = "published_at";
+	    		break;
+	    	case "name":
+	    		$sort_by = "identifier";
+	    		break;
+	    }
 	    
 	    $data = json_decode(
 		    wp_remote_retrieve_body(
 			    wp_remote_get( 
-					ICONFINDER_API_URL . "users/{$user_id}/iconsets?client_id={$api_client_id}&client_secret={$api_client_secret}&count=100", 
-					array( 'sslverify' => false )
+					ICONFINDER_API_URL . "users/{$user_id}/iconsets" . 
+					    "?client_id={$api_client_id}&client_secret={$api_client_secret}" . 
+					    "&count=" . ICONFINDER_API_MAX_COUNT, 
+					array( 'sslverify' => ICONFINDER_API_SSLEVERIFY )
 				)
 			), 
 			true
 		);
-		
-		#TODO: Filter by license type
-		#TODO: Filter by collection
 		
 	    $data = $data['iconsets'];
 
@@ -173,6 +195,7 @@ class Iconfinder_Portfolio_Public {
 			    }
 			}
 		    else {
+		        // Filter by style
 			    if ($style != "") {
 			    	$is_match = false;
 			        foreach ($iconset['styles'] as $iconset_style){
@@ -182,14 +205,16 @@ class Iconfinder_Portfolio_Public {
 			        }
 			        if (! $is_match) continue;
 			    }
-			    if ($type != "") {
+			    // Filter by license type
+			    if (in_array($type, $valid_license_types)) {
 			    	$is_match = false;
-			        $iconset_type = intval($iconset['is_premium']) == 1 ? 'premium' : 'free' ;
+			        $iconset_type = intval($iconset['is_premium']) == 1 ? ICONFINDER_TYPE_PREMIUM : ICONFINDER_TYPE_FREE ;
 			    	if ($iconset_type == $type) {
 			    	    $is_match = true;
 			    	}
 			    	if (! $is_match) continue;
 			    }
+			    // Filter by categories
 			    if (count($categories)) {
 			    	$is_match = false;
 			    	foreach ($iconset['categories'] as $iconset_category){
@@ -199,17 +224,64 @@ class Iconfinder_Portfolio_Public {
 			        }
 			        if (! $is_match) continue;
 			    }
+			    if ($collection != "") {
+			        #TODO: Filter by collection
+			    }
 			    array_push($iconsets, $iconset);
 		    }
 	    }
 	    
 	    if (! count($iconsets)) {
-	        $iconsets = array_slice($data, 0, $count);
+	        $iconsets = $data;
 	    }
 	    
-	    # die('<pre>' . print_r($iconsets, true) . '</pre>');
-
-		include plugin_dir_path( __FILE__ ) . '/partials/iconfinder-portfolio-public-display.php';
+	    if (in_array($sort_by, $valid_sort_fields) && in_array($sort_order, $valid_sort_orders)) {
+	    	$iconsets = Iconfinder_Portfolio_Public::array_sort($iconsets, $sort_by, $sort_order);
+	    }
+	    
+	    if ($count > 0) {
+	        $iconsets = array_slice($iconsets, 0, $count);
+	    }
+	    	    
+	    return Iconfinder_Portfolio_Public::apply_theme($iconsets, $theme);
+	}
+	
+	/**
+	 * Apply the custom or default theme to the output
+	 * @param <String> $theme - The theme name
+	 * @return <Strong> The HTML output
+	 */
+	private static function apply_theme($iconsets, $theme='default') {
+		$output = "";
+		
+		$theme_file = null;
+	    if ($theme != "") {
+	        $theme_file = plugin_dir_path( __FILE__ ) . "/partials/theme-{$theme}.php";
+	    }
+	    if ($theme == 'default' || $theme_file == null || ! file_exists($theme_file)) {
+			$theme_file = plugin_dir_path( __FILE__ ) . '/partials/iconfinder-portfolio-public-display.php';
+		}
+	    
+		ob_start();
+		include $theme_file;
+		$output = ob_get_contents();
+		ob_end_clean();
+		return $output;
+	}
+	
+	/**
+	 * Sort iconsets by a specific field
+	 * @param <Array> $array - The iconsets to sort
+	 * @param <String> $on - The field to sort on
+	 * @param <String> $order - The sort order
+	 */
+	private static function array_sort($array, $on, $order) {
+	
+	    usort($array, function($a, $b) use ($on, $order) {
+	    	if ($order == SORT_ASC) return $a[$on] < $b[$on];
+	    	return $a[$on] > $b[$on];
+	    });
+	    return $array;
 	}
 
 }
