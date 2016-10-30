@@ -57,6 +57,23 @@ You can also use the following list of parameters to filter the content that dis
 
 The above token will display the first 20 iconsets from your Iconfinder account. ordered by newest to oldest.
 
+#### sourt_by and sort_order
+
+You can specify the display order or iconsets in either ascending (ASC) or descending (DESC) order based on the  `date`, `name`, or `iconset_id`.
+
+`[iconfinder_portfolio sort_by=date sort_order=DESC]`
+
+Valid sort_by values:
+
+* date (published_at attribute)
+* name (identifier attribute)
+* iconset_id
+
+Valid sort_order values:
+
+* ASC (oldest to newest, Z-A, lowest to highest ID)
+* DESC (newest to oldest, A-Z, highest to lowest ID)
+
 #### style
 
 You can show only iconsets that are a particular style by including the 'style' parameter.
