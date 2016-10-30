@@ -65,8 +65,8 @@ You can specify the display order or iconsets in either ascending (ASC) or desce
 
 Valid sort_by values:
 
-* date (published_at attribute)
-* name (identifier attribute)
+* date (the publication date of the iconset)
+* name (the name of the iconset)
 * iconset_id
 
 Valid sort_order values:
