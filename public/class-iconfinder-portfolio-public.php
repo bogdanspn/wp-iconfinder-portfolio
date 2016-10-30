@@ -141,7 +141,8 @@ class Iconfinder_Portfolio_Public {
 				'categories' => '',
 				'theme' => '',
 				'sort_by' => '',
-				'sort_order' => SORT_DESC
+				'sort_order' => SORT_DESC,
+				'omit' => ''
 	    ), $attrs );
 	    
 	    $id         = $attrs['id'];
@@ -155,6 +156,7 @@ class Iconfinder_Portfolio_Public {
 	    $theme      = $attrs['theme'];
 	    $sort_by    = strtolower($attrs['sort_by']);
 	    $sort_order = strtoupper($attrs['sort_order']) == "ASC" ? SORT_ASC : SORT_DESC;
+	    $omit       = ! empty($attrs['omit']) ? explode(',', $attrs['omit']) : array();
 	    
 	    /*
 	    Coerce-user-friendly values to DB field names. This is just a nicety to make the shortcode values 
@@ -185,6 +187,9 @@ class Iconfinder_Portfolio_Public {
 	    $data = $data['iconsets'];
 
 	    foreach ($data as &$iconset) {
+	    
+	        if (in_array($iconset['iconset_id'], $omit)) continue;
+	    
 	        $iconset['permalink'] = "http://iconfinder.com/iconsets/{$iconset['identifier']}" . (! empty($username) ? "?ref={$username}" : "");
 			$iconset['preview']   = "https://cdn4.iconfinder.com/data/iconsets/previews/medium/{$iconset['identifier']}.png";
 			$iconset['price']     = $iconset['prices'][0]['price'];
