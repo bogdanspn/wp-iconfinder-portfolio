@@ -202,12 +202,10 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 
 ## Roadmap
 
-* Add sort-by and sort-order parameters
 * Allow multiple style identifiers
 * Add WP text editor integration
 * Add UI to create new smartcodes for copy/paste or direct insert
 * Widgetize output
-* Add documentation for theming output
 
 ## Changelog
 
