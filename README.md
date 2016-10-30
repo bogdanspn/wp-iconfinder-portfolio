@@ -34,7 +34,9 @@ You will also need a valid API Application on Iconfinder.com. You can request an
 
 Iconfinder Portfolio uses shortcodes to display content that you specify anywhere on your site.
 
-The most basic version of the shortcode will display up to 100 iconsets from your Iconfinder account. Simply add this token to any blog post or page on your site:
+The most basic version of the shortcode will display up to 100 iconsets from your Iconfinder account. If no count is specified, the default API limit of 100 sets will be displayed. 
+
+To display an unfiltered list of iconsets, simply add this token to any blog post or page on your site:
 
 `[iconfinder_portfolio]`
 
@@ -43,7 +45,7 @@ The most basic version of the shortcode will display up to 100 iconsets from you
 You can also use the following list of parameters to filter the content that displayed. Details for each parameter are included below.
 
 * sets  - Shows a specific list of iconsets by iconset IDs
-* count - Limits the number of iconsets that are displayed (1 - 100)
+* count - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)
 * style - Shows only iconsets matching a valid style identifier
 * type - Shows only iconsets matching a valid type identifier
 * categories - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
@@ -176,7 +178,6 @@ For complete details for creating your own theme,  See the example theme in:
 You can specify a custom theme by including the 'theme' parameter to the Iconfinder Portfolio shortcode. The name of your theme is the middle part of the theme file name. For example, if your theme file name is `theme-mytheme.php`. The theme name would simply be `mytheme`.
 
 `[iconfinder_portfolio theme=mytheme]`
-
 
 ## Known Issues
 
