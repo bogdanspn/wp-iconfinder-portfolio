@@ -201,5 +201,5 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 ## Credits
 
 * The Iconfinder Portfolio plugin is built on the WordPress Plugin Boilerplate by http://wppb.io
-* The initial code was auto-generated using WPPB generator at http://wppb.me/
+* The initial code was auto-generated using WPPB generator at http://wppb.me
 * Additional guidance was provided by the article https://scotch.io/tutorials/how-to-build-a-wordpress-plugin-part-1
