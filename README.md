@@ -8,7 +8,7 @@ License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
 A WordPress plugin that integrates the Iconfinder API with a WordPress-powered site
 
-## Description ==
+## Description
 
 This plugin allows anyone to display content from Iconfinder.com on a WordPress-powered site. In order to use this plugin, you will need an active account on Iconfinder.com and a valid API application key.
 
