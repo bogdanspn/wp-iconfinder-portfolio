@@ -22,6 +22,7 @@ In order to use this plugin you will need a valid (free) account on Iconfinder. 
 You will also need a valid API Application on Iconfinder.com. You can request an API application by visiting https://www.iconfinder.com/api-solution and clicking the Request A Demo button or email support@iconfinder.com
 
 ### Installing the Plugin
+
 1. Upload `iconfinder-portfolio` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Navigate to Admin Menu > Settings > Iconfinder Portfolio
@@ -47,15 +48,15 @@ You can show only iconsets that are a particular style by including the 'style' 
 
 Valid Style Values:
 
-- 3d
-- cartoon
-- flat
-- glyph
-- handdrawn
-- outline
-- photorealistic
-- pixel
-- smooth
+* 3d
+* cartoon
+* flat
+* glyph
+* handdrawn
+* outline
+* photorealistic
+* pixel
+* smooth
 
 #### type (premium or free icons)
 
@@ -65,8 +66,8 @@ You can show only free or premium iconsets by including the 'type' parameter.
 
 Valid Type Values:
 
-- premium
-- free
+* premium
+* free
 
 #### sets (a comma-separated list of specific iconset ids)
 
@@ -84,56 +85,56 @@ You can show iconsets from specific categories by including the 'categories' par
 
 Valid Category Values:
 
-- abstract
-- animal
-- arrow
-- avatars-smiley
-- business-finance
-- christmas
-- clothes-accessory
-- computer-hardware
-- desktop-app
-- easter
-- education-science
-- events-and-entertainment
-- fall
-- family-home
-- file-folder
-- flag
-- food-drinks
-- gaming-gambling
-- halloween
-- health-beauty-and-fashion
-- healthcare-medical
-- interior-building
-- ios7-optimized
-- maps-navigation
-- mixed
-- mobile-app
-- music-multimedia
-- nature-outdoor
-- network-communication
-- nsfw
-- photography-graphic-design
-- real-estate
-- recreation-hobby
-- romance
-- seasons
-- security
-- seo-web
-- shipping-delivery-and-fulfillment
-- shopping-ecommerce
-- sign-symbol
-- social-media
-- sports-award
-- spring
-- summer
-- touch-gesture
-- transportation
-- travel-hotel
-- ui
-- weather
-- winter
+* abstract
+* animal
+* arrow
+* avatars-smiley
+* business-finance
+* christmas
+* clothes-accessory
+* computer-hardware
+* desktop-app
+* easter
+* education-science
+* events-and-entertainment
+* fall
+* family-home
+* file-folder
+* flag
+* food-drinks
+* gaming-gambling
+* halloween
+* health-beauty-and-fashion
+* healthcare-medical
+* interior-building
+* ios7-optimized
+* maps-navigation
+* mixed
+* mobile-app
+* music-multimedia
+* nature-outdoor
+* network-communication
+* nsfw
+* photography-graphic-design
+* real-estate
+* recreation-hobby
+* romance
+* seasons
+* security
+* seo-web
+* shipping-delivery-and-fulfillment
+* shopping-ecommerce
+* sign-symbol
+* social-media
+* sports-award
+* spring
+* summer
+* touch-gesture
+* transportation
+* travel-hotel
+* ui
+* weather
+* winter
 
 ## Known Issues
 
@@ -141,5 +142,6 @@ Valid Category Values:
 
 ## Changelog
 
-= 1.0 =
+### 1.0
+
 * Initial release
