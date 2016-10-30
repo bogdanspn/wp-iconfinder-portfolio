@@ -38,7 +38,22 @@ The most basic version of the shortcode will display up to 100 iconsets from you
 
 `[iconfinder_portfolio]`
 
-You can also filter content to match the following parameters:
+### Shortcode Paramaters 
+
+You can also use the following list of parameters to filter the content that displayed. Details for each parameter are included below.
+
+* sets  - Shows a specific list of iconsets by iconset IDs
+* count - Limits the number of iconsets that are displayed (1 - 100)
+* style - Shows only iconsets matching a valid style identifier
+* type - Shows only iconsets matching a valid type identifier
+* categories - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
+* mixed - You can combine any of the above (sets overrides all other filters except count)
+
+#### count
+
+`[iconfinder_portfolio count=20]`
+
+The above token will display the first 20 iconsets from your Iconfinder account. ordered by newest to oldest.
 
 #### style
 
@@ -136,9 +151,45 @@ Valid Category Values:
 * weather
 * winter
 
+#### Mixed Filters
+
+You can also display iconsets that match multiple filters. Keep in mind, however, that 'sets' (a list of specific iconset IDs, overrides all other filters)
+
+`[iconfinder_portfolio style=outline type=free categories=business-finance,shopping-ecommerce,seo-web]`
+
+### Calling the Shortcode in Theme files
+
+You can also call the Iconfinder Portfolio shortcode from your theme files with the following:
+
+`<?php do_shortcode("[iconfinder_portfolio style=outline]"); ?>`
+
+### Theming the Iconfinder Portfolio output
+
+You can create your own templates for the output from the Iconfinder Portfolio plugin. Add your custom theme file to `wp-content/iconfinder-portfolio/public/partials/`.
+
+Note that theme names are required to follow the format `theme-identifier.php` where `theme-` is the required prefix and `idenfitier` is your custom theme name. `identifier` is the only part of the name you can modify.
+
+For complete details for creating your own theme,  See the example theme in:
+
+`wp-content/plugins/iconfinder-portfolio/public/partials/theme-mytheme.php`
+
+You can specify a custom theme by including the 'theme' parameter to the Iconfinder Portfolio shortcode. The name of your theme is the middle part of the theme file name. For example, if your theme file name is `theme-mytheme.php`. The theme name would simply be `mytheme`.
+
+`[iconfinder_portfolio theme=mytheme]`
+
+
 ## Known Issues
 
 * None as of October 30, 2016
+
+## Roadmap
+
+* Add sort-by and sort-order parameters
+* Allow multiple style identifiers
+* Add WP text editor integration
+* Add UI to create new smartcodes for copy/paste or direct insert
+* Widgetize output
+* Add documentation for theming output
 
 ## Changelog
 
