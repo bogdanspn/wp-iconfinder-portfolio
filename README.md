@@ -50,6 +50,9 @@ You can also use the following list of parameters to filter the content that dis
 * type - Shows only iconsets matching a valid type identifier
 * categories - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
 * mixed - You can combine any of the above (sets overrides all other filters except count)
+* omit - a comma-separated list of iconset IDs to omit from display
+* sort_by - the iconset field name to sort by
+* sort_order - whether to sort in ASC or DESC order
 
 #### count
 
@@ -57,7 +60,7 @@ You can also use the following list of parameters to filter the content that dis
 
 The above token will display the first 20 iconsets from your Iconfinder account. ordered by newest to oldest.
 
-#### sourt_by and sort_order
+#### sort_by and sort_order
 
 You can specify the display order or iconsets in either ascending (ASC) or descending (DESC) order based on the  `date`, `name`, or `iconset_id`.
 
@@ -73,6 +76,12 @@ Valid sort_order values:
 
 * ASC (oldest to newest, Z-A, lowest to highest ID)
 * DESC (newest to oldest, A-Z, highest to lowest ID)
+
+#### omit
+
+You can omit one or more iconsets from display by including the `omit` parameter like in the example below
+
+`[iconfinder_portfolio style=outline omit=10234,56078,98706]`
 
 #### style
 
