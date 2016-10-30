@@ -206,6 +206,10 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 * Add WP text editor integration
 * Add UI to create new smartcodes for copy/paste or direct insert
 * Widgetize output
+* Integrate with MailChimp to capture email addresses
+* Integration with Social Media sharing
+* Allow site users to view all icons in an iconset
+* Update for better SEO
 
 ## Changelog
 
