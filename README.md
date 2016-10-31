@@ -219,7 +219,7 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 * Integration with Social Media sharing
 * Allow site users to view all icons in an iconset
 * Update for better SEO
-* Add ability to omit specific sets
+* Add preview_size shortcode attr
 
 ## Changelog
 
