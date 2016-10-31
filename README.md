@@ -207,7 +207,7 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 
 ## Known Issues
 
-* None as of October 30, 2016
+* sort_by does not currently work due to issues using closures in some versions of PHP
 
 ## Roadmap
 
