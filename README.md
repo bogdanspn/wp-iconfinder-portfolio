@@ -26,9 +26,8 @@ You will also need a valid API Application on Iconfinder.com. You can request an
 1. Upload `iconfinder-portfolio` to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Navigate to Admin Menu > Settings > Iconfinder Portfolio
-4. Enter your valid userid. You can location your USERID by ... TBD
-5. Enter your valid username that you selected when you created your Iconfinder account
-6. Enter the API Application Client ID and Client Secret, which you can locate ... TBD
+4. Enter your valid username that you selected when you created your Iconfinder account
+5. Enter the API Application Client ID and Client Secret, which you can locate ... TBD
 
 ### Displaying Content on Your site
 
@@ -211,8 +210,6 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 
 ## Roadmap
 
-* Update API calls to use username instead of user_id (easier for users to configure)
-* Remove user_id setting from settings panel (only need username)
 * Add ability to display all sets in a collection by collection_id
 * Move plugin menu to top-level, add sub-menus as need for help, promos, etc.
 * Allow multiple style identifiers
@@ -233,6 +230,9 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 * Initial release
 * Added sorting
 * Added `omit` to filter out specific sets by iconset_id
+* Removed user_id from settings page
+* Updated API calls to use username instead of user_id
+* Adding constants to settings file for ICONFINDER_URL, ICONFINDER_CDN_URL
 
 ## Credits
 
