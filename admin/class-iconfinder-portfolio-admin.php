@@ -114,8 +114,8 @@ class Iconfinder_Portfolio_Admin {
 		 *        Administration Menus: http://codex.wordpress.org/Administration_Menus
 		 *
 		 */
-		add_options_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page')
-		);
+		add_menu_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
+		# add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
 	}
 	
 	/**
@@ -160,7 +160,6 @@ class Iconfinder_Portfolio_Admin {
 		// All checkboxes inputs
 		$valid = array();
 		
-		$valid['user_id']           = isset($input['user_id']) && is_numeric($input['user_id']) ? $input['user_id'] : null;
 		$valid['api_client_id']     = isset($input['api_client_id']) && ! empty($input['api_client_id']) ? $input['api_client_id'] : null;
 		$valid['api_client_secret'] = isset($input['api_client_secret']) && ! empty($input['api_client_secret']) ? $input['api_client_secret'] : null;
 		$valid['username']          = isset($input['username']) && ! empty($input['username']) ? $input['username'] : null;

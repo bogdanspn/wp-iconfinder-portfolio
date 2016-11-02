@@ -2,8 +2,10 @@
 /**
  * Iconfinder portfolio global settings
  */
- 
-define('ICONFINDER_API_URL', "https://api.iconfinder.com/v2/");
+
+define('ICONFINDER_URL',     'http://iconfinder.com/'); 
+define('ICONFINDER_API_URL', 'https://api.iconfinder.com/v2/');
+define('ICONFINDER_CDN_URL', 'https://cdn4.iconfinder.com/');
 
 define('ICONFINDER_TYPE_PREMIUM',      'premium');
 define('ICONFINDER_TYPE_FREE',         'free');

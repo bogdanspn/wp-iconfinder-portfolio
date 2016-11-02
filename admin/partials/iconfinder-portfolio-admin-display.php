@@ -25,7 +25,6 @@
 		//Grab all options
 		$options = get_option($this->plugin_name);
 		
-		$user_id           = $options['user_id'];
 		$api_client_id     = $options['api_client_id'];
 		$api_client_secret = $options['api_client_secret'];
 		$username          = $options['username'];
@@ -40,18 +39,8 @@
     		<p>Get more details by visiting the <a href="https://developer.iconfinder.com/" target="_blank">Iconfinder API Documentation</a> </p>
     	</fieldset>
     	
-    	<fieldset>
-            <label for="<?php echo $this->plugin_name; ?>-user_id">
-                <span><?php esc_attr_e('Iconfinder User ID', $this->plugin_name); ?></span>
-            </label>
-            <fieldset>
-                <legend class="screen-reader-text"><span><?php _e('Iconfinder User ID', $this->plugin_name); ?></span></legend>
-                <input type="text" class="regular-text" id="<?php echo $this->plugin_name; ?>-user_id" name="<?php echo $this->plugin_name; ?>[user_id]" value="<?php echo $user_id; ?>"/>
-            </fieldset>
-        </fieldset>
-        
         <fieldset>
-            <label for="<?php echo $this->plugin_name; ?>-user_id">
+            <label for="<?php echo $this->plugin_name; ?>-username">
                 <span><?php esc_attr_e('Iconfinder Username', $this->plugin_name); ?></span>
             </label>
             <fieldset>

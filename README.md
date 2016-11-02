@@ -207,25 +207,32 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 
 ## Known Issues
 
-* None
+* Version 1.0 causes an error in WP admin but doesn't cause errors on public pages
 
 ## Roadmap
 
+* Update API calls to use username instead of user_id (easier for users to configure)
+* Remove user_id setting from settings panel (only need username)
+* Add ability to display all sets in a collection by collection_id
+* Move plugin menu to top-level, add sub-menus as need for help, promos, etc.
 * Allow multiple style identifiers
 * Add WP text editor integration
 * Add UI to create new smartcodes for copy/paste or direct insert
 * Widgetize output
-* Integrate with MailChimp to capture email addresses
 * Integration with Social Media sharing
 * Allow site users to view all icons in an iconset
 * Update for better SEO
 * Add preview_size shortcode attr
+* Show all valid shortcode params in settings panel
+* Show Iconset and IconSetCollection IDs in plugin settings panel
 
 ## Changelog
 
 ### 1.0
 
 * Initial release
+* Added sorting
+* Added `omit` to filter out specific sets by iconset_id
 
 ## Credits
 

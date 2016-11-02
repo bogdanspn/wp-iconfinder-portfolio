@@ -118,31 +118,30 @@ class Iconfinder_Portfolio_Public {
 	 public static function iconfinder_portfolio_shortcode( $attrs ) {
 	 
 	    $iconsets = array();
-	    $valid_sort_fields = array('published_at', 'identifier', 'iconset_id');
+	    $valid_sort_fields = array('published_at', 'identifier', 'name', 'iconset_id');
 	    $valid_sort_orders = array(SORT_ASC, SORT_DESC);
 	    $valid_license_types = array(ICONFINDER_TYPE_PREMIUM, ICONFINDER_TYPE_FREE);
 
 		$_options = get_option('iconfinder-portfolio');
 		
-		$user_id           = isset($_options['user_id']) ? $_options['user_id'] : null;
 		$client_id         = isset($_options['api_client_id']) ? $_options['api_client_id'] : null;
 		$api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
 		$username          = isset($_options['username']) ? $_options['username'] : null;
 		
 		$attrs = shortcode_atts(
 			array(
-				'userid'  => $user_id,
-				'count'   => 0,
-				'channel' => 'iconsets',
-				'style'   => '',
-				'type'    => '',
+				'username'   => $username,
+				'count'      => 0,
+				'channel'    => 'iconsets',
+				'style'      => '',
+				'type'       => '',
 				'collection' => '',
-				'sets' => '',
+				'sets'       => '',
 				'categories' => '',
-				'theme' => '',
-				'sort_by' => '',
+				'theme'      => '',
+				'sort_by'    => '',
 				'sort_order' => SORT_DESC,
-				'omit' => ''
+				'omit'       => ''
 	    ), $attrs );
 	    
 	    $id         = $attrs['id'];
@@ -158,24 +157,21 @@ class Iconfinder_Portfolio_Public {
 	    $sort_order = strtoupper($attrs['sort_order']) == "ASC" ? SORT_ASC : SORT_DESC;
 	    $omit       = ! empty($attrs['omit']) ? explode(',', $attrs['omit']) : array();
 	    
+	    $categories = array_map('trim', $categories);
+	    $sets       = array_map('trim', $sets);
+	    $omit       = array_map('trim', $omit);
+	    
 	    /*
 	    Coerce-user-friendly values to DB field names. This is just a nicety to make the shortcode values 
 	    easier to remember and to type.
 	    */
 	    
-	    switch ($sort_by) {
-	    	case "date":
-	    		$sort_by = "published_at";
-	    		break;
-	    	case "name":
-	    		$sort_by = "identifier";
-	    		break;
-	    }
+	    $sort_by = $sort_by == "date" ? "published_at" : $sort_by;
 	    
 	    $data = json_decode(
 		    wp_remote_retrieve_body(
 			    wp_remote_get( 
-					ICONFINDER_API_URL . "users/{$user_id}/iconsets" . 
+					ICONFINDER_API_URL . "users/{$username}/iconsets" . 
 					    "?client_id={$api_client_id}&client_secret={$api_client_secret}" . 
 					    "&count=" . ICONFINDER_API_MAX_COUNT, 
 					array( 'sslverify' => ICONFINDER_API_SSLEVERIFY )
@@ -190,8 +186,8 @@ class Iconfinder_Portfolio_Public {
 	    
 	        if (in_array($iconset['iconset_id'], $omit)) continue;
 	    
-	        $iconset['permalink'] = "http://iconfinder.com/iconsets/{$iconset['identifier']}" . (! empty($username) ? "?ref={$username}" : "");
-			$iconset['preview']   = "https://cdn4.iconfinder.com/data/iconsets/previews/medium/{$iconset['identifier']}.png";
+	        $iconset['permalink'] = ICONFINDER_URL . "iconsets/{$iconset['identifier']}" . (! empty($username) ? "?ref={$username}" : "");
+			$iconset['preview']   = ICONFINDER_CDN_URL . "data/iconsets/previews/medium/{$iconset['identifier']}.png";
 			$iconset['price']     = $iconset['prices'][0]['price'];
 
 			if (count($sets)) {
@@ -240,8 +236,9 @@ class Iconfinder_Portfolio_Public {
 	        $iconsets = $data;
 	    }
 	    
+	    // The call to array_sort_dep is required for now for compatibility with older versions of PHP
 	    if (in_array($sort_by, $valid_sort_fields) && in_array($sort_order, $valid_sort_orders)) {
-	    	$iconsets = Iconfinder_Portfolio_Public::array_sort($iconsets, $sort_by, $sort_order);
+	    	$iconsets = Iconfinder_Portfolio_Public::sort_array($iconsets, $sort_by, $sort_order);
 	    }
 	    
 	    if ($count > 0) {
@@ -275,12 +272,37 @@ class Iconfinder_Portfolio_Public {
 	}
 	
 	/**
+	 * @deprecated
+	 * Sort iconsets by a specific field
+	 * @param <Array> $array - The iconsets to sort
+	 * @param <String> $on - The field to sort on
+	 * @param <String> $order - The sort order
+	 *
+	 * Note: The ideal solution would be to use usort and a custom comparison 
+	 * function. But, older versions of PHP do not support passing of anonymous 
+	 * functions or the 'use' keyword. So the only backward-compatible solution 
+	 * is to write a custom sort algorithm. Since the function will never compare 
+	 * more than 100 objects, I guess this will have to suffice for now.
+	 */
+	private static function sort_array($array, $sort_by, $sort_order) {
+		
+		$sort_array = array();
+		
+		foreach($array as $key => $val) {
+	        $sort_array[$key] = $val[$sort_by];
+	    }
+	    array_multisort($sort_array, $sort_order, $array);
+	    return $array;
+	}
+	
+	/**
 	 * Sort iconsets by a specific field
 	 * @param <Array> $array - The iconsets to sort
 	 * @param <String> $on - The field to sort on
 	 * @param <String> $order - The sort order
 	 */
-	private static function array_sort($array, $on, $order) {
+	/*
+	private static function sort_array($array, $on, $order) {
 	
 	    usort($array, function($a, $b) use ($on, $order) {
 	    	if ($order == SORT_ASC) return $a[$on] < $b[$on];
@@ -288,5 +310,5 @@ class Iconfinder_Portfolio_Public {
 	    });
 	    return $array;
 	}
-
+	*/
 }
