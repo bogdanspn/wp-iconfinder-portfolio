@@ -19,6 +19,10 @@
 
     <h2><?php echo esc_html(get_admin_page_title()); ?></h2>
     
+    <div class="notice notice-info">
+		<p><?php _e( 'Get more details by visiting the <a href="https://developer.iconfinder.com/" target="_blank">Iconfinder API Documentation</a> ', $this->plugin_name ); ?></p>
+	</div>
+    
     <form method="post" name="iconfinder_portfolio_options" action="options.php">
     
 		<?php
@@ -34,10 +38,6 @@
 			settings_fields($this->plugin_name);
 			do_settings_sections($this->plugin_name);
 		?>
-    
-    	<fieldset>
-    		<p>Get more details by visiting the <a href="https://developer.iconfinder.com/" target="_blank">Iconfinder API Documentation</a> </p>
-    	</fieldset>
     	
         <fieldset>
             <label for="<?php echo $this->plugin_name; ?>-username">

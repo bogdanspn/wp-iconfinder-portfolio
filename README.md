@@ -52,6 +52,8 @@ You can also use the following list of parameters to filter the content that dis
 * omit - a comma-separated list of iconset IDs to omit from display
 * sort_by - the iconset field name to sort by
 * sort_order - whether to sort in ASC or DESC order
+* collection - The collection_id of a collection of iconsets to display
+* img_size - The preview image size (normal, large)
 
 #### count
 
@@ -110,6 +112,16 @@ Valid Type Values:
 
 * premium
 * free
+
+#### collection
+
+You can specify a Collection of iconsets from your Iconfinder profile to display.
+
+`[iconfinder_portfolio collection=12345]`
+
+You can combine the `collection` parameter with other filtering parameters as well.
+
+`[iconfinder_portfolio collection=12345 sort_by=name sort_order=DESC omit=98765,98764]`
 
 #### sets (a comma-separated list of specific iconset ids)
 
@@ -178,6 +190,17 @@ Valid Category Values:
 * weather
 * winter
 
+#### img_size (preview image size)
+
+You can choose which iconset preview image size to display on your site.
+
+`[iconfinder_portfolio style=outline img_size=large]`
+
+Valid Type Values:
+
+* normal
+* large
+
 #### Mixed Filters
 
 You can also display iconsets that match multiple filters. Keep in mind, however, that 'sets' (a list of specific iconset IDs, overrides all other filters)
@@ -210,8 +233,6 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 
 ## Roadmap
 
-* Add ability to display all sets in a collection by collection_id
-* Move plugin menu to top-level, add sub-menus as need for help, promos, etc.
 * Allow multiple style identifiers
 * Add WP text editor integration
 * Add UI to create new smartcodes for copy/paste or direct insert
@@ -219,9 +240,9 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 * Integration with Social Media sharing
 * Allow site users to view all icons in an iconset
 * Update for better SEO
-* Add preview_size shortcode attr
 * Show all valid shortcode params in settings panel
-* Show Iconset and IconSetCollection IDs in plugin settings panel
+* Show Iconset and Collection IDs in plugin settings panel
+* Add "Test API credentials" to Iconfinder Porfolio settings page
 
 ## Changelog
 
@@ -233,6 +254,9 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 * Removed user_id from settings page
 * Updated API calls to use username instead of user_id
 * Adding constants to settings file for ICONFINDER_URL, ICONFINDER_CDN_URL
+* Added collections to output options
+* Added Iconset and Collection IDs in plugin settings panel
+* Added img_size parameter to shortcode
 
 ## Credits
 

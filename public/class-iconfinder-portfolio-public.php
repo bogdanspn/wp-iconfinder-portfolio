@@ -111,28 +111,94 @@ class Iconfinder_Portfolio_Public {
 	}
 	
 	/**
+	 * Determine correct API URl from the shortcode attrs
+	 * @param $attrs - The shortcode attrs
+	 * @since 1.0.0
+	 */
+	private static function get_api_url($attrs) {
+	
+		$_options = get_option('iconfinder-portfolio');
+		
+		$api_client_id     = isset($_options['api_client_id']) ? $_options['api_client_id'] : null;
+		$api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
+		$username          = isset($_options['username']) ? $_options['username'] : null;
+		
+	    $collection = $attrs['collection'];
+	
+		$api_path = "users/{$username}/iconsets";
+		
+		if ($collection != "") {
+		    $api_path = "collections/{$collection}/iconsets";
+		}
+		
+		$api_url = ICONFINDER_API_URL . 
+			"{$api_path}?client_id={$api_client_id}&client_secret={$api_client_secret}" . 
+			"&count=" . ICONFINDER_API_MAX_COUNT;
+			
+		return $api_url;
+	}
+	
+	/**
+	 * Make the API call
+	 */
+	public static function call_api($api_url, $sslverify=ICONFINDER_API_SSLEVERIFY) {
+	    
+	    $response = null;
+	    try {
+		    $response = json_decode(
+			    wp_remote_retrieve_body(
+				    wp_remote_get( 
+						$api_url, 
+						array('sslverify' => $sslverify)
+					)
+				), 
+				true
+			);
+	    
+		    if (isset($response['code'])) {
+		        throw new Exception("[{$response['code']}] - {$response['message']}");
+		    }
+		    else if (isset($response['detail'])) {
+		    	throw new Exception("[Exception] - {$response['detail']}");
+		    }
+		    // a bit kludgy, but I want to normalize the response fields here 
+		    // instead of having a bunch of conditional checks elesewhere.
+		    if (isset($response['iconsets']) && ! isset($response['items'])) {
+		    	$response['items'] = $response['iconsets'];
+		    	unset($response['iconsets']);
+		    }
+	    }
+	    catch(Exception $e) {
+	        throw new Exception($e);
+	    }
+	    return $response;
+	}
+	
+	private static function dump($what) {
+	    die ('<pre>' . print_r($what, true) . '</pre>');
+	}
+	
+	/**
 	 * Render the Iconfinder Portfolio shortcodes
 	 * 
 	 * @since 1.0.0
 	 */
 	 public static function iconfinder_portfolio_shortcode( $attrs ) {
 	 
-	    $iconsets = array();
-	    $valid_sort_fields = array('published_at', 'identifier', 'name', 'iconset_id');
-	    $valid_sort_orders = array(SORT_ASC, SORT_DESC);
+	    $iconsets            = array();
+	    $valid_sort_fields   = array('published_at', 'identifier', 'name', 'iconset_id');
+	    $valid_sort_orders   = array(SORT_ASC, SORT_DESC);
 	    $valid_license_types = array(ICONFINDER_TYPE_PREMIUM, ICONFINDER_TYPE_FREE);
+	    $valid_img_sizes     = array('normal', 'large');
 
 		$_options = get_option('iconfinder-portfolio');
 		
-		$client_id         = isset($_options['api_client_id']) ? $_options['api_client_id'] : null;
-		$api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
-		$username          = isset($_options['username']) ? $_options['username'] : null;
+		$username = isset($_options['username']) ? $_options['username'] : null;
 		
 		$attrs = shortcode_atts(
 			array(
 				'username'   => $username,
 				'count'      => 0,
-				'channel'    => 'iconsets',
 				'style'      => '',
 				'type'       => '',
 				'collection' => '',
@@ -141,25 +207,33 @@ class Iconfinder_Portfolio_Public {
 				'theme'      => '',
 				'sort_by'    => '',
 				'sort_order' => SORT_DESC,
-				'omit'       => ''
+				'omit'       => '',
+				'img_size'   => 'large'
 	    ), $attrs );
 	    
+	    array_map($attrs, 'strtolower');
+	    
 	    $id         = $attrs['id'];
-	    $channel    = $attrs['channel'];
 	    $count      = $attrs['count'];
 	    $style      = $attrs['style'];
 	    $type       = $attrs['type'];
 	    $sets       = ! empty($attrs['sets']) ? explode(',', $attrs['sets']) : array();
 	    $categories = ! empty($attrs['categories']) ? explode(',', $attrs['categories']) : array();
-	    $collection = $attrs['collection'];
 	    $theme      = $attrs['theme'];
-	    $sort_by    = strtolower($attrs['sort_by']);
+	    $sort_by    = $attrs['sort_by'];
 	    $sort_order = strtoupper($attrs['sort_order']) == "ASC" ? SORT_ASC : SORT_DESC;
 	    $omit       = ! empty($attrs['omit']) ? explode(',', $attrs['omit']) : array();
+	    $img_size   = $attrs['img_size'];
 	    
 	    $categories = array_map('trim', $categories);
 	    $sets       = array_map('trim', $sets);
 	    $omit       = array_map('trim', $omit);
+	    
+	    if (! in_array($img_size, $valid_img_sizes)) {
+	        $img_size = 'normal';
+	    }
+	    
+	    $img_size = $img_size == 'normal' ? 'medium' : 'medium-2x';
 	    
 	    /*
 	    Coerce-user-friendly values to DB field names. This is just a nicety to make the shortcode values 
@@ -168,28 +242,34 @@ class Iconfinder_Portfolio_Public {
 	    
 	    $sort_by = $sort_by == "date" ? "published_at" : $sort_by;
 	    
-	    $data = json_decode(
-		    wp_remote_retrieve_body(
-			    wp_remote_get( 
-					ICONFINDER_API_URL . "users/{$username}/iconsets" . 
-					    "?client_id={$api_client_id}&client_secret={$api_client_secret}" . 
-					    "&count=" . ICONFINDER_API_MAX_COUNT, 
-					array( 'sslverify' => ICONFINDER_API_SSLEVERIFY )
-				)
-			), 
-			true
-		);
-		
-	    $data = $data['iconsets'];
-
-	    foreach ($data as &$iconset) {
+	    $data = null;
+	    
+	    try {
+	        $data = self::call_api(
+	        	self::get_api_url($attrs)
+	    	);
+	    }	  
+	    catch (Exception $e) {
+	        die($e);
+	    }  
+	    
+	    $raw = $data['items'];
+	    
+	    foreach ($raw as &$iconset) {
 	    
 	        if (in_array($iconset['iconset_id'], $omit)) continue;
 	    
 	        $iconset['permalink'] = ICONFINDER_URL . "iconsets/{$iconset['identifier']}" . (! empty($username) ? "?ref={$username}" : "");
-			$iconset['preview']   = ICONFINDER_CDN_URL . "data/iconsets/previews/medium/{$iconset['identifier']}.png";
-			$iconset['price']     = $iconset['prices'][0]['price'];
-
+			$iconset['preview']   = ICONFINDER_CDN_URL . "data/iconsets/previews/{$img_size}/{$iconset['identifier']}.png";
+			
+			// Rather than check the existance of each level of the array, 
+			// just trap any possible exceptions/null values and move on
+			$iconset['price'] = null;
+			try {
+			    $iconset['price'] = $iconset['prices'][0]['price'];
+			}
+			catch(Exception $e) {/*Exit Gracefully*/}
+			
 			if (count($sets)) {
 				if (in_array($iconset['iconset_id'], $sets)) {
 			    	array_push($iconsets, $iconset);
@@ -225,27 +305,24 @@ class Iconfinder_Portfolio_Public {
 			        }
 			        if (! $is_match) continue;
 			    }
-			    if ($collection != "") {
-			        #TODO: Filter by collection
-			    }
 			    array_push($iconsets, $iconset);
 		    }
 	    }
 	    
 	    if (! count($iconsets)) {
-	        $iconsets = $data;
+	        $iconsets = $raw;
 	    }
 	    
 	    // The call to array_sort_dep is required for now for compatibility with older versions of PHP
 	    if (in_array($sort_by, $valid_sort_fields) && in_array($sort_order, $valid_sort_orders)) {
-	    	$iconsets = Iconfinder_Portfolio_Public::sort_array($iconsets, $sort_by, $sort_order);
+	    	$iconsets = self::sort_array($iconsets, $sort_by, $sort_order);
 	    }
 	    
 	    if ($count > 0) {
 	        $iconsets = array_slice($iconsets, 0, $count);
 	    }
 	    	    
-	    return Iconfinder_Portfolio_Public::apply_theme($iconsets, $theme);
+	    return self::apply_theme($iconsets, $theme);
 	}
 	
 	/**
@@ -253,7 +330,7 @@ class Iconfinder_Portfolio_Public {
 	 * @param <String> $theme - The theme name
 	 * @return <Strong> The HTML output
 	 */
-	private static function apply_theme($iconsets, $theme='default') {
+	private static function apply_theme($items, $theme='default') {
 		$output = "";
 		
 		$theme_file = null;
@@ -284,7 +361,7 @@ class Iconfinder_Portfolio_Public {
 	 * is to write a custom sort algorithm. Since the function will never compare 
 	 * more than 100 objects, I guess this will have to suffice for now.
 	 */
-	private static function sort_array($array, $sort_by, $sort_order) {
+	public static function sort_array($array, $sort_by, $sort_order) {
 		
 		$sort_array = array();
 		

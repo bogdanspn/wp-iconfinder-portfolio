@@ -107,16 +107,24 @@ class Iconfinder_Portfolio_Admin {
 	 */
 	public function add_plugin_admin_menu() {
 		/*
-		 * Add a settings page for this plugin to the Settings menu.
+		 * Add a settings page for this plugin to the Admin.
 		 *
 		 * NOTE:  Alternative menu locations are available via WordPress administration menu functions.
 		 *
 		 *        Administration Menus: http://codex.wordpress.org/Administration_Menus
 		 *
 		 */
-		add_menu_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
-		# add_menu_page( string $page_title, string $menu_title, string $capability, string $menu_slug, callable $function = '', string $icon_url = '', int $position = null )
+		add_menu_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name);
+		add_submenu_page( $this->plugin_name, 'API Settings', 'API Settings', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
+		add_submenu_page( $this->plugin_name, 'My Collections', 'My Collections', 'manage_options', $this->plugin_name . '-collections', array($this, 'display_collections_page'));
+		add_submenu_page( $this->plugin_name, 'My Iconsets', 'My Iconsets', 'manage_options', $this->plugin_name . '-iconsets', array($this, 'display_iconsets_page'));
 	}
+	
+	# add_menu_page('My Custom Page', 'My Custom Page', 'manage_options', 'my-top-level-slug');
+	# add_submenu_page( 'my-top-level-slug', 'My Custom Page', 'My Custom Page', 'manage_options', 'my-top-level-slug');
+	# add_submenu_page( 'my-top-level-slug', 'My Custom Submenu Page', 'My Custom Submenu Page','manage_options', 'my-secondary-slug');
+
+
 	
 	/**
 	 * Add settings action link to the plugins page.
@@ -139,7 +147,109 @@ class Iconfinder_Portfolio_Admin {
 	 * @since    1.0.0
 	 */
 	public function display_plugin_setup_page() {
-		include_once( 'partials/iconfinder-portfolio-admin-display.php' );
+	
+	    echo $this->get_admin_partial(null, 'iconfinder-portfolio-admin-display.php');
+	}
+	
+	/**
+	 * Render the settings page for this plugin.
+	 *
+	 * @since    1.0.0
+	 */
+	public function display_collections_page() {
+	
+	    # Grab the collections from the API
+	    
+	    $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
+	    
+	    $response = Iconfinder_Portfolio_Public::call_api($this->get_admin_api_url('collections'));
+	    
+	    if (isset($response['items'])) {
+	    	$data['items'] = $response['items'];
+	    }
+	
+	    echo $this->get_admin_partial($data, 'iconfinder-portfolio-admin-collections.php');
+	}
+	
+	private function dump($what) {
+	
+	    die('<pre>' . print_r($what, true) . '</pre>');
+	}
+	
+	/**
+	 * Render the settings page for this plugin.
+	 *
+	 * @since    1.0.0
+	 */
+	public function display_iconsets_page() {
+	
+		# Grab the iconsets from the API
+		
+		$data = array('message' => 'Enter your API credentials on the API Settings page to list your iconsets here');
+		
+		$response = Iconfinder_Portfolio_Public::call_api($this->get_admin_api_url('iconsets'));
+	    
+	    if (isset($response['items'])) {
+	    	$data['items'] = $response['items'];
+	    }
+	
+		echo $this->get_admin_partial($data, 'iconfinder-portfolio-admin-iconsets.php');
+	}
+	
+	/**
+	 * Determine correct API URl from the shortcode attrs
+	 * @param $attrs - The shortcode attrs
+	 * @since 1.0.0
+	 */
+	private function get_admin_api_url($channel) {
+	
+		$_options = get_option('iconfinder-portfolio');
+		
+		$valid_channels = array('iconsets', 'collections', 'categories', 'styles');
+		
+		$api_client_id     = isset($_options['api_client_id']) ? $_options['api_client_id'] : null;
+		$api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
+		$username          = isset($_options['username']) ? $_options['username'] : null;
+		
+		$api_path = "users/{$username}/{$channel}";
+		
+		$api_url = ICONFINDER_API_URL . 
+			"{$api_path}?client_id={$api_client_id}&client_secret={$api_client_secret}" . 
+			"&count=" . ICONFINDER_API_MAX_COUNT;
+			
+		return $api_url;
+	}
+	
+	/**
+	 * Apply the custom or default theme to the output
+	 * @param <String> $theme - The theme name
+	 * @return <Strong> The HTML output
+	 */
+	private function get_admin_partial($data, $filename) {
+		$output = "";
+		
+		$admin_file = null;
+	    if ($filename != "") {
+	        $admin_file = plugin_dir_path( __FILE__ ) . "/partials/$filename";
+	    }
+	    
+	    $items = array();
+	    if (isset($data['items'])) {
+	        $items = $data['items'];
+	    }
+	    
+	    $items = Iconfinder_Portfolio_Public::sort_array($items, 'name', SORT_ASC);
+	    
+	    $message = 'Nothing to display';
+	    if (isset($data['message'])) {
+	        $message = $data['message'];
+	    }
+	    
+		ob_start();
+		include $admin_file;
+		$output = ob_get_contents();
+		ob_end_clean();
+		return $output;
 	}
 	
 	/**
