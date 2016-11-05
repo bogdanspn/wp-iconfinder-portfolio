@@ -220,7 +220,7 @@
 	
 	<p>You can also call the Iconfinder Portfolio shortcode from your theme files with the following:</p>
 	
-	<input value="&lt;?php do_shortcode("[iconfinder_portfolio style=outline]"); ?&gt;" class="shortcode" onclick="this.select()" />
+	<input value="&lt;?php do_shortcode('[iconfinder_portfolio style=outline]'); ?&gt;" class="shortcode" onclick="this.select()" />
 	
 	<h3 class="notice">Theming the Iconfinder Portfolio output</h3>
 	
