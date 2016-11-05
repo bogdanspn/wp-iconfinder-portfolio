@@ -243,6 +243,8 @@ You can specify a custom theme by including the 'theme' parameter to the Iconfin
 * Show all valid shortcode params in settings panel
 * Show Iconset and Collection IDs in plugin settings panel
 * Add "Test API credentials" to Iconfinder Porfolio settings page
+* Add graceful failure recovery
+* Add local caching of objects to display if the API is unreachable
 
 ## Changelog
 
