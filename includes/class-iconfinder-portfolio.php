@@ -97,6 +97,11 @@ class Iconfinder_Portfolio {
 	 * @access   private
 	 */
 	private function load_dependencies() {
+	
+		/**
+		 * Global settings file.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/iconfinder-portfolio-settings.php';
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
@@ -109,16 +114,16 @@ class Iconfinder_Portfolio {
 		 * of the plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-iconfinder-portfolio-i18n.php';
+		
+		/**
+		 * Global utility functions file.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/iconfinder-portfolio-functions.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-iconfinder-portfolio-admin.php';
-		
-		/**
-		 * Global settings file.
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/iconfinder-portfolio-settings.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing

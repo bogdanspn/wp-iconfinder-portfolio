@@ -118,13 +118,8 @@ class Iconfinder_Portfolio_Admin {
 		add_submenu_page( $this->plugin_name, 'API Settings', 'API Settings', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
 		add_submenu_page( $this->plugin_name, 'My Collections', 'My Collections', 'manage_options', $this->plugin_name . '-collections', array($this, 'display_collections_page'));
 		add_submenu_page( $this->plugin_name, 'My Iconsets', 'My Iconsets', 'manage_options', $this->plugin_name . '-iconsets', array($this, 'display_iconsets_page'));
+		add_submenu_page( $this->plugin_name, 'Documentation', 'Documentation', 'manage_options', $this->plugin_name . '-documentation', array($this, 'display_plugin_documentation'));
 	}
-	
-	# add_menu_page('My Custom Page', 'My Custom Page', 'manage_options', 'my-top-level-slug');
-	# add_submenu_page( 'my-top-level-slug', 'My Custom Page', 'My Custom Page', 'manage_options', 'my-top-level-slug');
-	# add_submenu_page( 'my-top-level-slug', 'My Custom Submenu Page', 'My Custom Submenu Page','manage_options', 'my-secondary-slug');
-
-
 	
 	/**
 	 * Add settings action link to the plugins page.
@@ -152,6 +147,16 @@ class Iconfinder_Portfolio_Admin {
 	}
 	
 	/**
+	 * Render the documentation page for this plugin.
+	 *
+	 * @since    1.0.0
+	 */
+	public function display_plugin_documentation() {
+	
+	    echo $this->get_admin_partial(null, 'iconfinder-portfolio-documentation.php');
+	}
+	
+	/**
 	 * Render the settings page for this plugin.
 	 *
 	 * @since    1.0.0
@@ -162,7 +167,10 @@ class Iconfinder_Portfolio_Admin {
 	    
 	    $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
 	    
-	    $response = Iconfinder_Portfolio_Public::call_api($this->get_admin_api_url('collections'));
+	    $response = iconfinder_call_api(
+            $this->get_admin_api_url('iconsets'), 
+            'display_collections_page'
+        );
 	    
 	    if (isset($response['items'])) {
 	    	$data['items'] = $response['items'];
@@ -187,7 +195,10 @@ class Iconfinder_Portfolio_Admin {
 		
 		$data = array('message' => 'Enter your API credentials on the API Settings page to list your iconsets here');
 		
-		$response = Iconfinder_Portfolio_Public::call_api($this->get_admin_api_url('iconsets'));
+		$response = iconfinder_call_api(
+            $this->get_admin_api_url('iconsets'), 
+            'display_iconsets_page'
+        );
 	    
 	    if (isset($response['items'])) {
 	    	$data['items'] = $response['items'];
@@ -238,7 +249,7 @@ class Iconfinder_Portfolio_Admin {
 	        $items = $data['items'];
 	    }
 	    
-	    $items = Iconfinder_Portfolio_Public::sort_array($items, 'name', SORT_ASC);
+	    $items = iconfinder_sort_array($items, 'name', SORT_ASC);
 	    
 	    $message = 'Nothing to display';
 	    if (isset($data['message'])) {

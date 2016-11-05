@@ -2,3 +2,23 @@
  * All of the CSS for your admin-specific functionality should be
  * included in this file.
  */
+ 
+pre, 
+h3.notice {
+
+    padding: 20px !important;
+    font-size: 15px;
+}
+
+h3.notice {
+
+    margin: 20px 0 0 0 !important;
+}
+
+input.shortcode {
+
+    width: 100%;
+    border: 1px solid #ccc;
+    background-color: #fafafa;
+    padding: 8px;
+}
