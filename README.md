@@ -43,17 +43,17 @@ To display an unfiltered list of iconsets, simply add this token to any blog pos
 
 You can also use the following list of parameters to filter the content that displayed. Details for each parameter are included below.
 
-* sets  - Shows a specific list of iconsets by iconset IDs
-* count - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)
-* style - Shows only iconsets matching a valid style identifier
-* type - Shows only iconsets matching a valid type identifier
-* categories - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
-* mixed - You can combine any of the above (sets overrides all other filters except count)
-* omit - a comma-separated list of iconset IDs to omit from display
-* sort_by - the iconset field name to sort by
-* sort_order - whether to sort in ASC or DESC order
-* collection - The collection_id of a collection of iconsets to display
-* img_size - The preview image size (normal, large)
+* **sets**  - Shows a specific list of iconsets by iconset IDs
+* **count** - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)
+* **style** - Shows only iconsets matching a valid style identifier
+* **type** - Shows only iconsets matching a valid type identifier
+* **categories** - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
+* **mixed** - You can combine any of the above (sets overrides all other filters except count)
+* **omit** - a comma-separated list of iconset IDs to omit from display
+* **sort_by** - the iconset field name to sort by
+* **sort_order** - whether to sort in ASC or DESC order
+* **collection** - The collection_id of a collection of iconsets to display
+* **img_size** - The preview image size (normal, large)
 
 #### count
 
@@ -67,7 +67,7 @@ You can specify the display order or iconsets in either ascending (ASC) or desce
 
 `[iconfinder_portfolio sort_by=date sort_order=DESC]`
 
-Valid sort_by values:
+##### Valid sort_by values:
 
 * date (the publication date of the iconset)
 * name (the name of the iconset)
@@ -90,7 +90,7 @@ You can show only iconsets that are a particular style by including the 'style' 
 
 `[iconfinder_portfolio style=outline]`
 
-Valid Style Values:
+##### Valid Style Values:
 
 * 3d
 * cartoon
@@ -108,7 +108,7 @@ You can show only free or premium iconsets by including the 'type' parameter.
 
 `[iconfinder_portfolio style=outline]`
 
-Valid Type Values:
+##### Valid Type Values:
 
 * premium
 * free
@@ -137,7 +137,7 @@ You can show iconsets from specific categories by including the 'categories' par
 
 `[iconfinder_portfolio categories=christmas,halloween,easter]`
 
-Valid Category Values:
+##### Valid Category Values:
 
 * abstract
 * animal
@@ -196,7 +196,7 @@ You can choose which iconset preview image size to display on your site.
 
 `[iconfinder_portfolio style=outline img_size=large]`
 
-Valid Type Values:
+##### Valid Type Values:
 
 * normal
 * large
