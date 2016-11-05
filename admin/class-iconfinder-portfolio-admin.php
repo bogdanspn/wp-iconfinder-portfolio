@@ -203,6 +203,25 @@ class Iconfinder_Portfolio_Admin {
 	    if (isset($response['items'])) {
 	    	$data['items'] = $response['items'];
 	    }
+	    
+	    if (count($data['items'])) {
+	        foreach ($data['items'] as &$item) {
+	            if (isset($item['categories'])) {
+	                $categories = array();
+	                foreach ($item['categories'] as $category) {
+	                    array_push($categories, $category['identifier']);
+	                }
+	                $item['category_string'] = implode(',', $categories);
+	            }
+	            if (isset($item['styles'])) {
+	                $styles = array();
+	                foreach ($item['styles'] as $style) {
+	                    array_push($styles, $style['identifier']);
+	                }
+	                $item['styles_string'] = implode(',', $styles);
+	            }
+	        }
+	    }
 	
 		echo $this->get_admin_partial($data, 'iconfinder-portfolio-admin-iconsets.php');
 	}
