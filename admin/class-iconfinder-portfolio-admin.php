@@ -168,14 +168,14 @@ class Iconfinder_Portfolio_Admin {
 	    $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
 	    
 	    $response = iconfinder_call_api(
-            $this->get_admin_api_url('iconsets'), 
+            $this->get_admin_api_url('collections'), 
             'display_collections_page'
         );
 	    
 	    if (isset($response['items'])) {
 	    	$data['items'] = $response['items'];
 	    }
-	
+	    
 	    echo $this->get_admin_partial($data, 'iconfinder-portfolio-admin-collections.php');
 	}
 	
