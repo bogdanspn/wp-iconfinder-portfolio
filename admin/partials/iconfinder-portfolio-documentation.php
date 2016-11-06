@@ -114,18 +114,49 @@
 	
 	<h4>Valid sort_by values:</h4>
 	
-	<ul>
-	    <li><strong>date</strong> - the publication date of the iconset</li>
-	    <li><strong>name</strong> - the name of the iconset)</li>
-	    <li><strong>iconset_id</strong></li>
-	</ul>
+	<table class="iconfinder-portfolio-params">
+		<head>
+		    <tr>
+		        <th>Option</th>
+		        <th>Description</th>
+		    </tr>
+		</head>
+		<tbody>
+		    <tr>
+		    	<td>date</td>
+		    	<td>the publication date of the iconset</td>
+		    </tr>
+		    <tr>
+		    	<td>name</td>
+		    	<td>the name of the iconset</td>
+		    </tr>
+		    <tr>
+		    	<td>iconset_id</td>
+		    	<td>the integer ID of the iconset</td>
+		    </tr>
+		</tbody>
+	</table>
 	
 	<h4>Valid sort_order values:</h4>
 	
-	<ul>
-	    <li><strong>ASC</strong> - oldest to newest, Z-A, lowest to highest ID</li>
-	    <li><strong>DESC</strong> - newest to oldest, A-Z, highest to lowest ID</li>
-	</ul>
+	<table class="iconfinder-portfolio-params">
+		<head>
+		    <tr>
+		        <th>Option</th>
+		        <th>Description</th>
+		    </tr>
+		</head>
+		<tbody>
+		    <tr>
+		    	<td>ASC</td>
+		    	<td>oldest to newest, Z-A, lowest to highest ID</td>
+		    </tr>
+		    <tr>
+		    	<td>DESC</td>
+		    	<td>newest to oldest, A-Z, highest to lowest ID</td>
+		    </tr>
+		</tbody>
+	</table>
 	
 	<h3 class="notice">omit</h3>
 	
@@ -140,18 +171,14 @@
 	<input value="[iconfinder_portfolio style=outline]" class="shortcode" onclick="this.select()" />
 	
 	<h4>Valid Style Values:</h4>
-	
-	<ul>
-	    <li>3d</li>
-	    <li>cartoon</li>
-	    <li>flat</li>
-	    <li>glyph</li>
-	    <li>handdrawn</li>
-	    <li>outline</li>
-	    <li>photorealistic</li>
-	    <li>pixel</li>
-	    <li>smooth</ii>
-	</ul>
+
+	<?php if (isset($data['styles'])) : ?>
+	    <ul class="iconfinder-portfolio-styles iconfinder-portfolio-options">
+	    <?php foreach ($data['styles'] as $style): ?>
+	        <li><?php echo $style['identifier']; ?></li>
+	    <?php endforeach; ?>
+	    </ul>
+	<?php endif; ?>
 	
 	<h3 class="notice">type</h3>
 	
@@ -193,58 +220,14 @@
 	<input value="[iconfinder_portfolio categories=christmas,halloween,easter]" class="shortcode" onclick="this.select()" />
 	
 	<h4>Valid Category Values:</h4>
-	<ul>
-	    <li>abstract</li>
-	    <li>animal</li>
-	    <li>arrow</li>
-	    <li>avatars-smiley</li>
-	    <li>business-finance</li>
-	    <li>christmas</li>
-	    <li>clothes-accessory</li>
-	    <li>computer-hardware</li>
-	    <li>desktop-app</li>
-	    <li>easter</li>
-	    <li>education-science</li>
-	    <li>events-and-entertainment</li>
-	    <li>fall</li>
-	    <li>family-home</li>
-	    <li>file-folder</li>
-	    <li>flag</li>
-	    <li>food-drinks</li>
-	    <li>gaming-gambling</li>
-	    <li>halloween</li>
-	    <li>health-beauty-and-fashion</li>
-	    <li>healthcare-medical</li>
-	    <li>interior-building</li>
-	    <li>ios7-optimized</li>
-	    <li>maps-navigation</li>
-	    <li>mixed</li>
-	    <li>mobile-app</li>
-	    <li>music-multimedia</li>
-	    <li>nature-outdoor</li>
-	    <li>network-communication</li>
-	    <li>nsfw</li>
-	    <li>photography-graphic-design</li>
-	    <li>real-estate</li>
-	    <li>recreation-hobby</li>
-	    <li>romance</li>
-	    <li>seasons</li>
-	    <li>security</li>
-	    <li>seo-web</li>
-	    <li>shipping-delivery-and-fulfillment</li>
-	    <li>shopping-ecommerce</li>
-	    <li>sign-symbol</li>
-	    <li>social-media</li>
-	    <li>sports-award</li>
-	    <li>spring</li>
-	    <li>summer</li>
-	    <li>touch-gesture</li>
-	    <li>transportation</li>
-	    <li>travel-hotel</li>
-	    <li>ui</li>
-	    <li>weather</li>
-	    <li>winter</li>
-	</ul>
+	
+	<?php if (isset($data['categories'])) : ?>
+	    <ul class="iconfinder-portfolio-categories iconfinder-portfolio-options">
+	    <?php foreach ($data['categories'] as $category): ?>
+	        <li><?php echo $category['identifier']; ?></li>
+	    <?php endforeach; ?>
+	    </ul>
+	<?php endif; ?>
 	
 	<h3 class="notice">img_size</h3>
 	

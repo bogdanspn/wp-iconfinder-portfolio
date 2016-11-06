@@ -153,7 +153,25 @@ class Iconfinder_Portfolio_Admin {
 	 */
 	public function display_plugin_documentation() {
 	
-	    echo $this->get_admin_partial(null, 'iconfinder-portfolio-documentation.php');
+	    $response = iconfinder_call_api(
+            $this->get_admin_api_url('categories'), 
+            "{$this->plugin_name}_categories"
+        );
+        
+        if (isset($response['categories'])) {
+	    	$data['categories'] = $response['categories'];
+	    }
+	    
+	    $response = iconfinder_call_api(
+            $this->get_admin_api_url('styles'), 
+            "{$this->plugin_name}_styles"
+        );
+        
+        if (isset($response['styles'])) {
+	    	$data['styles'] = $response['styles'];
+	    }
+	
+	    echo $this->get_admin_partial($data, 'iconfinder-portfolio-documentation.php');
 	}
 	
 	/**
@@ -199,7 +217,7 @@ class Iconfinder_Portfolio_Admin {
             $this->get_admin_api_url('iconsets'), 
             'display_iconsets_page'
         );
-	    
+        
 	    if (isset($response['items'])) {
 	    	$data['items'] = $response['items'];
 	    }
@@ -241,7 +259,12 @@ class Iconfinder_Portfolio_Admin {
 		$api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
 		$username          = isset($_options['username']) ? $_options['username'] : null;
 		
-		$api_path = "users/{$username}/{$channel}";
+		if (in_array($channel, array('iconsets', 'collections'))) {
+		    $api_path = "users/{$username}/{$channel}";
+		}
+		else {
+		    $api_path = "{$channel}";
+		}
 		
 		$api_url = ICONFINDER_API_URL . 
 			"{$api_path}?client_id={$api_client_id}&client_secret={$api_client_secret}" . 

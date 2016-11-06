@@ -38,3 +38,9 @@ input.shortcode {
 
     font-weight: bold; 
 }
+
+.iconfinder-portfolio-options li {
+
+    display: inline-block;
+    width: 20%;
+}
