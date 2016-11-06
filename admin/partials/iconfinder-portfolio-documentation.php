@@ -37,19 +37,67 @@
 	
 	<p>You can also use the following list of parameters to filter the content that displayed. Details for each parameter are included below.</p>
 	
-	<ul>
-		<li><strong>sets</strong> - Shows a specific list of iconsets by iconset IDs</li>
-		<li><strong>count</strong> - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)</li>
-		<li><strong>style</strong> - Shows only iconsets matching a valid style identifier</li>
-		<li><strong>type</strong> - Shows only iconsets matching a valid type identifier</li>
-		<li><strong>categories</strong> - Shows only iconsets matching a comma-separated list of 1 or more category identifiers</li>
-		<li><strong>mixed</strong> - You can combine any of the above (sets overrides all other filters except count)</li>
-		<li><strong>omit</strong> - a comma-separated list of iconset IDs to omit from display</li>
-		<li><strong>sort_by</strong> - the iconset field name to sort by</li>
-		<li><strong>sort_order</strong> - whether to sort in ASC or DESC order</li>
-		<li><strong>collection</strong> - The collection_id of a collection of iconsets to display</li>
-		<li><strong>img_size</strong> - The preview image size (normal, large)</li>
-	</ul>
+	<table class="iconfinder-portfolio-params">
+		<head>
+		    <tr>
+		        <th>Parameter</th>
+		        <th>Accepted Values</th>
+		        <th>Description</th>
+		    </tr>
+		</head>
+		<tbody>
+		    <tr>
+		    	<td>sets</td>
+		    	<td>comma-separated list of iconset ids</td>
+		    	<td>Displays a specific list of icon sets. Over-rides all other parameters except sort_by and sort_order.</td>
+		    </tr>
+			<tr>
+				<td>count</td>
+				<td>inegeger 0-100</td>
+				<td>Limits the number of iconsets that are displayed.</td>
+			</tr>
+			<tr>
+				<td>style</td>
+				<td>string identifier</td>
+				<td>Shows only iconsets matching a valid style identifier.</td>
+			</tr>
+			<tr>
+				<td>type</td>
+				<td>premium or free</td>
+				<td>Shows only iconsets matching a valid type identifier.</td>
+			</tr>
+			<tr>
+				<td>categories</td>
+				<td>comma-separated list of string identifiers</td>
+				<td>Shows only iconsets matching a comma-separated list of 1 or more category identifiers.</td>
+			</tr>
+			<tr>
+				<td>omit</td>
+				<td>comma-separated list of iconset ids</td>
+				<td>Filters from display 1 or more icon sets.</td>
+			</tr>
+			<tr>
+				<td>sort_by</td>
+				<td>string field name</td>
+				<td>Sorts the icon sets by the field name given. Requires sort_order param.</td>
+			</tr>
+			<tr>
+				<td>sort_order</td>
+				<td></td>
+				<td>Whether to sort in ASC or DESC order.</td>
+			</tr>
+			<tr>
+				<td>collection</td>
+				<td>integer collection ID</td>
+				<td>Displays all icon sets within a given collection. Requires sort_by param. Over-rides `sets` param.</td>
+			</tr>
+			<tr>
+				<td>img_size</td>
+				<td>normal or large</td>
+				<td>The icon set preview image size.</td>
+			</tr>
+		</tbody>
+	</table>
 	
 	<h3 class="notice">count</h3>
 	

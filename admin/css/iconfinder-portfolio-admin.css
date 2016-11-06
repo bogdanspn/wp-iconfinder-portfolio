@@ -22,3 +22,19 @@ input.shortcode {
     background-color: #fafafa;
     padding: 8px;
 }
+
+.iconfinder-portfolio-params th, 
+.iconfinder-portfolio-params td { 
+
+    padding: 10px 10px 0 10px; 
+}
+
+.iconfinder-portfolio-params th { 
+    
+    text-align: left; 
+}
+
+.iconfinder-portfolio-params tbody tr td:nth-child(1) { 
+
+    font-weight: bold; 
+}
