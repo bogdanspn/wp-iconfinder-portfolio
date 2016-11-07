@@ -200,10 +200,23 @@ class Iconfinder_Portfolio_Public {
         
         $data = null;
         
+        $item_id = '';
+        $channel = 'iconsets';
+        if (trim($collection) != '') {
+            $channel = 'collections';
+            $item_id = $collection;
+        }
+        
+        $cache_key = icf_get_cache_key(
+            $username,
+            $channel,
+            $item_id
+        );
+        
         try {
             $data = iconfinder_call_api(
                 self::get_api_url($attrs), 
-                str_replace('/', '_', attrs_to_api_path($attrs))
+                $cache_key
             );
         }      
         catch (Exception $e) {

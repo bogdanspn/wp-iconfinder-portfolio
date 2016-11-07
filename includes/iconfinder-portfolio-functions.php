@@ -35,11 +35,83 @@ function attrs_to_api_path($username='', $collection='') {
 }
 
 /**
+ * Get the appropriate cache key for the API call. These need to be 
+ * standardized throughout the plugin so we have a single function
+ * to created them based on the specific call. We use the username 
+ * in the key to insure uniqueness.
+ *
+ * Possible values:
+ *
+ *    - icf_{username}_iconsets
+ *    - icf_{username}_iconsets_{iconset_id} // Not yet implemented
+ *    - icf_{username}_collections
+ *    - icf_{username}_collections_{collection_id}
+ *    - icf_{username}_categories
+ *    - icf_{username}_styles
+ *
+ * @param $username - String username
+ * @param $attrs    - An array of the API path segments
+ * 
+ * @since 1.0.0
+ */
+function icf_get_cache_key($username='', $channel='', $item_id='') {
+
+    $cache_key = "icf_{$username}_{$channel}";
+    
+    if ($item_id != '') {
+        $cache_key .= "_{$item_id}";
+    }
+    
+    return $cache_key;
+}
+
+/**
+ * Get all stored cache keys
+ *
+ * @since 1.0.0
+ */
+function icf_get_cache_keys() {
+	
+    return get_option( 'icf_cache_keys', array() );
+}
+
+/**
+ * Update the registry of stored cache keys
+ *
+ * In order to avoid doing a bunch of lookups to determine which stored options
+ * belong to us, we keep a registry each time a new item is cached. When we 
+ * need to clear the cache, we can grab the keys then loop through them and 
+ * clear each one.
+ *
+ * @since 1.0.0
+ */
+function icf_update_cache_keys($new_key) {
+
+    $cache_keys = icf_get_cache_keys();
+    
+    if ( ! in_array( $new_key, $cache_keys ) )  {
+        array_push( $cache_keys, $new_key );
+    	$saved = update_option( 'icf_cache_keys', $cache_keys, 'no' );
+    }
+}
+
+/**
  * Make the API call
  */
 function iconfinder_call_api($api_url, $cache_key='') {
 
     $response = null;
+    
+    // Always try the local cache first. If we get a hit, just return the stored data.
+    
+    if ( $response = get_option( $cache_key ) ) {
+        
+        $response['from_cache'] = 1;
+        return $response;
+    }
+    
+    // If there is no cached data, make the API cale.
+    
     try {
         $response = json_decode(
             wp_remote_retrieve_body(
@@ -64,8 +136,17 @@ function iconfinder_call_api($api_url, $cache_key='') {
             unset($response['iconsets']);
         }
         
+        $response['from_cache'] = 0;
+        
         if (trim($cache_key) != '') {
-        	update_option( "iconfinder_portfolio_{$cache_key}", $response );
+        	if ( update_option( $cache_key, $response ) ) {
+        	    $stored_keys = get_option( 'icf_cache_keys', array() );
+        	    if ( ! in_array( $cache_key, $stored_keys ) )  {
+        			array_push( $stored_keys, $cache_key );
+    				$saved = update_option('icf_cache_keys', $stored_keys, 'no');
+    			}
+        	}
+        	
         }
     }
     catch(Exception $e) {
@@ -73,7 +154,7 @@ function iconfinder_call_api($api_url, $cache_key='') {
     }
     
     if ($response == null && trim($cache_key) != '') {
-        $response = get_option( "iconfinder_portfolio_{$cache_key}" );
+        $response = get_option( $cache_key );
     }
     
     return $response;
@@ -110,6 +191,6 @@ function sort_array($array, $on, $order) {
 /**
  * This is a debug function and ideally should be removed from the production code.
  */
-function icfp_dump($what) {
+function icf_dump($what) {
     die ('<pre>' . print_r($what, true) . '</pre>');
 }

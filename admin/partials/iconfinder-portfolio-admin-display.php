@@ -41,7 +41,7 @@
     	
         <fieldset>
             <label for="<?php echo $this->plugin_name; ?>-username">
-                <span><?php esc_attr_e('Iconfinder Username', $this->plugin_name); ?></span>
+                <h3><?php esc_attr_e('Iconfinder Username', $this->plugin_name); ?></h3>
             </label>
             <fieldset>
                 <legend class="screen-reader-text"><span><?php _e('Iconfinder Username', $this->plugin_name); ?></span></legend>
@@ -51,7 +51,7 @@
         
         <fieldset>
             <label for="<?php echo $this->plugin_name; ?>-api_client_id">
-                <span><?php esc_attr_e('Iconfinder API Client ID', $this->plugin_name); ?></span>
+                <h3><?php esc_attr_e('Iconfinder API Client ID', $this->plugin_name); ?></h3>
             </label>
             <fieldset>
                 <legend class="screen-reader-text"><span><?php _e('Iconfinder API Client ID', $this->plugin_name); ?></span></legend>
@@ -61,7 +61,7 @@
         
         <fieldset>
             <label for="<?php echo $this->plugin_name; ?>-api_client_secret">
-                <span><?php esc_attr_e('Iconfinder API Client Secret', $this->plugin_name); ?></span>
+                <h3><?php esc_attr_e('Iconfinder API Client Secret', $this->plugin_name); ?></h3>
             </label>
             <fieldset>
                 <legend class="screen-reader-text"><span><?php _e('Iconfinder API Client Secret', $this->plugin_name); ?></span></legend>
@@ -69,8 +69,21 @@
             </fieldset>
         </fieldset>
 
-        <?php submit_button('Save all changes', 'primary','submit', TRUE); ?>
-
+        <?php submit_button('Save all changes', 'primary','purgecache', TRUE); ?>
+    </form>
+    
+    <form method="post" name="iconfinder_portfolio_options" action="admin-post.php">
+        <fieldset>
+            <label for="<?php echo $this->plugin_name; ?>-purgecache">
+                <h3><?php esc_attr_e('Purge Cache', $this->plugin_name); ?></h3>
+            </label>
+            <fieldset>
+                <legend class="screen-reader-text"><span><?php _e('Purge Cache', $this->plugin_name); ?></span></legend>
+                <div class="notice notice-info inline"><p><?php _e( 'Since your Iconfinder portfolio only changes when you upload new icons, there is no need to make live requests to the API with every pageview. By default, the plugin caches the results of API calls to reduce bandwidth demands and to insure quick responses to page requests. Click the button below to clear the cache each time you upload new icons to your portfolio. You do not need to clear the cache when you add a new shortcode to your site.', $this->plugin_name ); ?></p></div>
+                <?php submit_button( 'Clear Cache', 'secondary' ); ?>
+            </fieldset>
+        </fieldset>
+        <input type="hidden" id="<?php echo $this->plugin_name; ?>-purgecache" name="<?php echo $this->plugin_name; ?>[purgecache]" value="true"/>
     </form>
 
 </div>

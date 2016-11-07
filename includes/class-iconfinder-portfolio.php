@@ -168,8 +168,12 @@ class Iconfinder_Portfolio {
 		
 		$this->loader->add_action('admin_init', $plugin_admin, 'options_update');
 		
+		// Add the purge_cache form handler hook
+		$this->loader->add_action( 'admin_post', $plugin_admin, 'purge_cache' );
+
 		// Add menu item
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
+		
 		
 		// Add Settings link to the plugin
 		$plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_name . '.php' );

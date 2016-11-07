@@ -1,34 +1,3 @@
-# Iconfinder Portfolio
-
-* Tags: iconfinder, portfolio, referral content, icons
-* Requires at least: 3.0.1
-* Tested up to: 4.3
-* License: GPLv2 or later
-* License URI: http://www.gnu.org/licenses/gpl-2.0.html
-
-A WordPress plugin that integrates the Iconfinder API with a WordPress-powered site
-
-## Description
-
-This plugin allows anyone to display content from Iconfinder.com on a WordPress-powered site. In order to use this plugin, you will need an active account on Iconfinder.com and a valid API application key.
-
-## Installation
-
-
-### Before You Begin
-
-In order to use this plugin you will need a valid (free) account on Iconfinder. To create an account, simply visit http://iconfinder.com and click the "Sign Up" link in the upper right-hand corner of the home page.
-
-You will also need a valid API Application on Iconfinder.com. You can request an API application by visiting https://www.iconfinder.com/api-solution and clicking the Request A Demo button or email support@iconfinder.com
-
-### Installing the Plugin
-
-1. Upload `iconfinder-portfolio` to the `/wp-content/plugins/` directory
-2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Navigate to Admin Menu > Settings > Iconfinder Portfolio
-4. Enter your valid username that you selected when you created your Iconfinder account
-5. Enter the API Application Client ID and Client Secret, which you can locate ... TBD
-
 ### Displaying Content on Your site
 
 Iconfinder Portfolio uses shortcodes to display content that you specify anywhere on your site.
@@ -43,17 +12,17 @@ To display an unfiltered list of iconsets, simply add this token to any blog pos
 
 You can also use the following list of parameters to filter the content that displayed. Details for each parameter are included below.
 
-* **sets**  - Shows a specific list of iconsets by iconset IDs
-* **count** - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)
-* **style** - Shows only iconsets matching a valid style identifier
-* **type** - Shows only iconsets matching a valid type identifier
-* **categories** - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
-* **mixed** - You can combine any of the above (sets overrides all other filters except count)
-* **omit** - a comma-separated list of iconset IDs to omit from display
-* **sort_by** - the iconset field name to sort by
-* **sort_order** - whether to sort in ASC or DESC order
-* **collection** - The collection_id of a collection of iconsets to display
-* **img_size** - The preview image size (normal, large)
+* sets  - Shows a specific list of iconsets by iconset IDs
+* count - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)
+* style - Shows only iconsets matching a valid style identifier
+* type - Shows only iconsets matching a valid type identifier
+* categories - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
+* mixed - You can combine any of the above (sets overrides all other filters except count)
+* omit - a comma-separated list of iconset IDs to omit from display
+* sort_by - the iconset field name to sort by
+* sort_order - whether to sort in ASC or DESC order
+* collection - The collection_id of a collection of iconsets to display
+* img_size - The preview image size (normal, large)
 
 #### count
 
@@ -67,7 +36,7 @@ You can specify the display order or iconsets in either ascending (ASC) or desce
 
 `[iconfinder_portfolio sort_by=date sort_order=DESC]`
 
-##### Valid sort_by values:
+Valid sort_by values:
 
 * date (the publication date of the iconset)
 * name (the name of the iconset)
@@ -90,7 +59,7 @@ You can show only iconsets that are a particular style by including the 'style' 
 
 `[iconfinder_portfolio style=outline]`
 
-##### Valid Style Values:
+Valid Style Values:
 
 * 3d
 * cartoon
@@ -108,7 +77,7 @@ You can show only free or premium iconsets by including the 'type' parameter.
 
 `[iconfinder_portfolio style=outline]`
 
-##### Valid Type Values:
+Valid Type Values:
 
 * premium
 * free
@@ -137,7 +106,7 @@ You can show iconsets from specific categories by including the 'categories' par
 
 `[iconfinder_portfolio categories=christmas,halloween,easter]`
 
-##### Valid Category Values:
+Valid Category Values:
 
 * abstract
 * animal
@@ -196,7 +165,7 @@ You can choose which iconset preview image size to display on your site.
 
 `[iconfinder_portfolio style=outline img_size=large]`
 
-##### Valid Type Values:
+Valid Type Values:
 
 * normal
 * large
@@ -226,12 +195,6 @@ For complete details for creating your own theme,  See the example theme in:
 You can specify a custom theme by including the 'theme' parameter to the Iconfinder Portfolio shortcode. The name of your theme is the middle part of the theme file name. For example, if your theme file name is `theme-mytheme.php`. The theme name would simply be `mytheme`.
 
 `[iconfinder_portfolio theme=mytheme]`
-
-#### Owly image carousel theme
-	
-Iconfinder Portfolio comes with a built-in image slider based on the Owl image slider for jQuery. You can specify the theme by adding the following parameter to your shortcode:
-	
-`[iconfinder_portfolio theme=owly]`
 
 ## Known Issues
 
@@ -265,9 +228,6 @@ Iconfinder Portfolio comes with a built-in image slider based on the Owl image s
 * Added collections to output options
 * Added Iconset and Collection IDs in plugin settings panel
 * Added img_size parameter to shortcode
-* Added "Clear Cache" feature to admin
-* Changed the way API calls are made. Instead of API-first, cache-second, the logic was changed to use the cached version of data first and only call the API if the cache has been purged or is otherwise empty.
-* Added Bogdan Rosu's implementation of the Owl image carousel. Now ships with two themes for front end.
 
 ## Credits
 

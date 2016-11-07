@@ -2,6 +2,8 @@
 /**
  * Iconfinder portfolio global settings
  */
+ 
+define('ICFP_PLUGIN_NAME', "iconfinder_portfolio");
 
 define('ICONFINDER_URL',     'http://iconfinder.com/'); 
 define('ICONFINDER_API_URL', 'https://api.iconfinder.com/v2/');
