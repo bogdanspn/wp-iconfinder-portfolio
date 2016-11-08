@@ -75,8 +75,6 @@ class Iconfinder_Portfolio {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-		
-		$this->loader->add_action('admin_init', $plugin_admin, 'options_update');
 
 	}
 
