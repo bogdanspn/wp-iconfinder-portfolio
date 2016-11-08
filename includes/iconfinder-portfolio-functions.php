@@ -117,7 +117,7 @@ function iconfinder_call_api($api_url, $cache_key='') {
             wp_remote_retrieve_body(
                 wp_remote_get( 
                     $api_url, 
-                    array('sslverify' => ICONFINDER_API_SSLEVERIFY)
+                    array('sslverify' => ICONFINDER_API_SSLVERIFY)
                 )
             ), 
             true
