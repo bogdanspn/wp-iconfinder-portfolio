@@ -153,6 +153,7 @@ class Iconfinder_Portfolio_Public {
         
         $attrs = shortcode_atts(
             array(
+                'id'         => '',
                 'username'   => $username,
                 'count'      => 0,
                 'style'      => '',
