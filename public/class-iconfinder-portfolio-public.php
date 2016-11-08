@@ -167,7 +167,7 @@ class Iconfinder_Portfolio_Public {
                 'img_size'   => 'large'
         ), $attrs );
         
-        array_map($attrs, 'strtolower');
+        array_map('strtolower', $attrs);
         
         $id         = $attrs['id'];
         $count      = $attrs['count'];
