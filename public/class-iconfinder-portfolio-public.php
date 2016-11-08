@@ -167,6 +167,7 @@ class Iconfinder_Portfolio_Public {
                 'img_size'   => 'large'
         ), $attrs );
         
+        // Test
         array_map('strtolower', $attrs);
         
         $id         = $attrs['id'];
