@@ -71,14 +71,18 @@ You can specify the display order or iconsets in either ascending (ASC) or desce
 
 ##### Valid sort_by values:
 
-* date (the publication date of the iconset)
-* name (the name of the iconset)
-* iconset_id
+| Value | Description |
+|-----------|-------------|
+| date | the publication date of the iconset |
+| name | the name of the iconset |
+| iconset_id | the ID of the iconset |
 
 Valid sort_order values:
 
-* ASC (oldest to newest, Z-A, lowest to highest ID)
-* DESC (newest to oldest, A-Z, highest to lowest ID)
+| Value | Description |
+|-----------|-------------|
+| ASC | oldest to newest, Z-A, lowest to highest ID |
+| DESC | newest to oldest, A-Z, highest to lowest ID |
 
 #### omit
 
