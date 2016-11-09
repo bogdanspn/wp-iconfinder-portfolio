@@ -43,24 +43,6 @@ To display an unfiltered list of iconsets, simply add this token to any blog pos
 
 You can also use the following list of parameters to filter the content that displayed. Details for each parameter are included below.
 
-* **sets**  - Shows a specific list of iconsets by iconset IDs
-* **count** - Limits the number of iconsets that are displayed (1 - 100, 100 is the default if no count is specified)
-* **style** - Shows only iconsets matching a valid style identifier
-* **type** - Shows only iconsets matching a valid type identifier
-* **categories** - Shows only iconsets matching a comma-separated list of 1 or more category identifiers
-* **mixed** - You can combine any of the above (sets overrides all other filters except count)
-* **omit** - a comma-separated list of iconset IDs to omit from display
-* **sort_by** - the iconset field name to sort by
-* **sort_order** - whether to sort in ASC or DESC order
-* **collection** - The collection_id of a collection of iconsets to display
-* **img_size** - The preview image size (normal, large)
-
-| Parameter   |      Description      |  Cool |
-|----------|:-------------:|------:|
-| col 1 is |  left-aligned | $1600 |
-| col 2 is |    centered   |   $12 |
-| col 3 is | right-aligned |    $1 |
-
 | Parameter | Accepted Values | Description |
 |-----------|-----------------|-------------|
 | sets | comma-separated list of iconset ids | Displays a specific list of icon sets. Over-rides all other parameters except sort_by and sort_order. |
