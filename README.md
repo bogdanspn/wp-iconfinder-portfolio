@@ -55,6 +55,26 @@ You can also use the following list of parameters to filter the content that dis
 * **collection** - The collection_id of a collection of iconsets to display
 * **img_size** - The preview image size (normal, large)
 
+| Parameter   |      Description      |  Cool |
+|----------|:-------------:|------:|
+| col 1 is |  left-aligned | $1600 |
+| col 2 is |    centered   |   $12 |
+| col 3 is | right-aligned |    $1 |
+
+| Parameter | Accepted Values | Description |
+|-----------|-----------------|-------------|
+| sets | comma-separated list of iconset ids | Displays a specific list of icon sets. Over-rides all other parameters except sort_by and sort_order. |
+| count | inegeger 0-100 | Limits the number of iconsets that are displayed. |
+| style	string identifier | Shows only iconsets matching a valid style identifier. |
+| type | premium or free | Shows only iconsets matching a valid type identifier. |
+| categories | comma-separated list of string identifiers | Shows only iconsets matching a comma-separated list of 1 or more category identifiers. |
+| omit | comma-separated list of iconset ids | Filters from display 1 or more icon sets. |
+| sort_by | string field name | Sorts the icon sets by the field name given. Requires sort_order param. |
+| sort_order | Whether to sort in ASC or DESC order. |
+| collection | integer collection ID | Displays all icon sets within a given collection. Requires sort_by param. Over-rides `sets` param. |
+| img_size | normal or large | The icon set preview image size. |
+
+
 #### count
 
 `[iconfinder_portfolio count=20]`
