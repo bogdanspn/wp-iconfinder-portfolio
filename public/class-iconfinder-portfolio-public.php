@@ -148,6 +148,7 @@ class Iconfinder_Portfolio_Public {
         $valid_img_sizes     = array('normal', 'large');
 
         $_options = get_option('iconfinder-portfolio');
+        $options = array();
         
         $username = isset($_options['username']) ? $_options['username'] : null;
         
@@ -165,7 +166,9 @@ class Iconfinder_Portfolio_Public {
                 'sort_by'    => '',
                 'sort_order' => SORT_DESC,
                 'omit'       => '',
-                'img_size'   => 'large'
+                'img_size'   => 'large',
+                'show_links' => 1,
+                'show_price' => 1
         ), $attrs );
         
         array_map('strtolower', $attrs);
@@ -182,9 +185,36 @@ class Iconfinder_Portfolio_Public {
         $omit       = ! empty($attrs['omit']) ? explode(',', $attrs['omit']) : array();
         $img_size   = $attrs['img_size'];
         $collection = $attrs['collection'];
+        $show_links = $attrs['show_links'];
+        $show_price = $attrs['show_price'];
         $categories = array_map('trim', $categories);
         $sets       = array_map('trim', $sets);
         $omit       = array_map('trim', $omit);
+        
+        if (! in_array($show_links, array('1', '0', 'true', 'false'))) {
+            $show_links = 1;
+        }
+        else if ($show_links == 'true') {
+            $show_links = 1;
+        }
+        else if ($show_links == 'false') {
+            $show_links = 0;
+        }
+        
+        if (! in_array($show_price, array('1', '0', 'true', 'false'))) {
+            $show_price = 1;
+        }
+        else if ($show_price == 'true') {
+            $show_price = 1;
+        }
+        else if ($show_price == 'false') {
+            $show_price = 0;
+        }
+        
+        $options = array(
+            'show_links' => $show_links,
+            'show_price' => $show_price
+        );
         
         if (! in_array($img_size, $valid_img_sizes)) {
             $img_size = 'normal';
@@ -294,7 +324,7 @@ class Iconfinder_Portfolio_Public {
             $iconsets = array_slice($iconsets, 0, $count);
         }
                 
-        return self::apply_theme($iconsets, $theme);
+        return self::apply_theme($iconsets, $theme, $options);
     }
     
     /**
@@ -302,7 +332,7 @@ class Iconfinder_Portfolio_Public {
      * @param <String> $theme - The theme name
      * @return <Strong> The HTML output
      */
-    private static function apply_theme($items, $theme='default') {
+    private static function apply_theme($items, $theme='default', $options=array('show_price'=>1, 'show_links'=>1)) {
         $output = "";
         
         $theme_file = null;
