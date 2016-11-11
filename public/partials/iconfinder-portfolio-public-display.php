@@ -11,18 +11,33 @@
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/public/partials
  */
+ 
+if (! isset($options)) $options = array(
+    'show_links' => 1,
+    'show_price' => 1
+);
 ?>
 <div class="gs_drib_area gs_drib_theme1">
 	<div class="container">
 		<div class="row">
 			<?php foreach ($items as $iconset) : ?>
 				<div class="col-md-4 drib-shots">
-				    <a href="<?php echo $iconset['permalink']; ?>" target="_blank">
+				    <?php if ($options['show_links']) : ?>
+				        <a href="<?php echo $iconset['permalink']; ?>" target="_blank">
+				    <?php endif; ?>
 				    	<img src="<?php echo $iconset['preview']; ?>" alt="<?php echo $iconset['name']; ?> preview image" />
 				    </a>
 				    <p class="info">
-				    	<a href="<?php echo $iconset['permalink']; ?>" target="_blank"><?php echo $iconset['name']; ?></a> 
-				    	<span class="price"><?php echo $iconset['price'] != "" ? "$" . $iconset['price'] : "Free"; ?></span>
+				        <?php if ($options['show_links']) : ?>
+				    	    <a href="<?php echo $iconset['permalink']; ?>" target="_blank">
+				    	<?php endif; ?>
+				    	    <?php echo $iconset['name']; ?>
+				    	<?php if ($options['show_links']) : ?>
+				    	    </a> 
+				    	<?php endif; ?>
+				    	<?php if ($options['show_price']) : ?>
+				    	    <span class="price"><?php echo $iconset['price'] != "" ? "$" . $iconset['price'] : "Free"; ?></span>
+				    	<?php endif; ?>
 				    </p>
 				</div>
 			<?php endforeach; ?>
