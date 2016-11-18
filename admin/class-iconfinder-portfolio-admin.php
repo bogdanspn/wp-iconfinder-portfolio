@@ -342,6 +342,18 @@ class Iconfinder_Portfolio_Admin {
 
 	    wp_redirect( admin_url( 'admin.php?page=iconfinder-portfolio' ) );
 	}
+    
+    /**
+	 * Sync local content with source.
+	 *
+	 * @since 1.1.0
+	 */
+	public function sync_content() {
+	
+	    // Sync local content with source
+
+	    wp_redirect( admin_url( 'admin.php?page=iconfinder-portfolio' ) );
+	}
 	
 	/**
 	 * Validate all options fields
@@ -351,11 +363,15 @@ class Iconfinder_Portfolio_Admin {
 	public function validate($input) {
 		$valid = array();
 		
-		$valid['api_client_id']     = isset($input['api_client_id']) && ! empty($input['api_client_id']) ? $input['api_client_id'] : null;
-		$valid['api_client_secret'] = isset($input['api_client_secret']) && ! empty($input['api_client_secret']) ? $input['api_client_secret'] : null;
-		$valid['username']          = isset($input['username']) && ! empty($input['username']) ? $input['username'] : null;
+		$valid['api_client_id']        = isset($input['api_client_id']) && ! empty($input['api_client_id']) ? $input['api_client_id'] : null;
+		$valid['api_client_secret']    = isset($input['api_client_secret']) && ! empty($input['api_client_secret']) ? $input['api_client_secret'] : null;
+		$valid['username']             = isset($input['username']) && ! empty($input['username']) ? $input['username'] : null;
+        
+        $valid['use_custom_post_type'] = isset($input['use_custom_post_type']) && ! empty($input['use_custom_post_type']) ? $input['use_custom_post_type'] : null;
+        $valid['show_footer_link']     = isset($input['show_footer_link']) && ! empty($input['show_footer_link']) ? $input['show_footer_link'] : null;
+        $valid['link_to_iconfinder']   = isset($input['link_to_iconfinder']) && ! empty($input['link_to_iconfinder']) ? $input['link_to_iconfinder'] : null;
 
-		return $valid;
+        return $valid;
 	}
 	
 }
