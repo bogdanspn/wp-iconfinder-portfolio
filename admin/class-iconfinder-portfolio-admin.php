@@ -143,7 +143,7 @@ class Iconfinder_Portfolio_Admin {
 	 */
 	public function display_plugin_setup_page() {
 	
-	    echo $this->apply_admin_theme(null, 'iconfinder-portfolio-admin-display.php');
+	    echo $this->apply_admin_theme(null, 'iconfinder-portfolio-admin-settings.php');
 	}
 	
 	/**
@@ -292,7 +292,7 @@ class Iconfinder_Portfolio_Admin {
 		
 		$admin_file = null;
 	    if ($filename != "") {
-	        $admin_file = plugin_dir_path( __FILE__ ) . "/partials/$filename";
+	        $admin_file = plugin_dir_path( __FILE__ ) . "partials/$filename";
 	    }
 	    
 	    $items = array();
