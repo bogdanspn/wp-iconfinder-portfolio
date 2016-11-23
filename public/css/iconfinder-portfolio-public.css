@@ -904,3 +904,26 @@ div.button-row {
     margin-right: 10px;
     display: inline-block;
 }
+
+.powered-by-iconfinder {
+    
+    clear: both;
+    float: left;
+    background: #31373b;
+    height: 50px;
+    text-align: center;
+    width: 100%;
+}
+
+.powered-by-iconfinder a {
+    
+    font-size: 12px !important;
+    text-transform: uppercase;
+    line-height: 50px;
+    color: #aaa;
+}
+
+.powered-by-iconfinder a:hover {
+    
+    color: #ff5949;
+}

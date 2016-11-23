@@ -75,7 +75,6 @@ class Iconfinder_Portfolio {
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
 	}
 
 	/**
@@ -112,11 +111,21 @@ class Iconfinder_Portfolio {
 		 * of the plugin.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-iconfinder-portfolio-i18n.php';
+        
+        /**
+		 * Global utility functions file.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/custom-post-types.php';
 		
 		/**
 		 * Global utility functions file.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/iconfinder-portfolio-functions.php';
+        
+        /**
+		 * Data transformation functions file.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/transforms.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
@@ -167,7 +176,8 @@ class Iconfinder_Portfolio {
 		$this->loader->add_action('admin_init', $plugin_admin, 'options_update');
 		
 		// Add the purge_cache form handler hook
-		$this->loader->add_action( 'admin_post', $plugin_admin, 'purge_cache' );
+		$this->loader->add_action( 'admin_post_purge_cache', $plugin_admin, 'purge_cache' );
+        $this->loader->add_action( 'admin_post_update_iconset_data', $plugin_admin, 'process_iconset_admin_post' );
 
 		// Add menu item
 		$this->loader->add_action( 'admin_menu', $plugin_admin, 'add_plugin_admin_menu' );
@@ -192,7 +202,6 @@ class Iconfinder_Portfolio {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 	}
-	
 
 	/**
 	 * Run the loader to execute all of the hooks with WordPress.
@@ -233,5 +242,5 @@ class Iconfinder_Portfolio {
 	public function get_version() {
 		return $this->version;
 	}
-
+    
 }

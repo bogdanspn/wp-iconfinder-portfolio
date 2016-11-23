@@ -117,23 +117,35 @@ class Iconfinder_Portfolio_Public {
      * @param $attrs - The shortcode attrs
      * @since 1.0.0
      */
-    private static function get_api_url($attrs) {
+    public static function get_api_url($attrs) {
     
         $_options = get_option('iconfinder-portfolio');
         
-        $api_client_id     = isset($_options['api_client_id']) ? $_options['api_client_id'] : null;
-        $api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
-        $username          = isset($_options['username']) ? $_options['username'] : null;
-        $collection        = isset($attrs['collection']) ? $attrs['collection'] : null ;
-        $api_path          = attrs_to_api_path($username, $collection);
+        $api_client_id     = get_val($_options, 'api_client_id');
+        $api_client_secret = get_val($_options, 'api_client_secret');
+        $username          = get_val($_options, 'username');
+        $collection        = get_val($attrs, 'collection');
+        $iconset           = get_val($attrs, 'iconset');
+        
+        $channel = 'iconsets';
+        $identifier = null;
+        if (! empty($iconset)) {
+            $channel = 'icons';
+            $identifier = $iconset;
+        }
+        else if (! empty($collection)) {
+            $channel = 'collections';
+            $identifier = $collection;
+        }
+        $api_path = attrs_to_api_path($username, $channel, $identifier);
 
         $api_url = ICONFINDER_API_URL . 
             "{$api_path}?client_id={$api_client_id}&client_secret={$api_client_secret}" . 
             "&count=" . ICONFINDER_API_MAX_COUNT;
-            
+
         return $api_url;
     }
-    
+
     /**
      * Render the Iconfinder Portfolio shortcodes
      * 
@@ -146,51 +158,32 @@ class Iconfinder_Portfolio_Public {
         $valid_sort_orders   = array(SORT_ASC, SORT_DESC);
         $valid_license_types = array(ICONFINDER_TYPE_PREMIUM, ICONFINDER_TYPE_FREE);
         $valid_img_sizes     = array('normal', 'large');
+        $item_id             = null;
+        $options             = array();
 
         $_options = get_option('iconfinder-portfolio');
-        $options = array();
+        $username = get_val($_options, 'username');
         
-        $username = isset($_options['username']) ? $_options['username'] : null;
+        $attrs = get_shortcode_attrs($attrs, array('username'=>$username));
+
+        $id         = get_val($attrs, 'id');
+        $count      = get_val($attrs, 'count', 100);
+        $style      = get_val($attrs, 'style');
+        $type       = get_val($attrs, 'type');
+        $sets       = str_to_array(get_val($attrs, 'sets'));
+        $categories = str_to_array(get_val($attrs, 'categories'));
+        $theme      = get_val($attrs, 'theme');
+        $sort_by    = get_val($attrs, 'sort_by');
+        $sort_order = strtoupper(get_val($attrs, 'sort_order')) === "ASC" ? SORT_ASC : SORT_DESC;
+        $omit       = str_to_array(get_val($attrs, 'omit'));
+        $img_size   = get_val($attrs, 'img_size', 'normal');
+        $collection = get_val($attrs, 'collection');
+        $show_links = get_val($attrs, 'show_links', true);
+        $show_price = get_val($attrs, 'show_price', true);
+        $iconset    = get_val($attrs, 'iconset');
+        $img_size   = get_val($attrs, 'img_size', 'medium-2x');
         
-        $attrs = shortcode_atts(
-            array(
-                'id'         => '',
-                'username'   => $username,
-                'count'      => 0,
-                'style'      => '',
-                'type'       => '',
-                'collection' => '',
-                'sets'       => '',
-                'categories' => '',
-                'theme'      => '',
-                'sort_by'    => '',
-                'sort_order' => SORT_DESC,
-                'omit'       => '',
-                'img_size'   => 'large',
-                'show_links' => 1,
-                'show_price' => 1
-        ), $attrs );
-        
-        array_map('strtolower', $attrs);
-        
-        $id         = $attrs['id'];
-        $count      = $attrs['count'];
-        $style      = $attrs['style'];
-        $type       = $attrs['type'];
-        $sets       = ! empty($attrs['sets']) ? explode(',', $attrs['sets']) : array();
-        $categories = ! empty($attrs['categories']) ? explode(',', $attrs['categories']) : array();
-        $theme      = $attrs['theme'];
-        $sort_by    = $attrs['sort_by'];
-        $sort_order = strtoupper($attrs['sort_order']) == "ASC" ? SORT_ASC : SORT_DESC;
-        $omit       = ! empty($attrs['omit']) ? explode(',', $attrs['omit']) : array();
-        $img_size   = $attrs['img_size'];
-        $collection = $attrs['collection'];
-        $show_links = $attrs['show_links'];
-        $show_price = $attrs['show_price'];
-        $categories = array_map('trim', $categories);
-        $sets       = array_map('trim', $sets);
-        $omit       = array_map('trim', $omit);
-        
+        // Make sure a few variables are the expect type or value
         if (! in_array($show_links, array('1', '0', 'true', 'false'))) {
             $show_links = 1;
         }
@@ -211,37 +204,40 @@ class Iconfinder_Portfolio_Public {
             $show_price = 0;
         }
         
+        $sort_by = $sort_by == "date" ? "published_at" : $sort_by;
+        
         $options = array(
             'show_links' => $show_links,
             'show_price' => $show_price
         );
         
-        if (! in_array($img_size, $valid_img_sizes)) {
-            $img_size = 'normal';
+        if ($img_size === 'medium') {
+            $img_size = 'medium-2x';
+        }
+        else if (in_array($img_size, array('small', 'normal', 'default'))) {
+            $img_size = 'medium';
+        }
+        else if (! in_array($img_size, $valid_img_sizes)) {
+            $img_size = 'medium';
         }
         
-        $img_size = $img_size == 'normal' ? 'medium' : 'medium-2x';
-        
-        /*
-        Coerce-user-friendly values to DB field names. This is just a nicety to make the shortcode values 
-        easier to remember and to type.
-        */
-        
-        $sort_by = $sort_by == "date" ? "published_at" : $sort_by;
-        
         $data = null;
-        
-        $item_id = '';
+        $identifier = null;
         $channel = 'iconsets';
-        if (trim($collection) != '') {
+        
+        if (! empty($iconset)) {
+            $channel = 'icons';
+            $identifier = $iconset;
+        }
+        else if (! empty($collection)) {
             $channel = 'collections';
-            $item_id = $collection;
+            $identifier = $collection;
         }
         
         $cache_key = icf_get_cache_key(
             $username,
             $channel,
-            $item_id
+            $identifier
         );
         
         try {
@@ -251,89 +247,194 @@ class Iconfinder_Portfolio_Public {
             );
         }      
         catch (Exception $e) {
+            icf_queue_notices(
+                ICONFINDER_SERVER_ERROR_MSG,
+                'error'
+            );
             return ICONFINDER_SERVER_ERROR_MSG;
         }  
         
-        $raw = $data['items'];
+        $content = array(
+            'type' => get_val($data, 'data_type', 'iconsets'),
+            'items' => array()
+        );
         
-        foreach ($raw as &$iconset) {
-        
-            if (in_array($iconset['iconset_id'], $omit)) continue;
-        
-            $iconset['permalink'] = ICONFINDER_URL . "iconsets/{$iconset['identifier']}" . (! empty($username) ? "?ref={$username}" : "");
-            $iconset['preview']   = ICONFINDER_CDN_URL . "data/iconsets/previews/{$img_size}/{$iconset['identifier']}.png";
-            
-            // Rather than check the existance of each level of the array, 
-            // just trap any possible exceptions/null values and move on
-            $iconset['price'] = null;
-            try {
-                $iconset['price'] = $iconset['prices'][0]['price'];
+        if ($content['type'] == 'icons') {
+            $icons = scrub_icons_list($data['items']);
+            # icf_dump($icons);
+            foreach ($icons as $icon) {
+                if (in_array($icon['icon_id'], $omit)) continue;
+                
+                $icon['permalink'] = ICONFINDER_URL . "icons/{$icon['icon_id']}" . (! empty($username) ? "?ref={$username}" : "");
+                    
+                array_push($content['items'], $icon);
             }
-            catch(Exception $e) {/*Exit Gracefully*/}
-            
-            if (count($sets)) {
-                if (in_array($iconset['iconset_id'], $sets)) {
+        }
+        else if ($content['type'] == 'iconsets') {
+            $iconsets = array();
+            foreach ($data['items'] as &$iconset) {
+
+                if (in_array($iconset['iconset_id'], $omit)) continue;
+
+                $iconset['permalink'] = ICONFINDER_URL . "iconsets/{$iconset['identifier']}" . (! empty($username) ? "?ref={$username}" : "");
+                $iconset['preview']   = ICONFINDER_CDN_URL . "data/iconsets/previews/{$img_size}/{$iconset['identifier']}.png";
+
+                // Rather than check the existance of each level of the array, 
+                // just trap any possible exceptions/null values and move on
+                $iconset['price'] = null;
+                try {
+                    $iconset['price'] = $iconset['prices'][0]['price'];
+                }
+                catch(Exception $e) {/*Exit Gracefully*/}
+
+                if (count($sets)) {
+                    if (in_array($iconset['iconset_id'], $sets)) {
+                        array_push($iconsets, $iconset);
+                    }
+                }
+                else {
+                    // Filter by style
+                    if ($style != "") {
+                        $is_match = false;
+                        foreach ($iconset['styles'] as $iconset_style){
+                            if ($iconset_style['identifier'] ==  $style) {
+                                $is_match = true;
+                            }
+                        }
+                        if (! $is_match) continue;
+                    }
+                    // Filter by license type
+                    if (in_array($type, $valid_license_types)) {
+                        $is_match = false;
+                        $iconset_type = intval($iconset['is_premium']) == 1 ? ICONFINDER_TYPE_PREMIUM : ICONFINDER_TYPE_FREE ;
+                        if ($iconset_type == $type) {
+                            $is_match = true;
+                        }
+                        if (! $is_match) continue;
+                    }
+                    // Filter by categories
+                    if (count($categories)) {
+                        $is_match = false;
+                        foreach ($iconset['categories'] as $iconset_category){
+                            if (in_array($iconset_category['identifier'], $categories)) {
+                                $is_match = true;
+                            }
+                        }
+                        if (! $is_match) continue;
+                    }
                     array_push($iconsets, $iconset);
                 }
             }
-            else {
-                // Filter by style
-                if ($style != "") {
-                    $is_match = false;
-                    foreach ($iconset['styles'] as $iconset_style){
-                        if ($iconset_style['identifier'] ==  $style) {
-                            $is_match = true;
-                        }
-                    }
-                    if (! $is_match) continue;
-                }
-                // Filter by license type
-                if (in_array($type, $valid_license_types)) {
-                    $is_match = false;
-                    $iconset_type = intval($iconset['is_premium']) == 1 ? ICONFINDER_TYPE_PREMIUM : ICONFINDER_TYPE_FREE ;
-                    if ($iconset_type == $type) {
-                        $is_match = true;
-                    }
-                    if (! $is_match) continue;
-                }
-                // Filter by categories
-                if (count($categories)) {
-                    $is_match = false;
-                    foreach ($iconset['categories'] as $iconset_category){
-                        if (in_array($iconset_category['identifier'], $categories)) {
-                            $is_match = true;
-                        }
-                    }
-                    if (! $is_match) continue;
-                }
-                array_push($iconsets, $iconset);
+
+            if (! count($iconsets)) {
+                $iconsets = $data['items'];
             }
+
+            // The call to array_sort_dep is required for now for compatibility with older versions of PHP
+            if (in_array($sort_by, $valid_sort_fields) && in_array($sort_order, $valid_sort_orders)) {
+                # $iconsets = self::sort_array($iconsets, $sort_by, $sort_order);
+                $iconsets = iconfinder_sort_array($iconsets, $sort_by, $sort_order);
+            }
+            $content['items'] = $iconsets;
         }
-        
-        if (! count($iconsets)) {
-            $iconsets = $raw;
-        }
-        
-        // The call to array_sort_dep is required for now for compatibility with older versions of PHP
-        if (in_array($sort_by, $valid_sort_fields) && in_array($sort_order, $valid_sort_orders)) {
-            # $iconsets = self::sort_array($iconsets, $sort_by, $sort_order);
-            $iconsets = iconfinder_sort_array($iconsets, $sort_by, $sort_order);
+        else {
+            # throw new Exception("Unsupported data type");
+            icf_queue_notices(
+                "Unsupported data type",
+                'error'
+            );
         }
         
         if ($count > 0) {
-            $iconsets = array_slice($iconsets, 0, $count);
+            $content['items'] = array_slice($content['items'], 0, $count);
         }
                 
-        return self::apply_theme($iconsets, $theme, $options);
+        return self::apply_theme($content, $theme, $options);
+    }
+    
+    /**
+     * Process the list of icons and format the data array as it is expected
+     * by the template.
+     * @param array $data
+     * 
+     * @since 1.1.0
+     */
+    private static function format_icons_data($data=array()) {
+        
+        
+    }
+    
+    /**
+     * Process the array of icon sets and format the data array as it is
+     * expected by the template.
+     * @param array $data
+     * 
+     * @since 1.1.0
+     */
+    private static function format_iconsets_data($data) {
+        
+        
+    }
+    
+    /**
+     * 
+     * @param type $data
+     * @param type $styles
+     * 
+     * @since 1.1.0
+     */
+    private static function filter_by_styles($data, $styles) {
+        
+        
+    }
+    
+    /**
+     * 
+     * @param type $data
+     * @param type $categories
+     * 
+     * @since 1.1.0
+     */
+    private static function filter_by_categories($data, $categories) {
+        
+        
+    }
+    
+    /**
+     * 
+     * @param type $data
+     * @param type $categories
+     * 
+     * @since 1.1.0
+     */
+    private static function filter_by_license($data, $categories) {
+        
+        
+    }
+    
+    /**
+     * 
+     * @param type $data
+     * @param type $categories
+     * 
+     * @since 1.1.0
+     */
+    private static function filter_by_iconset_id($data, $categories) {
+        
+        
     }
     
     /**
      * Apply the custom or default theme to the output
      * @param <String> $theme - The theme name
      * @return <Strong> The HTML output
+     * 
+     * @since 1.0.0
      */
-    private static function apply_theme($items, $theme='default', $options=array('show_price'=>1, 'show_links'=>1)) {
+    private static function apply_theme($content, $theme='default', $options=array('show_price'=>1, 'show_links'=>1)) {
         $output = "";
+        
+        $items = get_val($content, 'items', array());
         
         $theme_file = null;
         if ($theme != "") {

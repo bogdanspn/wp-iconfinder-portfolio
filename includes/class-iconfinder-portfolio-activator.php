@@ -23,14 +23,14 @@
 class Iconfinder_Portfolio_Activator {
 
 	/**
-	 * Short Description. (use period)
+	 * Active the plugin.
 	 *
-	 * Long Description.
+	 * Activate the plugin and create the necessary content types for storing 
+     * iconfinder porfolio data locally (to make is searchable).
 	 *
-	 * @since    1.0.0
+	 * @since    1.1.0
 	 */
 	public static function activate() {
 
 	}
-
 }
