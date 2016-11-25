@@ -152,6 +152,10 @@ body.toplevel_page_iconfinder-portfolio form p {
     min-height: 500px;
 }
 
+.drib-shots.icf-mode-basic {
+    min-height: 420px !important;
+}
+
 .drib-shots p {
     
     padding: 0 10px;

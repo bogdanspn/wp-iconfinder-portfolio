@@ -34,6 +34,8 @@ class Iconfinder_Portfolio_Deactivator {
         self::remove_custom_post_types();
         self::remove_iconfinder_data();
         self::remove_cache_data();
+        
+        unregister_setting( ICF_PLUGIN_NAME, ICF_PLUGIN_NAME);
 	}
 
     /**

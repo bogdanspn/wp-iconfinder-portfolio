@@ -31,6 +31,10 @@ class Iconfinder_Portfolio_Activator {
 	 * @since    1.1.0
 	 */
 	public static function activate() {
-
+        register_setting( 
+            ICF_PLUGIN_NAME, 
+            ICF_PLUGIN_NAME, 
+            'register_default_settings'
+        );
 	}
 }

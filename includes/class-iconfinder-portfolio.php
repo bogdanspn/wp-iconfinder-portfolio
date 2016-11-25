@@ -69,12 +69,23 @@ class Iconfinder_Portfolio {
 	public function __construct() {
 
 		$this->plugin_name = 'iconfinder-portfolio';
-		$this->version = '1.0.0';
+		$this->version = '1.1.0';
 
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+        
+        define('ICF_PLUGIN_NAME',    $this->plugin_name);
+        define('ICF_PLUGIN_VERSION', $this->version);
+        
+        $_options = get_option( ICF_PLUGIN_NAME );
+        $plugin_mode = get_val($_options, 'plugin_mode', ICF_PLUGIN_MODE_DEFAULT);
+        define('ICF_PLUGIN_MODE', $plugin_mode);
+        
+        define('ICF_PLUGIN_PATH', plugin_dir_path( dirname( __FILE__ ) ));
+        define('ICF_PUBLIC_PATH', ICF_PLUGIN_PATH . 'public/');
+        define('ICF_TEMPLATE_PATH', ICF_PLUGIN_PATH . 'public/partials/');
 	}
 
 	/**
@@ -116,6 +127,11 @@ class Iconfinder_Portfolio {
 		 * Global utility functions file.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/custom-post-types.php';
+        
+        /**
+		 * Load the custom search engine.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-search-plus.php';
 		
 		/**
 		 * Global utility functions file.
@@ -201,6 +217,7 @@ class Iconfinder_Portfolio {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+        $this->loader->add_action( 'init', $plugin_public, 'load_search_engine' );
 	}
 
 	/**

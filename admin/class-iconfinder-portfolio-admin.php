@@ -55,10 +55,10 @@ class Iconfinder_Portfolio_Admin {
     
     /**
      * Get the current plugin mode.
-     * @returns <string> Plugin mode
+     * @returns string Plugin mode
      */
     public function get_mode() {
-        $_options = get_option('iconfinder-portfolio');
+        $_options = get_option( ICF_PLUGIN_NAME );
         $plugin_mode = get_val($_options, 'plugin_mode', ICF_PLUGIN_MODE_DEFAULT);
         if (empty($plugin_mode)) {
             $plugin_mode = ICF_PLUGIN_MODE_DEFAULT;
@@ -126,8 +126,12 @@ class Iconfinder_Portfolio_Admin {
 		 *        Administration Menus: http://codex.wordpress.org/Administration_Menus
 		 *
 		 */
+        $iconsets_menu_text = 'Iconsets Shortcodes';
+        if ($this->get_mode() == ICF_PLUGIN_MODE_ADVANCED) {
+            $iconsets_menu_text = 'Import Manager';
+        }
 		add_menu_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name);
-        add_submenu_page( $this->plugin_name, 'Iconsets Manager', 'Iconsets Shortcodes', 'manage_options', $this->plugin_name . '-iconsets', array($this, 'display_iconsets_page'));
+        add_submenu_page( $this->plugin_name, $iconsets_menu_text, $iconsets_menu_text, 'manage_options', $this->plugin_name . '-iconsets', array($this, 'display_iconsets_page'));
 		add_submenu_page( $this->plugin_name, 'Collections Shortcodes', 'Collections Shortcodes', 'manage_options', $this->plugin_name . '-collections', array($this, 'display_collections_page'));
         add_submenu_page( $this->plugin_name, 'Settings', 'Settings', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
 		add_submenu_page( $this->plugin_name, 'Documentation', 'Documentation', 'manage_options', $this->plugin_name . '-documentation', array($this, 'display_plugin_documentation'));
@@ -171,7 +175,7 @@ class Iconfinder_Portfolio_Admin {
 	 */
 	public function display_plugin_documentation() {
 	
-	    $_options = get_option('iconfinder-portfolio');
+	    $_options = get_option( ICF_PLUGIN_NAME );
 		$username = isset($_options['username']) ? $_options['username'] : null;
 
 	    $response = iconfinder_call_api(
@@ -204,7 +208,7 @@ class Iconfinder_Portfolio_Admin {
 	
 	    # Grab the collections from the API
 	    
-	    $_options = get_option('iconfinder-portfolio');
+	    $_options = get_option( ICF_PLUGIN_NAME );
 		$username = isset($_options['username']) ? $_options['username'] : null;
 	    
 	    $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
@@ -233,16 +237,19 @@ class Iconfinder_Portfolio_Admin {
 	 */
 	public function display_iconsets_page() {
 	
-		# Grab the iconsets from the API
+		// Grab the iconsets from the API
 		
-	    $_options = get_option( 'iconfinder-portfolio' );
+	    $_options = get_option( ICF_PLUGIN_NAME );
 		$username = isset( $_options['username'] ) ? $_options['username'] : null;
 		
-		$data = array( 'message' => 'Enter your API credentials on the API Settings page to list your iconsets here' );
+		$data = array( 
+            'message' => ICF_ENTER_API_CREDENTIALS,
+            'items'   => array()
+        );
 		
 		$response = iconfinder_call_api(
             $this->get_admin_api_url( 'iconsets' ), 
-             icf_get_cache_key( $username, 'iconsets' )
+            icf_get_cache_key( $username, 'iconsets' )
         );
         
 	    if (isset($response['items'])) {
@@ -269,35 +276,30 @@ class Iconfinder_Portfolio_Admin {
 
                 if ($this->get_mode() == ICF_PLUGIN_MODE_ADVANCED) {
                     $iconset_post = get_post_by_iconset_id($item['iconset_id']);
-                    if (! empty($iconset_post)) {
+                    if (is_object($iconset_post) && isset($iconset_post->ID)) {
                         $item['is_imported'] = true;
-                        $latest_sync = get_post_meta( $iconset_post->ID, 'latest_sync', true);
-                        if (empty($latest_sync)) {
-                            $latest_sync = 'Never';
-                        }
-                        $item['latest_sync'] = $latest_sync;
+                        $item['latest_sync'] = get_post_meta( $iconset_post->ID, 'latest_sync', true );
                     }
                 }
 	        }
 	    }
-	    
 		echo $this->apply_admin_theme($data, 'iconfinder-portfolio-admin-iconsets.php');
 	}
 	
 	/**
 	 * Determine correct API URl from the shortcode attrs
-	 * @param <string> $channel - The shortcode attrs
+	 * @param string $channel - The shortcode attrs
 	 * @since 1.0.0
 	 */
 	private function get_admin_api_url($channel) {
 	
-		$_options = get_option('iconfinder-portfolio');
+		$_options = get_option( ICF_PLUGIN_NAME );
 		
-		$valid_channels = array('iconsets', 'collections', 'categories', 'styles');
+        $valid_channels = icf_get_setting('valid_api_channels', array());
 		
-		$api_client_id     = isset($_options['api_client_id']) ? $_options['api_client_id'] : null;
-		$api_client_secret = isset($_options['api_client_secret']) ? $_options['api_client_secret'] : null;
-		$username          = isset($_options['username']) ? $_options['username'] : null;
+        $api_client_id     = get_val($_options, 'api_client_id');
+        $api_client_secret = get_val($_options, 'api_client_secret');
+        $username          = get_val($_options, 'username');
 		
 		if (in_array($channel, array('iconsets', 'collections'))) {
 		    $api_path = "users/{$username}/{$channel}";
@@ -315,8 +317,8 @@ class Iconfinder_Portfolio_Admin {
 	
 	/**
 	 * Apply the custom or default theme to the output
-	 * @param <String> $theme - The theme name
-	 * @return <Strong> The HTML output
+	 * @param string $theme - The theme name
+	 * @return string The HTML output
 	 */
 	private function apply_admin_theme($data, $filename) {
 		$output = "";
@@ -344,76 +346,85 @@ class Iconfinder_Portfolio_Admin {
 		ob_end_clean();
 		return $output;
 	}
-	
-	/**
-	*  Save the plugin options
-	*
-	*
-	* @since    1.0.0
-	*/
-	public function options_update() {
-		register_setting( $this->plugin_name, $this->plugin_name, array($this, 'validate') );
-	}
-	
-	/**
-	 * Performs the cache purge
-	 *
-	 * @since 1.0.0
-	 */
-	public function purge_cache() {
-        
-	    $cache_keys = icf_get_cache_keys();
-	    
-	    foreach ( $cache_keys as $cache_key ) {
-	    
-	        delete_option( $cache_key );
-	    }
-	    
-	    update_option( 'icf_cache_keys', array() );
-
-	    wp_redirect( admin_url( 'admin.php?page=iconfinder-portfolio' ) );
-	}
         
     public function process_iconset_admin_post() {
         
+        $result = null;
         $post_data  = get_val( $_POST, $this->plugin_name, null );
         $action     = strtolower(get_val( $_POST, 'submit', '' ));
         $iconset_id = get_val( $post_data, 'iconset_id', null );
         
-        # die (__FUNCTION__ . ' called');
-        # icf_dump($post_data);
-        # die($action);
-        
-        if (! empty($iconset_id) && ! empty($action)) {
-            
+        if (empty($iconset_id) || empty($action)) {
+            $result = icf_append_error($result, null, "Iconset could not be found");
+        }
+        else {
             // Do the thing
-            if (in_array($action, array('trash', 'update'))) {
+            if (in_array($action, array('delete', 'update'))) {
                 $iconset = get_post_by_iconset_id($iconset_id);
-                if (true || ! empty($iconset)) {
-                    if ( 'trash' === $action ) {
-                    
-                        # die('trash action caught');
-                        delete_iconset_post($iconset_id);
+                if (is_wp_error($iconset)) {
+                    $result = icf_append_error($result, $iconset);
+                }
+                else {
+                    if ( 'delete' === $action ) {
+                        $delete = delete_iconset_post($iconset_id);
+                        if (is_wp_error($delete)) {
+                            $result = icf_append_error(
+                                $result, 
+                                $delete,
+                                "Iconset ID {$iconset_id} could not be deleted"
+                            );
+                        }
+                        else {
+                            icf_queue_notices(
+                                "Iconset `{$iconset->post_title}` was successfully deleted.",
+                                'success'
+                            );
+                        }
                     }
                     else if ( 'update' === $action ) {
                         
-                        # die('update action caught');
-                        update_iconset_post($iconset_id, array());
+                        $post_id = update_iconset_post($iconset_id, array());
+                        if (is_wp_error($post_id)) {
+                            $result = icf_append_error(
+                                $result, 
+                                $post_id,
+                                "Iconset ID {$iconset_id} could not be updated"
+                            );
+                        }
+                        else {
+                            icf_queue_notices(
+                                "Iconset `{$iconset['identifier']}` was successfully updated.",
+                                'success'
+                            );
+                        }
                     }
                 }
-                //TODO: Handle post not found
             }
             else if ( 'import' === $action ) {
-                // Create the new iconset
-                // Create new icons
-                // Be sure to add references between iconset and icons
-                
-                # die('import action caught');
-                create_iconset_post($iconset_id, array());
+                $post_id = create_iconset_post($iconset_id, array());
+                if (is_wp_error($post_id)) {
+                    $result = icf_append_error(
+                        $result, 
+                        $post_id,
+                        "Iconset ID {$iconset_id} could not be imported"
+                    );
+                }
+                else {
+                    $post = get_post($post_id);
+                    icf_queue_notices(
+                        "Iconset `{$post->post_title}` was successfully imported.",
+                        'success'
+                    );
+                }
             }
         }
-        //TODO: Handle nothing found
         
+        if (is_wp_error($result)) {
+            icf_queue_notices(
+                $result->get_error_messages(),
+                'error'
+            );
+        }
         wp_redirect( admin_url( 'admin.php?page=iconfinder-portfolio-iconsets' ) );
     }
     
@@ -426,9 +437,36 @@ class Iconfinder_Portfolio_Admin {
 	
 	    // Sync local content with source
 
-	    wp_redirect( admin_url( 'admin.php?page=iconfinder-portfolio' ) );
+	    wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
 	}
 	
+    	
+	/**
+	*  Save the plugin options
+	*
+	* @since    1.0.0
+	*/
+	public function options_update() {
+
+		register_setting( ICF_PLUGIN_NAME, ICF_PLUGIN_NAME, array($this, 'validate') );
+	}
+	
+	/**
+	 * Performs the cache purge
+	 *
+	 * @since 1.0.0
+	 */
+	public function purge_cache() {
+        
+	    $cache_keys = icf_get_cache_keys();
+	    
+	    foreach ( $cache_keys as $cache_key ) {
+	        delete_option( $cache_key );
+	    }
+	    update_option( 'icf_cache_keys', array() );
+	    wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
+	}
+    
 	/**
 	 * Validate all options fields
 	 *
@@ -437,13 +475,41 @@ class Iconfinder_Portfolio_Admin {
 	public function validate($input) {
 		$valid = array();
 		
-		$valid['api_client_id']       = get_val( $input, 'api_client_id', null );
-		$valid['api_client_secret']   = get_val( $input, 'api_client_secret', null );
-		$valid['username']            = get_val( $input, 'username', null );
+		$valid['api_client_id']         = get_val( $input, 'api_client_id', null );
+		$valid['api_client_secret']     = get_val( $input, 'api_client_secret', null );
+		$valid['username']              = get_val( $input, 'username', null );
         
-        $valid['plugin_mode']         = get_val( $input, 'plugin_mode', 'basic' );
-        $valid['use_powered_by_link'] = get_val( $input, 'use_powered_by_link', true );
-        $valid['use_purchase_link']   = get_val( $input, 'use_purchase_link', true );
+        $valid['plugin_mode']           = get_val( $input, 'plugin_mode', 'basic' );
+        $valid['use_powered_by_link']   = get_val( $input, 'use_powered_by_link', true );
+        $valid['use_purchase_link']     = get_val( $input, 'use_purchase_link', true );
+        $valid['search_posts_per_page'] = get_val( $input, 'search_posts_per_page', ICF_SEARCH_POSTS_PER_PAGE );
+        
+        // We need to have at least one preview size at all times, 
+        // so if none are selected, use the default.
+        $icon_preview_sizes = get_val( $input, 'icon_preview_sizes');
+        if (! is_array($icon_preview_sizes) || empty($icon_preview_sizes)) {
+            $icon_preview_sizes = array(icf_get_setting('icon_default_preview_size'));
+        }
+        $valid['icon_preview_sizes'] = $icon_preview_sizes;
+        
+        // We need to have an iconset preview size at all times.
+        // If none is selected or set, use the default.
+        $iconset_preview_size = get_val( $input, 'iconset_preview_size');
+        if (empty($iconset_preview_size)) {
+            $iconset_preview_size = icf_get_setting('iconset_default_preview_size');
+        }
+        $valid['iconset_preview_size'] = $iconset_preview_size;
+        
+        // If we are currently in basic mode, and changing to 
+        // advanced mode, clear the cache. We don't want to leave 
+        // garbage behind. If the user switches back to basic mode,
+        // the plugin will create a new cache on the first 
+        // page requests.
+        if ($valid['plugin_mode'] === ICF_PLUGIN_MODE_ADVANCED) {
+            if (icf_get_option('plugin_mode') === ICF_PLUGIN_MODE_BASIC) {
+                $this->purge_cache();
+            }
+        }
 
         return $valid;
 	}

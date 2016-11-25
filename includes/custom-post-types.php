@@ -36,7 +36,7 @@ function add_collections_post_type() {
         'hierarchical'        => false,
         'public'              => true,
         'show_ui'             => true,
-        'show_in_menu'        => 'iconfinder-portfolio',
+        'show_in_menu'        => ICF_PLUGIN_NAME,
         'show_in_nav_menus'   => true,
         'show_in_admin_bar'   => true,
         'menu_position'       => 0,
@@ -80,7 +80,7 @@ function add_iconsets_post_type() {
         'hierarchical'        => false,
         'public'              => true,
         'show_ui'             => true,
-        'show_in_menu'        => 'iconfinder-portfolio',
+        'show_in_menu'        => ICF_PLUGIN_NAME,
         'show_in_nav_menus'   => true,
         'show_in_admin_bar'   => true,
         'menu_position'       => 1,
@@ -119,12 +119,12 @@ function add_icons_post_type() {
         'label'               => __( 'iconfinder-icons', $scope ),
         'description'         => __( 'Iconfinder Icons', $scope ),
         'labels'              => $labels,
-        'supports'            => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments'),
+        'supports'            => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'custom-fields'),
         'taxonomies'          => array( 'icon_category', 'icon_tag' ),
         'hierarchical'        => false,
         'public'              => true,
         'show_ui'             => true,
-        'show_in_menu'        => 'iconfinder-portfolio',
+        'show_in_menu'        => ICF_PLUGIN_NAME,
         'show_in_nav_menus'   => true,
         'show_in_admin_bar'   => true,
         'menu_position'       => 2,
@@ -157,7 +157,8 @@ function register_icon_taxonomies() {
             'show_ui' => true,
             'show_in_menu' => true,
             'hierarchical' => true,
-            'show_admin_column' => false
+            'show_admin_column' => true,
+            'publicly_queryable' => true
 		)
 	);
     // Register the icon tags taxonomy
@@ -175,7 +176,8 @@ function register_icon_taxonomies() {
 			),
             'show_ui' => true,
             'show_in_menu' => true,
-            'show_admin_column' => false
+            'show_admin_column' => true,
+            'publicly_queryable' => true
 		)
 	);
 }

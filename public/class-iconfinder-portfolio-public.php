@@ -112,6 +112,14 @@ class Iconfinder_Portfolio_Public {
         add_shortcode('iconfinder_portfolio', array( __CLASS__, 'iconfinder_portfolio_shortcode' ));
     }
     
+    public function load_search_engine() {
+        if (! class_exists('Gee_Search_Plus_Engine')) {
+            //TODO: How should this be handled?
+            return;
+        }
+        $gee_search_plus = new Gee_Search_Plus_Engine();
+    }
+    
     /**
      * Determine correct API URl from the shortcode attrs
      * @param $attrs - The shortcode attrs
