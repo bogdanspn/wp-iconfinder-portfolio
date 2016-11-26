@@ -315,7 +315,6 @@ class Gee_Search_Plus_Engine {
 		}
 
 		$wp_query->post = $new_search->post;
-
 	}
 
 

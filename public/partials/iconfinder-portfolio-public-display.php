@@ -22,7 +22,7 @@ $col_count = 4;
 <div class="gs_drib_area gs_drib_theme1">
 	<div class="container">
 		<div class="row">
-			<?php if ($content['type'] == 'iconsets') : ?>
+            <?php if ($content['type'] == 'iconsets') : ?>
                 <?php foreach ($content['items'] as $iconset) : ?>
                     <div class="col-md-<?php echo $col_count; ?> drib-shots iconset-<?php echo $iconset['identifier']; ?>">
                         <?php if ($options['show_links']) : ?>
@@ -45,7 +45,6 @@ $col_count = 4;
                     </div>
                 <?php endforeach; ?>
             <?php else: ?> 
-                <?php # icf_dump($content); ?>
                 <?php foreach ($content['items'] as $icon) : ?>
                     <?php
                         $preview = $icon['previews']['@256'];

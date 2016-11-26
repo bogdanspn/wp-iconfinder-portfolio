@@ -1,5 +1,8 @@
 <?php
 
+# if (! defined('WP_INC')) 
+#    die('Nothing to see here.');
+
 /**
  * This is a collection of utility functions used globally throughout the plugin.
  *
@@ -328,13 +331,8 @@ function iconfinder_sort_array($array, $sort_by, $sort_order) {
  * @since 1.1.0
  */
 function iconfinder_conditional_actions() {
-    $options = get_option('iconfinder-portfolio');
 
-    $plugin_mode = strtolower(get_val( $options, 'plugin_mode', 'basic' ));
-    if (empty($plugin_mode)) {
-        $plugin_mode = 'basic';
-    }
-    if ($plugin_mode === 'advanced' ) {
+    if (icf_is_advanced_mode()) {
         add_collections_post_type();
         add_iconsets_post_type();
         add_icons_post_type();
@@ -606,6 +604,7 @@ function import_icon_previews($iconset) {
                     else {
                         $preview['src'] = $src;
                         add_post_meta( $icon_post_id, "preview-{$key}" , $preview['src'], true );
+                        add_post_meta( $icon_post_id, "parent_post_id" , $iconset['post_id'], true );
                         $media = get_last_attachment($icon_post->ID);
                         update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
                     }
@@ -616,6 +615,8 @@ function import_icon_previews($iconset) {
             if (isset($icon['previews'][$default_preview_size])) {
                 $preview = $icon['previews'][$default_preview_size];
                 $src = media_sideload_image( $preview['src'], $icon_post_id, $alt_text, 'src' );
+                add_post_meta( $icon_post_id, "preview-{$key}" , $preview['src'], true );
+                add_post_meta( $icon_post_id, "parent_post_id" , $iconset['post_id'], true );
                 $media = get_last_attachment($icon_post->ID);
                 update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
                 $thumb_id = set_preview($icon_post_id, $media);
@@ -699,7 +700,7 @@ function create_iconset_post($iconset_id, $attrs=array()) {
     // an error.
     
     $iconset = get_one_iconset($iconset_id);    
-    
+
     if (! is_array($iconset) || ! isset($iconset['iconset_id'])) {
         return icf_append_error(
             $result,
@@ -728,7 +729,7 @@ function create_iconset_post($iconset_id, $attrs=array()) {
         // pass it as a separate argument while we are working on the 
         // impoart.
         
-        $iconset['post_id'] = $post_id;
+        $iconset['post_id'] = $post_id;        
         
         //TODO: if the collection doesn't exist, add it
         //TOD: add collection_id relationship field
@@ -742,8 +743,8 @@ function create_iconset_post($iconset_id, $attrs=array()) {
         // $import_sizes = icf_get_setting('iconset_preview_sizes');
         
         $default_preview_size = icf_get_option(
-                'iconset_preview_size', 
-                icf_get_setting('iconset_default_preview_size')
+            'iconset_preview_size', 
+            icf_get_setting('iconset_default_preview_size')
         );
         
         //TODO: Consider importing more than a single iconset preview.
@@ -783,7 +784,9 @@ function create_iconset_post($iconset_id, $attrs=array()) {
             // Alt tag to the one we created earlier.
             
             $media = get_last_attachment($iconset_post->ID);
-            update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
+            if (isset($media->ID)) {
+                update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
+            }
                 
             // Set the featured image for the iconset post.
             
@@ -1026,7 +1029,7 @@ function get_post_tags($post_ids) {
         $terms = wp_get_post_terms($post_id, 'icon_tag');
         if (is_array($terms) && count($terms)) {
             foreach ($terms as $term) {
-                if (! in_array($term->slug, $icon_tags)) {
+                if (! in_array($term->slug, $tags)) {
                     $tags[] = $term->slug;
                 }
             }
@@ -1388,6 +1391,25 @@ function add_iconset_meta($post_id, $iconset) {
     add_post_meta( $post_id, 'iconset_identifier', $iconset['identifier'], true );
     add_post_meta( $post_id, 'latest_sync', date('Y-m-d H:i:s'), true );
     add_post_meta( $post_id, 'icons_count', $iconset['icons_count'] );
+    add_post_meta( $post_id, 'iconset_type', $iconset['type'] );
+    if ( isset($iconset['prices']) && is_array($iconset['prices']) ) {
+        if ( isset( $iconset['prices'][0]['price'] ) ) {
+            add_post_meta( $post_id, 'price', $iconset['prices'][0]['price'], true );
+        }
+    }
+    if ( isset($iconset['prices']) && is_array($iconset['prices']) ) {
+        if ( isset( $iconset['prices'][0]['license'] ) ) {
+            $license = $iconset['prices'][0]['license'];
+            add_post_meta( $post_id, 'license_url', $license['url'], true );
+            add_post_meta( $post_id, 'license_name', $license['name'], true );
+        }
+    }
+    if ( isset($iconset['styles']) && is_array($iconset['styles']) ) {
+        $style = $iconset['styles'][0];
+        foreach ($style as $key => $value) {
+            add_post_meta( $post_id, "iconset_style_{$key}", $value, true );
+        }
+    }
     add_iconset_terms($post_id, $iconset);
 }
 
@@ -1487,595 +1509,8 @@ function icf_set_categories($post_id, $categories) {
     return wp_set_post_terms( $post_id, $post_categories, 'icon_category', false);
 }
 
-
-/**
- * Append or create a WP_Error. 
- * @param string $code
- * @param string $message
- * @param string $data
- * @param WP_Error $error
- * @return \WP_Error
- * 
- * @since 1.1.0
- */
-function icf_append_error($result, $error, $messages=array()) {
-    
-    if (! is_wp_error($result)) {
-        $result = new WP_Error( 'iconfinder_error', '');
-    }
-    
-    if (! empty($messages) && ! is_array($messages)) {
-        $messages = array($messages);
-    }
-    if (is_wp_error($error)) {
-        $messages = array_merge($messages, $error->get_error_messages());
-    }
-    
-    $n = 0;
-    foreach ($messages as $message) {
-        $result->add(
-            "iconfinder_error_{$n}",
-            __($message, ICF_PLUGIN_NAME),
-            null
-        );
-        $n++;
-    }
-    return $result;
+function setup_search_posts() {
+    global $wp_the_query;
+    $wp_the_query->posts = icf_setup_posts($wp_the_query->posts);
 }
-
-/**
- * Check to see if a post exists by iconset_id
- * @param integer $iconset_id
- * @return boolean or integer
- * 
- * @since 1.1.0
- */
-function icf_post_exists($iconset_id) {
-    $result = false;
-    $post = get_post_by_iconset_id($iconset_id);    
-    if (is_post($post)) {
-        $result = $post->ID;
-    }
-    return $result;
-}
-
-/**
- * Tests if a variable is an instance of WP_Post and has an ID.
- * @param mixed $post
- * @return boolean
- */
-function is_post($post) {
-    if (! is_a($post, 'WP_Post')) { return false; }
-    if (! isset($post->ID)) { return false; }
-    if (empty($post->ID)) { return false; }
-    return true;
-}
-
-/**
- * Get a setting value.
- * @param string $key
- * @param mixed $default
- * @return mixed
- * 
- * @since 1.1.0
- */
-function icf_get_setting($key, $default=null) {
-    
-    $settings = _icf_settings();
-    $value = $default ;
-    if (! empty($key) && isset($settings[$key])) {
-        $value = $settings[$key];
-    }
-    return $value;
-}        
-
-/**
- * Splits a character-delimited string into words.
- * @param string $str
- * @param string $delim
- * @return array
- * 
- * @since 1.1.0
- */
-function str_to_words($str, $delim='-') {
-    return array_map('trim', explode($delim, $str));
-}
-
-/**
- * Converts a dash-delimited identifier into a name of only words (no numbers).
- * @param string $str
- * @return string
- * 
- * @since 1.1.0
- */
-function nice_name($str) {
-
-    $clean = array();
-    $words = explode(' ', str_to_words($str));
-    foreach ($words as $word) {
-        if (is_numeric($word)) {
-            continue;
-        }
-        array_push($clean, $word);
-    }
-    return implode(' ', $clean);
-}
-
-/**
- * A wrapper for WP's get_option to return a single value.
- * @param type $name
- * @param type $default
- * @return type
- */
-function icf_get_option($name, $default=null) {
-    $value = $default;
-    $options = get_option( ICF_PLUGIN_NAME );
-    if (isset($options[$name])) {
-        $value = $options[$name];
-    }
-    return $value;
-}
-
-/**
- * Add JS `onclick` to a delete button/link.
- * 
- * @since 1.1.0
- */
-function onclick_confirm_delete() {
-    echo onclick(ICF_CONFIRM_DELETE);
-}
-
-/**
- * Add JS `onclick` to a the Update button.
- * 
- * @since 1.1.0
- */
-function onclick_confirm_update() {
-    echo onclick(ICF_CONFIRM_UPDATE);
-}
-
-/**
- * Add JS `onclick` to a the Import button.
- * 
- * @since 1.1.0
- */
-function onclick_confirm_import() {
-    echo onclick(ICF_CONFIRM_IMPORT, true);
-}
-
-/**
- * This is a debug function and ideally should be removed from the production code.
- */
-function icf_dump($what) {
-    die ('<pre>' . print_r($what, true) . '</pre>');
-}
-
-/**
- * Generates an `onclick` JS handler
- * @param string $message
- * @param boolean $undo
- * @return string
- * 
- * @since 1.1.0
- */
-function onclick($message, $undo=false) {
-    if (! $undo) {
-        $message .= ' ' . __('This action cannot be undone.');
-    }
-    return ' onclick="return confirm(\'' . $message . '\');"';
-}
-
-/**
- * Saves error message strings as transient to be displayed by action callback.
- * @param mixed $notices
- * 
- * @since 1.1.0
- */
-function icf_queue_notices($notices, $type='success') {
-    if (! is_array($notices)) {
-        $notices = array($notices);
-    }
-    $message = "";
-    foreach ($notices as $notice) {
-        $message .= "{$notice}<br/>";
-    }
-    return set_transient( ICF_PLUGIN_NAME . '_' . $type, $message, HOUR_IN_SECONDS );
-}
-
-/**
- * Show a success notice.
- * @param string $live
- * 
- * @since 1.1.0
- */
-function icf_admin_notices() {
-    
-    $types = array('success', 'error');
-
-    foreach ($types as $type) {
-        $transient_key = ICF_PLUGIN_NAME . '_' . $type;
-        $messages = get_transient( $transient_key, true );
-        delete_transient( $transient_key );
-
-        if (! empty($messages)) {
-            if (! is_array($messages)) {
-                $messages = array($messages);
-            }
-            foreach ($messages as $message) {
-                printf( '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>', $type, __( $message, ICF_PLUGIN_NAME) ); 
-            }
-            $message = null;
-        }
-    }
-}
-add_action( 'admin_notices' , 'icf_admin_notices' );
-
-
-function template_chooser($template) {    
-    global $wp_query;   
-    $post_type = get_query_var('post_type');   
-    if ( $wp_query->is_search && $post_type == 'icon' ) {
-        $template = ICF_TEMPLATE_PATH . 'icon-search.php';
-    }
-    else if ( $wp_query->is_search && $post_type == 'iconset' ) {
-        $template = ICF_TEMPLATE_PATH . 'iconset-search.php';
-    }   
-    return $template;   
-}
-add_filter('template_include', 'template_chooser');
-
-/**
- * Create numeric paginated results.
- * @global \WP_Query $wp_query
- * @return type
- * @author WPBeginner
- * @link http://www.wpbeginner.com/wp-themes/how-to-add-numeric-pagination-in-your-wordpress-theme/
- */
-function wpbeginner_numeric_posts_nav() {
-
-	if( is_singular() )
-		return;
-
-	global $wp_query;
-
-	/** Stop execution if there's only 1 page */
-	if( $wp_query->max_num_pages <= 1 )
-		return;
-
-	$paged = get_query_var( 'paged' ) ? absint( get_query_var( 'paged' ) ) : 1;
-	$max   = intval( $wp_query->max_num_pages );
-
-	/**	Add current page to the array */
-	if ( $paged >= 1 )
-		$links[] = $paged;
-
-	/**	Add the pages around the current page to the array */
-	if ( $paged >= 3 ) {
-		$links[] = $paged - 1;
-		$links[] = $paged - 2;
-	}
-
-	if ( ( $paged + 2 ) <= $max ) {
-		$links[] = $paged + 2;
-		$links[] = $paged + 1;
-	}
-
-	echo '<div class="navigation"><ul>' . "\n";
-
-	/**	Previous Post Link */
-	if ( get_previous_posts_link() )
-		printf( '<li>%s</li>' . "\n", get_previous_posts_link() );
-
-	/**	Link to first page, plus ellipses if necessary */
-	if ( ! in_array( 1, $links ) ) {
-		$class = 1 == $paged ? ' class="active"' : '';
-
-		printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( 1 ) ), '1' );
-
-		if ( ! in_array( 2, $links ) )
-			echo '<li>…</li>';
-	}
-
-	/**	Link to current page, plus 2 pages in either direction if necessary */
-	sort( $links );
-	foreach ( (array) $links as $link ) {
-		$class = $paged == $link ? ' class="active"' : '';
-		printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( $link ) ), $link );
-	}
-
-	/**	Link to last page, plus ellipses if necessary */
-	if ( ! in_array( $max, $links ) ) {
-		if ( ! in_array( $max - 1, $links ) )
-			echo '<li>…</li>' . "\n";
-
-		$class = $paged == $max ? ' class="active"' : '';
-		printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( $max ) ), $max );
-	}
-
-	/**	Next Post Link */
-	if ( get_next_posts_link() )
-		printf( '<li>%s</li>' . "\n", get_next_posts_link() );
-
-	echo '</ul></div>' . "\n";
-
-}
-
-/**
- * Add custom query parameters.
- * @param \WP_Query $query
- * @return \WP_Query
- */
-function icon_search_filter($query) {
-    
-    if (is_admin()) { return $query; }
-
-    $s = get_query_var('s');
-    $keywords = str_to_words($s, ' ');
-    if (! in_array($s, $keywords)) {
-        array_push($keywords, $s);
-    }    
-
-    if ( in_array( get_query_var('post_type'), array('icon', 'iconset')) ) {
-        $query->set('tax_query', array(array(
-                'taxonomy' => 'icon_tag',
-                'field'    => 'slug',
-                'terms'    => $keywords,
-            ))
-        );
-        # $query->set('post_status', 'publish');
-        $posts_per_page = icf_get_option('search_posts_per_page');
-        if (empty($posts_per_page) || $posts_per_page > ICF_SEARCH_POSTS_PER_PAGE) {
-            $posts_per_page = ICF_SEARCH_POSTS_PER_PAGE;
-        }
-        $query->set('posts_per_page', $posts_per_page);
-        # icf_dump(array('query' => $query));
-    }
-    return $query;
-}
-# add_filter( 'pre_get_posts', 'icon_search_filter' );
-
-function override_sql_query($query) {
-    $post_type = get_query_var('post_type');
-    $s = get_query_var('s');
-    $words = explode(',', $s);
-
-    $words = array_map('trim', $words);
-    $more_words = array();
-    foreach ($words as $word) {
-        $more_words = array_merge($more_words, explode(' ', $word));
-    }
-    $words = array_merge($words, $more_words);
-    $words = array_map('trim', $words);
-    $posts_per_page = icf_get_option('search_posts_per_page');
-
-    $terms_clauses = array();
-        
-    foreach ($words as $word) {
-        $terms_clauses[] =
-<<<EOD1
-((
-    (wp_posts.post_title LIKE '%$word%') OR 
-    (wp_posts.post_excerpt LIKE '%$word%') OR 
-    (wp_posts.post_content LIKE '%$word%') OR 
-    (t.name LIKE '%$word%')
-))
-EOD1;
-    }            
-    
-    $terms_clauses = implode(' OR ', $terms_clauses);
-            
-    $sql_query = 
-<<<EOD
-SELECT SQL_CALC_FOUND_ROWS 
-	wp_posts.ID 
-FROM 
-	wp_posts 
-LEFT JOIN 
-	wp_term_relationships tr 
-ON 
-	wp_posts.ID = tr.object_id 
-INNER JOIN 
-	wp_term_taxonomy tt 
-ON 
-	tt.term_taxonomy_id=tr.term_taxonomy_id 
-INNER JOIN 
-	wp_terms t ON t.term_id = tt.term_id 
-WHERE 
-	1=1 
-AND 
-	wp_posts.post_type = '$post_type' 
-AND (
-    (
-        $terms_clauses      
-    ) 
-    AND 
-    (
-        wp_posts.post_status = 'publish' OR 
-        wp_posts.post_status = 'refunded' OR 
-        wp_posts.post_status = 'failed' OR 
-        wp_posts.post_status = 'revoked' OR 
-        wp_posts.post_status = 'abandoned' OR 
-        wp_posts.post_status = 'active' OR 
-        wp_posts.post_status = 'inactive' OR 
-        wp_posts.post_status = 'private'
-    )
-)
-            
-GROUP BY 
-	wp_posts.ID 
-ORDER BY 
-	wp_posts.post_title 
-LIKE 
-	'%apple%' 
-DESC, 
-	wp_posts.post_date 
-DESC LIMIT 0,$posts_per_page
-EOD;
-    # icf_dump($query);
-    return $sql_query;
-}
-# add_filter( 'pre_get_posts', 'override_sql_query' );
-
-function all_search_words($str) {
-    $words = explode(',', $str);
-
-    $words = array_map('trim', $words);
-    $more_words = array();
-    foreach ($words as $word) {
-        $more_words = array_merge($more_words, explode(' ', $word));
-    }
-    $words = array_merge($words, $more_words);
-    $words = array_map('trim', $words);
-
-    return $words;
-}
-
-/**
- * Extends the WP search with custom taxonomy search.
- * 
- * The gist of this function was written by luistinygod and
- * was borrowed from the gsearch-plus plugin.
- * 
- * @global \WP_Query $wp_query
- * @return void
- * @author luistinygod
- * @link https://profiles.wordpress.org/luistinygod/
- * @link https://wordpress.org/plugins/gsearch-plus/ 
- */
-function do_icf_search() {
-    
-    global $wp_query;
-    
-    if (! is_search()) { return; }
-    
-    $posts_per_page = icf_get_option('search_posts_per_page');
-    $post_type      = get_query_var('post_type');    
-    $words          = all_search_words(get_query_var('s'));
-    $search_terms   = implode(' ', $words);
-
-	// prepare tax query
-	$my_tax_query = array();
-
-	foreach ( get_taxonomies( array( 'public' => true ) ) as $taxonomy ) {
-
-		if ( in_array( $taxonomy, array( 'link_category', 'nav_menu', 'post_format' ) ) ) {
-			continue;
-		}
-
-		$list_taxonomy_terms = get_terms( $taxonomy, array('hide_empty' => true, 'fields' => 'all') );
-		$hit_slugs = array();
-    
-		if ( !empty($list_taxonomy_terms) ) {
-			foreach ( $list_taxonomy_terms as $term ) {
-				if ( stripos( $term->name, $search_terms ) !== false || ( !empty( $words ) && in_array( strtolower( $term->name ), $words ) ) ) {
-					$hit_slugs[] = $term->slug;
-				}
-			}
-			if ( !empty($hit_slugs) ) {
-				$my_tax_query[] = array(
-					'taxonomy' => $taxonomy,
-					'field' => 'slug',
-					'terms' => $hit_slugs,
-				);
-			}
-		}
-	}
-
-	//run the search by taxonomies query
-	if ( !empty( $my_tax_query ) ) {
-
-		$my_tax_query['relation'] = 'OR';
-
-		$args = array(
-			'post_type' => $post_type,
-			'nopaging' => true,
-			'tax_query' => $my_tax_query,
-			'no_found_rows' => true,
-			'update_post_meta_cache' => false,
-			'update_post_term_cache' => false,
-            'posts_per_page' => $posts_per_page
-		);
-
-		$the_tax_query = new WP_Query( $args );
-        
-        if ($the_tax_query->has_posts()) {
-            // merge results and prepare $wp_query for the real world
-            $wp_query->query_vars['nopaging'] = false;
-            $wp_query->query_vars['posts_per_page'] = $posts_per_page;
-            $wp_query->query_vars['paged'] = $the_tax_query->paged;
-            $wp_query->posts = $the_tax_query->posts;
-            $wp_query->post_count = $the_tax_query->post_count;
-            $wp_query->found_posts = $the_tax_query->found_posts;
-
-            if ( $posts_per_page ) {
-                $wp_query->max_num_pages = ceil( $the_tax_query->found_posts / $posts_per_page );
-            } 
-            else {
-                $wp_query->max_num_pages = 1;
-            }
-
-            $wp_query->post = $the_tax_query->post;
-        }
-        
-        # icf_dump($the_tax_query);
-	}
-}
-# add_action( 'wp', 'do_icf_search' );
-
-function icon_searchform() {
-    require_once(ICF_TEMPLATE_PATH . 'icon-searchform.php');
-}
-add_action('icf_icon_searchform', 'icon_searchform');
-
-function iconset_searchform() {
-    require_once(ICF_TEMPLATE_PATH . 'iconset-searchform.php');
-}
-add_action('icf_iconset_searchform', 'iconset_searchform');
-
-/**
- * Paginate search results.
- * @global int $paged
- * @global \WP_Query $wp_query
- * @param array $pages
- * @param integer $range
- */
-function pagination($pages = '', $range = 4) {  
-     $showitems = ($range * 2)+1;  
- 
-     global $paged;
-     if (empty($paged)) {
-         $paged = 1;
-     }
- 
-     if ($pages == '') {
-         global $wp_query;
-         $pages = $wp_query->max_num_pages;
-         if (!$pages) {
-             $pages = 1;
-         }
-     }   
- 
-     if (1 != $pages) {
-         echo "<div class=\"pagination\"><span>Page ".$paged." of ".$pages."</span>";
-         if ($paged > 2 && $paged > $range+1 && $showitems < $pages) {
-             echo "<a href='".get_pagenum_link(1)."'>&laquo; First</a>";
-         }
-         if ($paged > 1 && $showitems < $pages) {
-             echo "<a href='".get_pagenum_link($paged - 1)."'>&lsaquo; Previous</a>";
-         }
- 
-         for ($i=1; $i <= $pages; $i++) {
-             if (1 != $pages &&( !($i >= $paged+$range+1 || $i <= $paged-$range-1) || $pages <= $showitems )) {
-                 echo ($paged == $i)? "<span class=\"current\">".$i."</span>":"<a href='".get_pagenum_link($i)."' class=\"inactive\">".$i."</a>";
-             }
-         }
- 
-         if ($paged < $pages && $showitems < $pages) { 
-             echo "<a href=\"".get_pagenum_link($paged + 1)."\">Next &rsaquo;</a>";
-         }
-         if ($paged < $pages-1 &&  $paged+$range-1 < $pages && $showitems < $pages) {
-             echo "<a href='".get_pagenum_link($pages)."'>Last &raquo;</a>";
-         }
-         echo "</div>\n";
-     }
-}
+# add_action('wp', 'setup_search_posts');

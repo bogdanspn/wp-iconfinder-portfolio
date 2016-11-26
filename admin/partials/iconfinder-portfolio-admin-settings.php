@@ -161,6 +161,16 @@
                                     </div>
                                 </div>
                                 <?php endif; ?>
+                                <?php $currency_symbol = icf_get_option('currency_symbol', ICF_DEFAULT_CURRENCY); ?>
+                                <div class="form-row">
+                                    <label class="form-label" for="<?php echo $this->plugin_name; ?>-currency_symbol">
+                                        <?php esc_attr_e('Currency Symbol', $this->plugin_name); ?>
+                                    </label>
+                                    <div class="form-option">
+                                        <legend class="screen-reader-text"><span><?php _e('Currency Symbol', $this->plugin_name); ?></span></legend>
+                                        <?php echo icf_currency_selector( $currency_symbol, $this->plugin_name . "[currency_symbol]" ); ?>
+                                    </div>
+                                </div>
                                 <div class="form-row">
                                     <label class="form-label" for="<?php echo $this->plugin_name; ?>-api_client_secret">
                                         <?php esc_attr_e('Powered by Iconfinder Link', $this->plugin_name); ?>
@@ -174,11 +184,11 @@
                                 </div>
                                 <div class="form-row">
                                     <label class="form-label" for="<?php echo $this->plugin_name; ?>-api_client_secret">
-                                        <?php esc_attr_e('Buy on Iconfinder Link', $this->plugin_name); ?>
+                                        <?php esc_attr_e('Show Product Links', $this->plugin_name); ?>
                                     </label>
                                     <div class="form-option">
-                                        <legend class="screen-reader-text"><span><?php _e('Buy on Iconfinder Link', $this->plugin_name); ?></span></legend>
-                                        <p><?php esc_attr_e( 'Displays a "Buy on Iconfinder" link next to icons data using your referrer code.', $this->plugin_name ); ?></p>
+                                        <legend class="screen-reader-text"><span><?php _e('Show Product Links', $this->plugin_name); ?></span></legend>
+                                        <p><?php esc_attr_e( 'In advanced mode, will show a link to a local product page if you create a custom field on the iconset named `product_link`, otherwise displays a "Buy on Iconfinder" link next to icons data using your referrer code. Basic Mode does not allow linking to local products.', $this->plugin_name ); ?></p>
                                         <input type="radio" name="<?php echo $this->plugin_name; ?>[use_purchase_link]" value="true" <?php if ($use_purchase_link) : ?>checked="checked"<?php endif; ?> />Yes
                                         <input type="radio" name="<?php echo $this->plugin_name; ?>[use_purchase_link]" value="false" <?php if (! $use_purchase_link) : ?>checked="checked"<?php endif; ?> />No
                                     </div>

@@ -339,14 +339,45 @@ class Iconfinder_Portfolio_Admin {
 	    if (isset($data['message'])) {
 	        $message = $data['message'];
 	    }
-	    
+        
+        # $output = self::do_buffer($admin_file);
+	    # return $output;
+        
 		ob_start();
 		include $admin_file;
 		$output = ob_get_contents();
 		ob_end_clean();
 		return $output;
 	}
-        
+    
+    /**
+    * Buffers the output from a file and returns the contents as a string.
+    * You can pass named variables to the file using a keyed array. 
+    * For instance, if the file you are loading accepts a variable named 
+    * $foo, you can pass it to the file  with the following:
+    * 
+    * @example 
+    * 
+    *      do_buffer('path/to/file.php', array('foo' => 'bar'));
+    * 
+    * @param string $path
+    * @param array $vars
+    * @return type
+    */
+    private function do_buffer($path, $vars=null) {
+       $output = null;
+       if (! empty($vars)) {
+           extract($vars);
+       }
+       if (file_exists($path)) {
+           ob_start();
+           include_once($path);
+           $output = ob_get_contents();
+           ob_end_clean();
+       }
+       return $output;
+   }
+
     public function process_iconset_admin_post() {
         
         $result = null;
@@ -483,6 +514,7 @@ class Iconfinder_Portfolio_Admin {
         $valid['use_powered_by_link']   = get_val( $input, 'use_powered_by_link', true );
         $valid['use_purchase_link']     = get_val( $input, 'use_purchase_link', true );
         $valid['search_posts_per_page'] = get_val( $input, 'search_posts_per_page', ICF_SEARCH_POSTS_PER_PAGE );
+        $valid['currency_symbol']       = get_val( $input, 'currency_symbol', ICF_DEFAULT_CURRENCY );
         
         // We need to have at least one preview size at all times, 
         // so if none are selected, use the default.

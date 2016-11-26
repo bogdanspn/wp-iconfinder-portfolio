@@ -75,7 +75,7 @@ function add_iconsets_post_type() {
         'label'               => __( 'iconfinder-iconsets', $scope ),
         'description'         => __( 'Iconfinder Iconsets', $scope ),
         'labels'              => $labels,
-        'supports'            => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments'),
+        'supports'            => array( 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'comments', 'custom-fields'),
         'taxonomies'          => array( 'icon_category', 'icon_tag' ),
         'hierarchical'        => false,
         'public'              => true,
@@ -146,7 +146,7 @@ function register_icon_taxonomies() {
 		'icon_category',
 		array('icon', 'iconset', 'collection'),
 		array(
-			'label' => __( 'Categories' ),
+			'label' => __( 'Iconfinder Categories' ),
 			'rewrite' => array( 'slug' => 'icon-category' ),
 			'capabilities' => array(
 				'manage_terms' => 'manage_custom_tax',
@@ -166,7 +166,7 @@ function register_icon_taxonomies() {
 		'icon_tag',
 		array('icon', 'iconset', 'collection'),
 		array(
-			'label' => __( 'Tags' ),
+			'label' => __( 'Iconfinder Tags' ),
 			'rewrite' => array( 'slug' => 'icon-tags' ),
 			'capabilities' => array(
 				'manage_terms' => 'manage_custom_tax',

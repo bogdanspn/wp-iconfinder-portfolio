@@ -7,10 +7,11 @@
  */
 ?>
 <div class="container clearfix icf-searchform">
-    <!-- <h3>Search Icons</h3> -->
-    <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform">
-        <input type="text" name="s" value="<?php echo get_query_var('s'); ?>" placeholder="Search Icons" class="search-field" />
-        <input type="hidden" name="post_type" value="icon" />
-        <input type="submit" alt="Search" value="Search" class="submit" />
+    <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform" class="search-form the-search-form clearfix">
+        <fieldset class="the-search-fieldset">
+            <input type="text" class="search-form-input text the-search-field" name="s" placeholder="Search Icons" value="<?php echo get_query_var('s'); ?>">
+            <input type="submit" value="Search" class="submit the-search-button">
+            <input type="hidden" name="post_type" value="icon" />
+        </fieldset>
     </form>
 </div>

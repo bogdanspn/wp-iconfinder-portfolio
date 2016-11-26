@@ -110,6 +110,7 @@ class Iconfinder_Portfolio_Public {
     public function add_shortcode() {
 
         add_shortcode('iconfinder_portfolio', array( __CLASS__, 'iconfinder_portfolio_shortcode' ));
+        add_shortcode('iconfinder_search', array( __CLASS__, 'iconfinder_search_shortcode' ));
     }
     
     public function load_search_engine() {
@@ -117,7 +118,11 @@ class Iconfinder_Portfolio_Public {
             //TODO: How should this be handled?
             return;
         }
-        $gee_search_plus = new Gee_Search_Plus_Engine();
+        if (! is_admin()) {
+            if (is_search() || is_iconfinder()) {
+                $gee_search_plus = new Gee_Search_Plus_Engine();
+            }
+        }
     }
     
     /**
@@ -153,6 +158,89 @@ class Iconfinder_Portfolio_Public {
 
         return $api_url;
     }
+    
+    private static function define_iconfinder() {
+        if (! defined('IS_ICONFINDER')) {
+            define('IS_ICONFINDER', true);
+        }
+    }
+    
+    /**
+     * Render the Iconfinder Search shortcodes
+     * 
+     * @since 1.0.0
+     */
+    public static function iconfinder_search_shortcode( $attrs ) {
+        
+        self::define_iconfinder();
+        
+        $content = null;
+        
+        $defaults = array(
+            'type' => 'icon'  
+        );
+        
+        $attrs = shortcode_atts($defaults, $attrs );
+        
+        $search_type = get_val($attrs, 'type');
+        
+        if ($search_type === 'iconset') {
+            $template = icf_locate_template('iconset-search-body.php');
+        }
+        else {
+            $template = icf_locate_template('icon-search-body.php');
+        }
+        
+        if (! empty($template)) {
+            $content = do_buffer($template, array('s' => get_query_var('s')));
+        }
+        return $content;
+    }
+    
+    public static function iconfinder_portfolio_shorcode_advanced( $attrs ) {
+        global $wp_query;
+        
+        self::define_iconfinder();
+                
+        $content = null;
+        $theme   = null;
+        $options = array();
+        
+        $username = icf_get_option('username');
+        
+        $attrs = get_shortcode_attrs($attrs, array('username'=>$username));
+
+        $count      = get_val($attrs, 'count', 100);
+        $style      = get_val($attrs, 'style');
+        $sets       = str_to_array(get_val($attrs, 'sets'));
+        $categories = str_to_array(get_val($attrs, 'categories'));
+        $theme      = get_val($attrs, 'theme');
+        $sort_by    = get_val($attrs, 'sort_by');
+        $sort_order = strtoupper(get_val($attrs, 'sort_order')) === "ASC" ? SORT_ASC : SORT_DESC;
+        $omit       = str_to_array(get_val($attrs, 'omit'));
+        $show_links = get_val($attrs, 'show_links', true);
+        $show_price = get_val($attrs, 'show_price', true);
+        $img_size   = get_val($attrs, 'img_size', 'medium-2x');
+        
+        $posts_per_page = icf_get_option('search_posts_per_page', 20);
+        $args = array(
+            'post_type' => 'iconset',
+            'posts_per_page' => $posts_per_page
+        );
+        
+        $wp_query->posts = icf_setup_posts(
+            query_posts($args)
+        );
+        
+        $template = icf_locate_template('iconset-advanced.php');
+
+        if (! empty($template)) {
+            $content = do_buffer($template);
+            wp_reset_query();
+            return $content;
+        }
+        return null;
+    }
 
     /**
      * Render the Iconfinder Portfolio shortcodes
@@ -160,6 +248,14 @@ class Iconfinder_Portfolio_Public {
      * @since 1.0.0
      */
      public static function iconfinder_portfolio_shortcode( $attrs ) {
+         
+         self::define_iconfinder();
+         
+         // If the plugin is in advanced mode, we use a completely different approach.
+         
+         if (icf_is_advanced_mode()) {
+             return self::iconfinder_portfolio_shorcode_advanced($attrs);
+         }
      
         $iconsets            = array();
         $valid_sort_fields   = array('published_at', 'identifier', 'name', 'iconset_id');
@@ -269,7 +365,6 @@ class Iconfinder_Portfolio_Public {
         
         if ($content['type'] == 'icons') {
             $icons = scrub_icons_list($data['items']);
-            # icf_dump($icons);
             foreach ($icons as $icon) {
                 if (in_array($icon['icon_id'], $omit)) continue;
                 

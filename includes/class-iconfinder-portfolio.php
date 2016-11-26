@@ -6,7 +6,7 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       http://iconify.it
+ * @link       http://iconfinder.com
  * @since      1.0.0
  *
  * @package    Iconfinder_Portfolio
@@ -25,7 +25,7 @@
  * @since      1.0.0
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/includes
- * @author     Scott Lewis <scott@iconify.it>
+ * @author     Iconfinder <support@iconfinder.com>
  */
 class Iconfinder_Portfolio {
 
@@ -83,8 +83,8 @@ class Iconfinder_Portfolio {
         $plugin_mode = get_val($_options, 'plugin_mode', ICF_PLUGIN_MODE_DEFAULT);
         define('ICF_PLUGIN_MODE', $plugin_mode);
         
-        define('ICF_PLUGIN_PATH', plugin_dir_path( dirname( __FILE__ ) ));
-        define('ICF_PUBLIC_PATH', ICF_PLUGIN_PATH . 'public/');
+        define('ICF_PLUGIN_PATH',   plugin_dir_path( dirname( __FILE__ ) ));
+        define('ICF_PUBLIC_PATH',   ICF_PLUGIN_PATH . 'public/');
         define('ICF_TEMPLATE_PATH', ICF_PLUGIN_PATH . 'public/partials/');
 	}
 
@@ -136,6 +136,8 @@ class Iconfinder_Portfolio {
 		/**
 		 * Global utility functions file.
 		 */
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/icf-theme.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/utils.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/iconfinder-portfolio-functions.php';
         
         /**

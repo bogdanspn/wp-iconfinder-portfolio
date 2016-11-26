@@ -14,8 +14,13 @@ define('ICONFINDER_LINK_ICONSETS', 'https://www.iconfinder.com/iconsets/');
 define('ICONFINDER_TYPE_PREMIUM',      'premium');
 define('ICONFINDER_TYPE_FREE',         'free');
 
+define('ICF_POST_TYPE_ICON', 'icon');
+define('ICF_POST_TYPE_ICONSET', 'iconset');
+
 define('ICONFINDER_API_SSLVERIFY',     false);
 define('ICONFINDER_API_MAX_COUNT',     100);
+
+define('ICF_DEFAULT_CURRENCY', 'USD');
 
 define(
     'ICONFINDER_SERVER_ERROR_MSG', 
@@ -60,6 +65,8 @@ define('ICF_DEFAULT_ICON_PREVIEW_SIZE', '@128');
  */
 function _icf_settings() {
     return array(
+        
+        'icf_post_types' => array(ICF_POST_TYPE_ICON, ICF_POST_TYPE_ICONSET),
     
         // We don't want to import all of the preview images so 
         // we limit what is imported to only a few reasonable sizes.
@@ -89,14 +96,6 @@ function _icf_settings() {
         // Valid API sub-paths
         
         'valid_api_channels' => array('iconsets', 'collections', 'categories', 'styles'),
-        
-        // The icon search column number
-        
-        'icon_search_cols' => 2, 
-        
-        // The icon search column number
-        
-        'iconset_search_cols' => 4, 
         
         // Shortcode default values
         
