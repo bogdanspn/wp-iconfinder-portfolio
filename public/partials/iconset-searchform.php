@@ -6,6 +6,7 @@
  * and open the template in the editor.
  */
 ?>
+<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
 <div class="container clearfix icf-searchform iconset">
     <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform" class="search-form the-search-form clearfix">
         <fieldset class="the-search-fieldset">

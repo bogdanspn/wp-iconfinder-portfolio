@@ -1,16 +1,13 @@
 <?php
 /**
- * Icon search results.
+ * The template for display portfolio post archives
+ *
+ * @since 3.0
  */
 ?>
 <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
-<header class="page-titles">
-    <div class="container clearfix">
-        <h1 class="entry-title"><?php echo __( 'Search Icons', ICF_PLUGIN_NAME ) ?></h1>
-        <h3 class="entry-subtitle"><?php echo __( 'Showing results for: ', ICF_PLUGIN_NAME ) . "`$s`" ?></h3>
-    </div>
-</header>
 <?php do_action('icf_icon_searchform'); ?>
+
 <section class="main search-results-main icf-search-results icon-search-results iconfinder-portfolio">
     <div class="gs_drib_area gs_drib_theme1">
         <div class="container">
@@ -19,12 +16,12 @@
                     <div class="col-md-2 drib-shots icf-search-item icon-search-item icon-<?php echo icf_the_icon_id(); ?>">
                         <?php global $post; ?>
                         <?php if (icf_show_links()) : ?>
-                            <a href="<?php echo get_the_permalink($post->post_parent); ?>" class="icon-preview">
-                        <?php endif; ?>
+                        <a href="<?php echo get_the_permalink($post->post_parent); ?>" class="icon-preview">
+                            <?php endif; ?>
                             <?php icf_the_preview( icf_get_the_icon_id(), null, array('title' => icf_get_the_post_tags()) ); ?>
-                        <?php if (icf_show_links()) : ?>
-                            </a>
-                        <?php endif; ?>
+                            <?php if (icf_show_links()) : ?>
+                        </a>
+                    <?php endif; ?>
                         <p class="info">
                             <?php if (icf_show_links()) : ?>
                                 <?php echo icf_get_the_product_button(get_the_ID(), __( 'View Package', ICF_PLUGIN_NAME )); ?>

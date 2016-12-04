@@ -12,25 +12,24 @@
         <h3 class="entry-subtitle"><?php echo __( 'Icon Set Search Result for ', ICF_PLUGIN_NAME ) . "`$s`" ?></h3>
     </div>
 </header>
+<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
 <?php do_action('icf_iconset_searchform'); ?>
-<section class="main search-results-main">
+<section class="main search-results-main iconset-search-results icf-search-results iconfinder-portfolio">
     <div class="gs_drib_area gs_drib_theme1">
         <div class="container">
             <div class="row">
                 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
-                    <div class="col-md-6 drib-shots icon-<?php icf_the_iconset_id(); ?>">
+                    <div class="col-md-6 drib-shots iconset-search-item icf-search-item iconset-<?php icf_the_iconset_id(); ?>">
                         <?php if (icf_show_links()) : ?>
-                            <a href="<?php icf_the_permalink(); ?>" target="_blank">
+                            <a href="<?php icf_the_permalink(); ?>" target="_blank" class="iconset-preview">
                         <?php endif; ?>
-                            <?php icf_the_preview( array('550', ''), array('title' => icf_get_the_post_tags()) ); ?>
-                        <?php if (icf_show_links()) : ?>    
+                            <?php icf_the_preview( get_the_ID(), array('550', ''), array('title' => icf_get_the_post_tags()) ); ?>
+                        <?php if (icf_show_links()) : ?>
                             </a>
                         <?php endif; ?>
                         <p class="info">
                             <?php if (icf_show_links()) : ?>
-                                <a href="<?php icf_the_permalink(); ?>" target="_blank">
-                                    <?php _e('View Product', ICF_PLUGIN_NAME ); ?>
-                                </a> 
+                                <?php icf_the_product_button(get_the_ID(), __( 'View Package', ICF_PLUGIN_NAME )); ?>
                             <?php else: ?>
                                 <?php the_title(); ?>
                             <?php endif; ?>
@@ -45,7 +44,7 @@
         </div>
     </div>
     <div class="container clearfix">
-        <?php wpbeginner_numeric_posts_nav(); ?>
+        <?php icf_pagination(); ?>
     </div>
 </section>
 <!-- Footer -->

@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Provide a admin area view for the plugin
  *
@@ -45,7 +47,8 @@
                                     $use_purchase_link   = is_true(get_val( $options, 'use_purchase_link', true ));
                                     $selected_sizes      = get_val($options, 'icon_preview_sizes');
                                     $iconset_img_size    = get_val($options, 'iconset_preview_size');
-                                    $posts_per_page      = icf_get_option('search_posts_per_page', ICF_SEARCH_POSTS_PER_PAGE);
+                                    $posts_per_page      = icf_get_option('posts_per_page', ICF_SEARCH_POSTS_PER_PAGE);
+                                    $show_price          = icf_get_option('show_price', true);
                                     
                                     if (! is_array($selected_sizes) || empty($selected_sizes)) {
                                         $selected_sizes = array(icf_get_setting('icon_default_preview_size'));
@@ -157,7 +160,7 @@
                                     </label>
                                     <div class="form-option">
                                         <legend class="screen-reader-text"><span><?php _e('Search Results Per Page', $this->plugin_name); ?></span></legend>
-                                        <input type="number" min="1" max="<?php echo ICF_SEARCH_POSTS_PER_PAGE_MAX; ?>" step="1" id="<?php echo $this->plugin_name; ?>-posts-per-page" name="<?php echo $this->plugin_name; ?>[search_posts_per_page]" value="<?php echo $posts_per_page; ?>"/>
+                                        <input type="number" min="1" max="<?php echo ICF_SEARCH_POSTS_PER_PAGE_MAX; ?>" step="1" id="<?php echo $this->plugin_name; ?>-posts-per-page" name="<?php echo $this->plugin_name; ?>[posts_per_page]" value="<?php echo $posts_per_page; ?>"/>
                                     </div>
                                 </div>
                                 <?php endif; ?>
@@ -194,6 +197,17 @@
                                     </div>
                                 </div>
                                 <div class="form-row">
+                                    <label class="form-label" for="<?php echo $this->plugin_name; ?>-plugin_mode">
+                                        <?php esc_attr_e('Show Prices', $this->plugin_name); ?>
+                                    </label>
+                                    <div class="form-option">
+                                        <legend class="screen-reader-text"><span><?php _e('Show Prices', $this->plugin_name); ?></span></legend>
+                                        <p><?php _e( 'Use this setting to show or hide prices site-wide. You can override this in shortcodes using `show_price=true`.', $this->plugin_name ); ?></p>
+                                        <input type="radio" name="<?php echo $this->plugin_name; ?>[show_price]" value="1" <?php if ($show_price ==  true) : ?>checked="checked"<?php endif; ?> />Yes
+                                        <input type="radio" name="<?php echo $this->plugin_name; ?>[show_price]" value="0" <?php if ($show_price ==  false) : ?>checked="checked"<?php endif; ?> />No
+                                    </div>
+                                </div>
+                                <div class="form-row">
                                     <div class="form-option">
                                         <?php submit_button('Save Settings', 'primary','purgecache', TRUE); ?>
                                     </div>
@@ -202,7 +216,7 @@
                         </div>
                     </div>
                 </div>
-                <?php if ($plugin_mode === ICF_PLUGIN_MODE_BASIC) : ?>
+                <?php if (! icf_is_advanced_mode()) : ?>
                     <div class="meta-box-sortables ui-sortable">
                         <div class="postbox">
                             <h2 class="hndle ui-sortable-handle"><span><?php esc_attr_e('Purge Cache', $this->plugin_name); ?></span></h2>
@@ -217,7 +231,8 @@
                                     </div>
                                     <div class="form-row">
                                         <div class="form-option">
-                                            <?php submit_button( 'Clear Cache', 'secondary' ); ?>
+                                            <?php submit_button( 'Clear Cache', 'secondary', 'submit', false , array('onclick' => confirm_js('Are you sure you want to Clear the cache?')) ); ?>
+                                            <?php submit_button( 'Refresh Cache', 'primary', 'submit', false, array('onclick' => confirm_js('Are you sure you want to Refresh the cache?')) ); ?>
                                         </div>
                                     </div>
                                     <input type="hidden" id="<?php echo $this->plugin_name; ?>-purgecache" name="<?php echo $this->plugin_name; ?>[purgecache]" value="true"/>

@@ -896,6 +896,7 @@ div.button-row {
 .drib-shots .info {
 
     font-size: .8em;
+    height: 30px;
 }
 
 .drib-shots .info .price {
@@ -1126,3 +1127,74 @@ div.button-row {
     outline: rgb(255, 255, 255) none 0px;
 }/*#INPUT_1:after*/
 
+.icon-item a.icon-preview,
+.iconset-item a.iconset-preview {
+    
+    display: block;
+}
+
+.icon-item a.icon-preview img,
+.iconset-item a.iconset-preview img {
+    
+    cursor: pointer;
+}
+
+a, a img, a img.wp-post-image { cursor: pointer; }
+
+.iconfinder-portfolio .edd-add-to-cart,
+.iconfinder-portfolio .edd-submit.button.blue, 
+.iconfinder-portfolio .entry-subtitle .buy-now a, 
+.iconfinder-portfolio .iconset-item .icf-buy-button,
+.iconfinder-portfolio .iconset-item .edd-submit.button.blue,
+.iconfinder-portfolio .iconset-item .entry-subtitle .buy-now a {
+
+    height: auto !important;
+    line-height: 20px !important;
+    transition: all 0.2s ease-in-out 0s;
+    float: left !important;
+    padding: 8px 16px;
+    margin-left: 0;
+}
+
+.icf-icon-advanced .icf-button-bar .icf-buy-button {
+      
+    margin: 0 !important;
+    float: none;
+    padding: 16px 32px;
+}
+
+.iconfinder-portfolio .iconset-item  .edd-add-to-cart-label {
+    
+    display: inline-block;
+    line-height: 20px;
+    height: 20px;
+}
+
+.icf-icon-advanced .iconset-item h2, 
+.icf-icon-advanced .iconset-item .icf-button {
+    
+    display: inline-block;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    margin-right: 20px;
+    height: auto;
+    text-transform: uppercase;
+}
+
+.icf-icon-advanced .iconset-item h2 .price {
+    
+     color: #A00;
+}
+
+.post-content .icf-icon-advanced h2 {
+   
+    margin: 0 !important;
+    height: 60px;
+    line-height: 60px;
+}
+
+.icf-icon-advanced .icf-button-bar .row {
+    
+    margin-bottom: 20px;
+}

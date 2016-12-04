@@ -1,33 +1,12 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /* 
  * @Package Iconfinder Portfolio
  * @author Iconfinder
  * @since 1.1.0
  */
-
-/**
- * Search for one of our templates in the plugin theme path 
- * first, then our plugin partials path.
- * @param type $template
- * @return type
- * @since 1.1.0
- */
-function icf_locate_template($template) {
-    $found_path = null;
-    $theme_path = locate_template($template, false);
-    if ($theme_path === '') {
-        $test_path = ICF_TEMPLATE_PATH . $template;
-        if (file_exists($test_path)) {
-            $found_path = $test_path;
-        }
-    }
-    else {
-        $found_path = $theme_path;
-    }
-    return $found_path;  
-}
-
 /**
  * These functions are for use inside the WP loop on Iconset posts.
  * They will technically work with regular WP posts but won't return 
@@ -55,12 +34,25 @@ function icf_locate_template($template) {
  * 
  *   <a href="http://mysite.com/product-one">Product One</a>
  * 
- * @param type $post_id
+ * Iconfinder Portfolio link hierarchy:
+ *
+ * - Icons always link to the parent iconset WP Custom Post
+ * - Icon sets allow three different custom fields for links/buttons:
+ * ---- purchase_html      -> Takes button html in a custom field. For instance, GetDPD button HTML
+ * ---- purchase_shortcode -> Takes an EDD or other button/buy now link shorcode
+ * ---- purchase_link      -> Takes a URL
+ * ---- link to iconset on Iconfinder (with your referrer code)
+ *
+ * @param null|int $post_id
  */
 function icf_the_permalink($post_id=null) {
     echo icf_get_the_permalink($post_id);
 }
 
+/**
+ * @param null|int $post_id
+ * @return string
+ */
 function icf_get_the_permalink($post_id=null) {
     if (empty($post_id)) {
         $post_id = get_the_ID();
@@ -68,108 +60,343 @@ function icf_get_the_permalink($post_id=null) {
     return icf_get_permalink($post_id);
 }
 
-function icf_the_preview($size='full', $attr=null) {
-    echo icf_get_the_preview($size, $attr);
+/**
+ * @param null|int $post_id
+ * @param string $text
+ * @param array|null $attrs
+ */
+function icf_the_product_button($post_id=null, $text='', $attrs=null) {
+    echo icf_get_the_product_button($post_id, $text, $attrs);
 }
 
-function icf_get_the_preview($size='full', $attr=null) {
-    return the_post_thumbnail($size, $attr);
+/**
+ * @param null|int $post_id
+ * @param string $text
+ * @param array|null $attrs
+ * @return mixed|null|string
+ */
+function icf_get_the_product_button($post_id=null, $text='', $attrs=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return icf_build_the_product_button($post_id, $text, $attrs);
 }
 
-function icf_the_price() {
-    echo icf_get_the_price();
+/**
+ * @param int $post_id
+ * @param string $size
+ * @param array|null $attr
+ */
+function icf_the_preview_by_id($post_id, $size='full', $attr=null) {
+    echo icf_get_the_preview_by_id( $post_id, $size, $attr );
 }
 
-function icf_get_the_price() {
-    return get_post_meta( get_the_ID(), 'price', true );
+/**
+ * @param int $post_id
+ * @param string $size
+ * @param array|null $attr
+ * @return string
+ */
+function icf_get_the_preview_by_id($post_id, $size='full', $attr=null) {
+    return get_the_post_thumbnail( $post_id, $size, $attr );
 }
 
-function icf_the_iconset_id() {
-    echo icf_get_the_iconset_id();
+/**
+ * @param null|int $post_id
+ * @param string $size
+ * @param array|null $attr
+ */
+function icf_the_preview($post_id=null, $size='full', $attr=null) {
+    echo icf_get_the_preview($post_id, $size, $attr);
 }
 
-function icf_get_the_iconset_id() {
-    return get_post_meta(get_the_ID(), 'iconset_id', true);
+/**
+ * @param null|int $post_id
+ * @param string $size
+ * @param array|null $attr
+ * @param int|null $post_id
+ * @return string
+ */
+function icf_get_the_preview($post_id=null, $size='full', $attr=null, $post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_the_post_thumbnail($post_id, $size, $attr);
 }
 
-function icf_the_icon_id() {
-    echo icf_get_the_icon_id();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_price($post_id=null) {
+    echo icf_get_the_price($post_id);
 }
 
-function icf_get_the_icon_id() {
-    return get_post_meta(get_the_ID(), 'icon_id', true);
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_price($post_id=null) {
+    if (empty($post_id)) $post_id = get_the_ID();
+    return get_post_meta( $post_id, 'price', true );
 }
 
-function icf_the_slug() {
-    echo icf_get_the_identifier();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_iconset_id($post_id=null) {
+    echo icf_get_the_iconset_id($post_id);
 }
 
-function icf_get_the_slug() {
-    return get_post_meta(get_the_ID(), 'iconset_identifier', true);
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_iconset_id($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'iconset_id', true);
 }
 
+/**
+ * @param null|int $post_id
+ */
+function icf_the_icon_id($post_id=null) {
+    echo icf_get_the_icon_id($post_id);
+}
+
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_icon_id($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'icon_id', true);
+}
+
+/**
+ * @param null|int $post_id
+ */
+function icf_the_slug($post_id=null) {
+    echo icf_get_the_slug($post_id);
+}
+
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_slug($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'iconset_identifier', true);
+}
+
+/**
+ * @return bool|null
+ */
 function icf_show_links() {
-    return icf_get_option('use_purchase_link', false);
+    
+    $show_links = get_val($GLOBALS, 'icf_show_links', null);
+    if (null === $show_links) {
+        $show_links = icf_get_option('use_purchase_link', false);
+    }
+    return is_true($show_links);
 }
 
-function icf_the_license_url() {
-    echo icf_get_the_license_url();
+/**
+ * @return bool|null
+ */
+function icf_show_price() {
+
+    $show_price = get_val($GLOBALS, 'icf_show_price', null);
+    if (null === $show_price) {
+        $show_price = icf_get_option('show_price', false);
+    }
+    return is_true($show_price);
 }
 
-function icf_get_the_license_url() {
-    return get_post_meta(get_the_ID(), 'license_url', true);
+/**
+ * @return mixed
+ */
+function icf_img_size() {
+    return get_query_var('icf_img_size');
 }
 
-function icf_the_license_name() {
-    echo icf_get_the_license_name();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_license_url($post_id=null) {
+    echo icf_get_the_license_url($post_id);
 }
 
-function icf_get_the_license_name() {
-    return get_post_meta(get_the_ID(), 'license_name', true);
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_license_url($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'license_url', true);
 }
 
-function icf_the_iconset_style_name() {
-    echo icf_get_the_iconset_style_name();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_license_name($post_id=null) {
+    echo icf_get_the_license_name($post_id);
 }
 
-function icf_get_the_iconset_style_name() {
-    return get_post_meta(get_the_ID(), 'iconset_style_name', true);
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_license_name($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'license_name', true);
 }
 
-function icf_the_iconset_style_slug() {
-    echo icf_get_the_iconset_style_slug();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_iconset_style_name($post_id=null) {
+    echo icf_get_the_iconset_style_name($post_id);
 }
 
-function icf_get_the_iconset_style_slug() {
-    return get_post_meta(get_the_ID(), 'iconset_style_identifier', true);
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_iconset_style_name($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'iconset_style_name', true);
 }
 
-function icf_the_iconset_type() {
-    echo icf_get_the_iconset_type();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_iconset_style_slug($post_id=null) {
+    echo icf_get_the_iconset_style_slug($post_id);
 }
 
-function icf_get_the_iconset_type() {
-    return get_post_meta(get_the_ID(), 'iconset_type', true);
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_iconset_style_slug($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'iconset_style_identifier', true);
+}
+
+/**
+ * @param null|int $post_id
+ */
+function icf_the_iconset_type($post_id=null) {
+    echo icf_get_the_iconset_type($post_id);
+}
+
+/**
+ * @param null|int $post_id
+ * @return mixed
+ */
+function icf_get_the_iconset_type($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return get_post_meta($post_id, 'iconset_type', true);
 }
 
 function icf_the_currency_symbol() {
     echo icf_get_the_currency_symbol();
 }
 
+/**
+ * @return mixed|null
+ */
 function icf_get_the_currency_symbol() {
     return icf_get_currency_symbol(
         icf_get_option('currency_symbol', ICF_DEFAULT_CURRENCY)
     );
 }
 
-function icf_the_product_link() {
-    echo icf_get_the_product_link();
+/**
+ * @param null|int $post_id
+ */
+function icf_the_post_tags($post_id=null) {
+    echo icf_get_the_post_tags($post_id);
 }
 
-function icf_the_post_tags() {
-    echo icf_get_the_post_tags();
+/**
+ * @param null|int $post_id
+ * @return string
+ */
+function icf_get_the_post_tags($post_id=null) {
+    if (empty($post_id)) {
+        $post_id = get_the_ID();
+    }
+    return implode(', ', wp_get_post_terms( $post_id, 'icon_tag', array('fields' => 'names')));
 }
 
-function icf_get_the_post_tags() {
-    return implode(', ', wp_get_post_terms( get_the_ID(), 'icon_tag', array('fields' => 'names')));
+function icf_pagination() {
+    wpbeginner_numeric_posts_nav();
+}
+
+/**
+ * @return int
+ */
+function icf_icon_count() {
+    return icf_count_posts( ICF_POST_TYPE_ICON );
+}
+
+/**
+ * @return int
+ */
+function icf_iconset_count() {
+    return icf_count_posts( ICF_POST_TYPE_ICONSET );
+}
+
+/**
+ * @param null $post_id
+ * @param null $args
+ * @param bool $all
+ * @return array
+ */
+function icf_get_children($post_id=null, $args=null, $all=true) {
+
+    $children = null;
+    $posts_per_page = -1;
+    if (! $all) {
+        $posts_per_page = icf_get_option(
+            'search_posts_per_page',
+            ICF_SEARCH_POSTS_PER_PAGE
+        );
+    }
+
+    if (empty($post_id)) $post_id = get_the_ID();
+    if (null === $args) {
+        $args = array(
+            'post_type'   => 'icon',
+            'post_parent' => $post_id,
+            'numberposts' => $posts_per_page,
+            'post_status' => 'publish'
+        );
+    }
+    return get_children($args);
+}
+
+function icf_icon_searchform() {
+    icon_searchform();
+}
+
+function icf_iconset_searchform() {
+    iconset_searchform();
 }

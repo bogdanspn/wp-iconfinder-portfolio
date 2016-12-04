@@ -19,6 +19,7 @@ if (! isset($options)) $options = array(
 $col_count = 4;
 
 ?>
+<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
 <div class="gs_drib_area gs_drib_theme1">
 	<div class="container">
 		<div class="row">

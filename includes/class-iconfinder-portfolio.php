@@ -1,5 +1,7 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * The file that defines the core plugin class
  *
@@ -192,6 +194,8 @@ class Iconfinder_Portfolio {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		
 		$this->loader->add_action('admin_init', $plugin_admin, 'options_update');
+
+		$this->loader->add_action( 'admin_post_iconsets_admin_pagination', $plugin_admin, 'iconsets_admin_pagination' );
 		
 		// Add the purge_cache form handler hook
 		$this->loader->add_action( 'admin_post_purge_cache', $plugin_admin, 'purge_cache' );

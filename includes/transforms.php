@@ -1,10 +1,12 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
  * Converts an API iconset array to a WP post update array.
- * @param <array> $iconset
- * @param <object> $post
- * @return <array>
+ * @param array $iconset
+ * @param object $post
+ * @return array
  */
 function iconset_to_post($iconset, $post=null, $collection=null) {
 
@@ -12,11 +14,13 @@ function iconset_to_post($iconset, $post=null, $collection=null) {
     $post_title       = get_val($post, 'post_title', 'Untitled Iconset');
     $post_content     = get_val($post, 'post_content', $default_content);
     
-    $icon_post_title  = get_val($iconset, 'identifier', $post_title);
+    $icon_post_title  = get_val($iconset, 'name', $post_title);
     $iconset_id       = get_val($iconset, 'iconset_id', null);
     
+    $identifier = get_val($iconset, 'identifier', $iconset_id);
+    
     if (! empty($iconset_id)) {
-        $icon_post_title .= " - ({$iconset_id})";
+        # $icon_post_title .= " - ({$iconset_id})";
     }
     
     return array(
@@ -31,71 +35,20 @@ function iconset_to_post($iconset, $post=null, $collection=null) {
 		'post_password'  => '',
 		'to_ping'        =>  '',
 		'pinged'         => '',
-		'post_parent'    => 0,
+		'post_parent'    => get_val($collection, 'post_id', 0),
 		'menu_order'     => 0,
-		'guid'           => '',
+		'guid'           => ICONFINDER_LINK_ICONSETS . $identifier,
 		'import_id'      => 0,
 		'context'        => '',
         'post_exceprt'   => '',
         'iconset_id'     => $iconset_id
     );
 }
-//TODO: Create Iconset, Collection, and Icon entity classes
-/*
- Array
-(
-    [styles] => Array
-        (
-            [0] => Array
-                (
-                    [identifier] => flat
-                    [name] => Flat
-                )
-
-        )
-
-    [icons_count] => 11
-    [is_premium] => 1
-    [published_at] => 2016-04-15T03:06:15.223
-    [prices] => Array
-        (
-            [0] => Array
-                (
-                    [currency] => USD
-                    [price] => 10
-                    [license] => Array
-                        (
-                            [url] => https://www.iconfinder.com/licenses/basic
-                            [license_id] => 71
-                            [name] => Basic license
-                            [scope] => free
-                        )
-
-                )
-
-        )
-
-    [identifier] => apple-watch-11
-    [type] => vector
-    [iconset_id] => 29921
-    [categories] => Array
-        (
-            [0] => Array
-                (
-                    [identifier] => electronics-appliances
-                    [name] => Electronics & appliances
-                )
-
-        )
-
-    [name] => Apple Watch
-)
- */
 
 /**
  * Converts an API collection array to a WP post update array.
- * @param <array> $iconset
- * @return <array>
+ * @param array $iconset
+ * @return array
  */
 function collection_to_post($collection) {
     return array(
@@ -121,10 +74,10 @@ function collection_to_post($collection) {
 
 /**
  * Converts an API response array to a WP post update array.
- * @param <array> $icon
- * @param <object> $post
- * @param <array> $iconset
- * @return <array>
+ * @param array $icon
+ * @param object $post
+ * @param array $iconset
+ * @return array
  */
 function icon_to_post($icon, $post=null, $iconset=null) {
     
@@ -135,6 +88,12 @@ function icon_to_post($icon, $post=null, $iconset=null) {
     }
     
     $post_content = get_val( $post, 'post_content', $post_title );
+
+    $parent_permalink = null;
+    $post_id = get_val($iconset, 'post_id', 0);
+    if ($post_id) {
+        $parent_permalink = get_the_permalink($post_id);
+    }
     
     return array(
         'ID'             => get_val($post, 'ID'),
@@ -148,9 +107,9 @@ function icon_to_post($icon, $post=null, $iconset=null) {
 		'post_password'  => '',
 		'to_ping'        =>  '',
 		'pinged'         => '',
-		'post_parent'    => 0,
+		'post_parent'    => get_val($iconset, 'post_id', 0),
 		'menu_order'     => 0,
-		'guid'           => '',
+		'guid'           => $parent_permalink,
 		'import_id'      => 0,
 		'context'        => '',
         'post_exceprt'   => '',
