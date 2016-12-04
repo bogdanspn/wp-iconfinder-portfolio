@@ -477,7 +477,6 @@ function template_chooser($template) {
     }
 
     $template_filename = basename($template);
-
     $find_file = locate_template($template_filename, false);
 
     if (empty($find_file)) {
@@ -485,21 +484,6 @@ function template_chooser($template) {
             $template = ICF_TEMPLATE_PATH . $template_filename;
         }
     }
-
-//    if ( $post_type === ICF_POST_TYPE_ICON ) {
-//        $template = locate_template('icon-search.php', false);
-//        if ($template === '') {
-//            $template = ICF_TEMPLATE_PATH . 'icon-search.php';
-//        }
-//    }
-//    else if ( is_search() && $post_type === ICF_POST_TYPE_ICONSET ) {
-//        $template = locate_template('iconset-search.php', false);
-//        if ($template === '') {
-//            $template = ICF_TEMPLATE_PATH . 'iconset-search.php';
-//        }
-//    }
-    # icf_dump(get_defined_vars());
-    # the_permalink();die();
     return $template;   
 }
 add_filter('template_include', 'template_chooser');
@@ -522,34 +506,6 @@ function is_iconfinder() {
     }
     return $is_iconfinder;
 }
-
-/**
- * Explicitly set the post_type query_var.
- * TODO: Need to verify if this is necessary
- * @param \WP_Query $query
- * @return \WP_Query
- */
-function set_post_type_query($query) {
-    
-    if (is_admin()) { return $query; }
-    
-    if (! is_iconfinder()) {
-        return $query;
-    }
-
-    if (! is_search()) {
-        return $query;
-    }
-
-    if (isset($_REQUEST['post_type'])) {
-        $post_type = $_REQUEST['post_type'];
-        if (! empty($post_type)) {
-            set_query_var('post_type', $post_type);
-        }
-    }
-    return $query;
-}
-# add_action('pre_get_posts', 'set_post_type_query');
 
 /**
  * @param \WP_Query $query
