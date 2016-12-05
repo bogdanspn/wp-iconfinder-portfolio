@@ -1,11 +1,11 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
- * The template for displaying portfolio posts
- *
- * @since 1.0
+ * @package Iconfinder Portfolio
  */
 ?>
-<!-- grab the posts -->
 <?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
     <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
     <div class="icf-icon-advanced">

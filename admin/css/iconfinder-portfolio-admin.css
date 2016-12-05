@@ -134,25 +134,8 @@ body.toplevel_page_iconfinder-portfolio form p {
     box-sizing: border-box;
 }
 
-.drib-shots {
-    
-    float: left; 
-    margin: 0 10px 10px 0; 
-    padding: 10px; 
-    
-    box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    background-color:#ffffff;
-    -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-    -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-    box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-    
-    min-height: 500px;
-}
-
 .drib-shots.icf-mode-basic {
+
     min-height: 420px !important;
 }
 
@@ -161,14 +144,102 @@ body.toplevel_page_iconfinder-portfolio form p {
     padding: 0 10px;
 }
 
-.drib-shots .button-row {
+.iconset-card .button-row {
     
     text-align: left;
     border-top: 1px solid #ccc;
-    border-bottom: 1px solid #ccc;
     padding: 10px 0 !important;
-    margin: 10px;
+    margin:  0 !important;
+
     min-height: 30px;
+}
+
+.iconset-card .button-row .button-import,
+.iconset-card .button-row .button-update {
+
+    float: left;
+}
+
+.iconset-card .button-row .button-delete {
+
+    float: right;
+}
+
+.iconset-card {
+
+    float: left;
+    margin: 0 10px 10px 0;
+    padding: 0px;
+    border: 1px solid #ddd;
+    background: #fff;
+    height: 460px;
+    width: 310px !important;
+    min-width: 310px !important;
+}
+
+.iconset-card.icf-mode-basic {
+
+    min-height: 420px !important;
+}
+
+.iconset-card .top,
+.iconset-card .bottom,
+.iconset-card .shortcode {
+
+    padding: 10px;
+}
+
+.iconset-card a {
+
+    cursor: pointer;
+}
+
+.iconset-card .bottom {
+
+    background: #fafafa;
+    height: 125px;
+    min-height: 125px;
+    border-top: 1px solid #ddd;
+}
+
+.iconset-card .bottom input {
+
+    background: transparent;
+}
+
+.iconset-card .top {
+
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.iconset-card img {
+
+    width: 95%;
+}
+
+.iconset-card .shortcode {
+
+    background: #efefef;
+    height: 20px;
+    text-align: center;
+}
+
+.iconset-card .shortcode input {
+
+    background: #efefef;
+    font-size: 1em;
+    width: 290px;
+    display: block;
+    border: none;
+    box-shadow: none;
+    text-align: center;
+}
+
+.iconset-card .top .info {
+
+    padding: 0;
+    margin: 0;
 }
 
 .danger {
@@ -188,10 +259,37 @@ body.toplevel_page_iconfinder-portfolio form p {
 
 .icf-admin-pagination {
 
-    width: 100%;
-    height: 20px;
+    height: 46px;
     margin: 20px 0 !important;
-    padding: 20px !important;
+    padding: 0px 10px !important;
+    clear: both;
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+.icf-admin-pagination.top .tablenav .tablenav-pages {
+
+    float: right;
+}
+
+.icf-admin-pagination.bottom .tablenav .tablenav-pages {
+
+    float: left;
+}
+
+.icf-admin-pagination.top .tablenav .tablenav-pages a,
+.icf-admin-pagination.bottom .tablenav .tablenav-pages a {
+
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background: #e5e5e5;
+    font-size: 13px;
+    font-weight: 400;
+    text-align: center;
 }
 
 .icf-admin-pagination input.button {

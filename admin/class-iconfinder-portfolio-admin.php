@@ -242,7 +242,7 @@ class Iconfinder_Portfolio_Admin {
 	    $_options = get_option( ICF_PLUGIN_NAME );
 		$username = isset( $_options['username'] ) ? $_options['username'] : null;
 
-		$current_page = $this->get_page_num();
+		$current_page = icf_get_page_number();
 
         $more_args = null;
         if ($current_page > 1) {
@@ -258,11 +258,12 @@ class Iconfinder_Portfolio_Admin {
 
         $response = iconfinder_call_api(
             $this->get_admin_api_url( 'iconsets', $more_args ),
-            icf_get_cache_key( $username, 'iconsets' )
+            icf_get_cache_key( $username, 'iconsets' ),
+            false
         );
 
 	    if (isset($response['items'])) {
-	    	$data['items'] = $response['items'];
+	    	$data['items'] = paginate_items($response['items'], 100, $current_page);
 	    }
 
 	    $data['page_count'] = ceil(get_val($response, 'total_count', 100) / 100);
@@ -306,23 +307,6 @@ class Iconfinder_Portfolio_Admin {
 	    }
 		echo $this->apply_admin_theme($data, 'iconfinder-portfolio-admin-iconsets.php');
 	}
-
-    /**
-     * Determines the proper pagination for displaying iconsets.
-     * @return int
-     * @since 1.1.0
-     */
-	public function get_page_num() {
-
-//        if (! empty($icf_pagination)) {
-//            if (! check_admin_referer('icf_iconsets_admin_pagination')) {
-//                icf_append_error(array('error' => 'You are not allowed to access that page'));
-//                wp_redirect(admin_url("admin.php?page=iconfinder-portfolio-iconsets"));
-//            }
-//        }
-        $current_page = get_val($_REQUEST, 'page_num', 1);
-        return $current_page;
-    }
 
     /**
      * Determine correct API URl from the shortcode attrs
@@ -478,7 +462,8 @@ class Iconfinder_Portfolio_Admin {
                 'error'
             );
         }
-        wp_redirect( admin_url( 'admin.php?page=iconfinder-portfolio-iconsets' ) );
+
+        wp_redirect( admin_url( "admin.php?page=iconfinder-portfolio-iconsets" . icf_get_page_query() ) );
     }
     
     /**

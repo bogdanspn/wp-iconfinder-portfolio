@@ -351,16 +351,34 @@ function icf_pagination() {
 }
 
 /**
+ * Output the icon count.
+ * @return void
+ */
+function icf_the_icon_count() {
+    echo icf_get_icon_count();
+}
+
+/**
+ * Return the icon count
  * @return int
  */
-function icf_icon_count() {
+function icf_get_icon_count() {
     return icf_count_posts( ICF_POST_TYPE_ICON );
 }
 
 /**
+ * Output the iconset count
+ * @return void
+ */
+function icf_the_iconset_count() {
+    echo icf_get_iconset_count();
+}
+
+/**
+ * Return the iconset count
  * @return int
  */
-function icf_iconset_count() {
+function icf_get_iconset_count() {
     return icf_count_posts( ICF_POST_TYPE_ICONSET );
 }
 

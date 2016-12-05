@@ -189,10 +189,14 @@ class Iconfinder_Portfolio_Public {
         $search_type = get_val($attrs, 'type');
 
         if ($search_type === 'iconset') {
-            $template = icf_locate_template('iconset-search-body.php');
+            $template = icf_locate_template(
+                icf_get_setting( 'iconset_search_shortcode_template' )
+            );
         }
         else {
-            $template = icf_locate_template('icon-search-body.php');
+            $template = icf_locate_template(
+                icf_get_setting( 'icon_search_shortcode_template' )
+            );
         }
 
         if (! empty($template)) {

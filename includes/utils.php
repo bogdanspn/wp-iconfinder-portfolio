@@ -93,8 +93,12 @@ function is_post($post) {
  * @return integer
  */
 function icf_count_posts($post_type) {
+    $count = 0;
     $posts_count = wp_count_posts( $post_type );
-    return $posts_count->publish;
+    if ( isset($posts_count->publish) ) {
+        $count = $posts_count->publish;
+    }
+    return $count;
 }
 
 /**
@@ -347,22 +351,116 @@ function wpbeginner_numeric_posts_nav() {
  */
 function icf_admin_iconsets_pagination($page_count, $current_page=1) {
 
-    $current_page = get_val($_REQUEST, 'page_num', $current_page);
-    $admin_url = admin_url("admin.php?page=iconfinder-portfolio-iconsets");
-    echo "<div class=\"icf_iconset_pagination clear clearfix\"><span>Pages:</span> \n";
-    echo "<form method=\"post\" action=\"{$admin_url}\" name='icf_iconsets_admin_pagination'>\n";
-    wp_nonce_field( 'icf_iconsets_admin_pagination', 'icf_iconsets_admin_pagination', $admin_url, true );
-    echo "<input type=\"hidden\" name=\"action\" value=\"iconsets_admin_pagination\" />\n";
+    $current_page = get_val($_REQUEST, 'paged', $current_page);
+    echo "<div class=\"tablenav top\">\n";
+    echo "<div class=\"tablenav-pages\">\n";
+    echo "<span class=\"first-page\">Pages:</span>\n";
     for ($i=0; $i<$page_count; $i++) {
-        $class = $i + 1 == $current_page ? 'primary' : 'secondary' ;
-        printf(
-            "<input type=\"submit\" name=\"page_num\" id=\"submit\" class=\"button button-{$class}\" value=\"%s\" />",
-            $i + 1
-        );
+        $page_num = $i + 1;
+        $class = $i + 1 == $current_page ? 'current-page' : '' ;
+        $admin_url = admin_url("admin.php?page=iconfinder-portfolio-iconsets&paged={$page_num}");
+        echo "<a class=\"first-page {$class}\" href=\"{$admin_url}\">{$page_num}</a>\n";
     }
-    echo "<input type=\"hidden\" name=\"" . ICF_PLUGIN_NAME . "[callback]\" value=\"display_iconsets_page\" />\n";
-    echo "</form>\n";
     echo "</div>\n";
+    echo "</div>\n";
+}
+
+//function _icf_admin_iconsets_pagination($page_count, $current_page=1) {
+//
+//    $current_page = get_val($_REQUEST, 'page_num', $current_page);
+//    $admin_url = admin_url("admin.php?page=iconfinder-portfolio-iconsets");
+//    echo "<div class=\"icf_iconset_pagination clear clearfix\"><span>Pages:</span> \n";
+//    echo "<form method=\"post\" action=\"{$admin_url}\" name='icf_iconsets_admin_pagination'>\n";
+//    wp_nonce_field( 'icf_iconsets_admin_pagination', 'icf_iconsets_admin_pagination', $admin_url, true );
+//    echo "<input type=\"hidden\" name=\"action\" value=\"iconsets_admin_pagination\" />\n";
+//    for ($i=0; $i<$page_count; $i++) {
+//        $class = $i + 1 == $current_page ? 'primary' : 'secondary' ;
+//        printf(
+//            "<input type=\"submit\" name=\"page_num\" id=\"submit\" class=\"button button-{$class}\" value=\"%s\" />",
+//            $i + 1
+//        );
+//    }
+//    echo "<input type=\"hidden\" name=\"" . ICF_PLUGIN_NAME . "[callback]\" value=\"display_iconsets_page\" />\n";
+//    echo "</form>\n";
+//    echo "</div>\n";
+//}
+
+/**
+ * Paginates a set of items.
+ * @param array $items
+ * @param int $items_per_page
+ * @param int $page_num
+ * @return array
+ */
+function paginate_items($items, $items_per_page, $page_num) {
+
+    $subset = array();
+    $item_count = count($items);
+    $page_count = ceil($item_count/$items_per_page);
+
+    /*
+     * By default we return the full set of items
+     */
+
+    $subset = $items;
+
+    /*
+     * If there are more items in the set than the max number
+     * of items per page, we want to get sub-set
+     */
+
+    if ($item_count > $items_per_page) {
+        $start = get_range_start($page_num, $items_per_page, $item_count, 0);
+        $subset = array_slice($items, $start, $items_per_page);
+    }
+
+    return $subset;
+}
+
+/**
+ * Used in pagination routines and other routines that need to capture
+ * a subset of a set of data.
+ * @param int $offset
+ * @param int $items_per_page
+ * @param int $item_count
+ * @param int $min
+ * @return int
+ */
+function get_range_start($offset, $items_per_page, $item_count, $min=0) {
+    $start = ($offset * $items_per_page) - $items_per_page;
+    return get_num_in_rang(
+        $start,
+        $item_count,
+        $min
+    );
+}
+
+/**
+ * Verifies that the specified number is within the range of
+ * the minimum and maximum range specified.
+ * @param int $num the number to check.
+ * @param int $max the maximum number in the set.
+ * @param int $min the minimum number in the set.
+ * @return int
+ */
+function get_num_in_rang($num, $max, $min=1) {
+    if ($num > $min) {
+        return $num < $max ? $num : $max ;
+    }
+    return $min;
+}
+
+/**
+ * Builds the pagination query to append to a URL.
+ * @param string $delim
+ */
+function icf_get_page_query( $delim = "&" ) {
+    $page_query = "";
+    $page_num = icf_get_page_number();
+    if ( is_numeric($page_num) && $page_num > 1 ) {
+        $page_query = "{$delim}paged={$page_num}";
+    }
+    return $page_query;
 }
 
 /**
@@ -377,7 +475,7 @@ function icf_page_number() {
  * @return int mixed
  */
 function icf_get_page_number() {
-    return get_val($_REQUEST, 'page_num');
+    return get_val($_REQUEST, 'paged');
 }
 
 /**
@@ -462,8 +560,7 @@ add_action('icf_iconset_searchform', 'iconset_searchform');
  * @since 1.1.0
  */
 function template_chooser($template) {    
-    global $wp_query;
-    
+
     if (! is_iconfinder()) {
         return $template;
     }
@@ -480,7 +577,7 @@ function template_chooser($template) {
     $find_file = locate_template($template_filename, false);
 
     if (empty($find_file)) {
-        if ( file_exists(ICF_TEMPLATE_PATH . $template_filenmae)) {
+        if ( file_exists(ICF_TEMPLATE_PATH . $template_filename)) {
             $template = ICF_TEMPLATE_PATH . $template_filename;
         }
     }
@@ -662,9 +759,22 @@ function icf_build_the_product_button($post_id, $text='', $attrs=null) {
 
     if (! is_array($attrs)) $attrs = array();
 
+    /**
+     * 1. Is this an icon post_type? Link to the iconset post.
+     * 2. Is there a product_html custom field (getDPD)? Just use that.
+     * 3. Is there a product_shortcode custom field (EDD)?
+     * 4. Is there a product_link custom field?
+     * 5. Is there a GUID set?
+     * 6. Can we manually build an Iconfinder link?
+     * 7. Just use the default permalink.
+     */
+
     $the_button = null;
     $post = get_post($post_id);
     if (is_object($post)) {
+        /**
+         * 1. Is this an icon post_type?
+         */
         if ($post->post_type == 'icon') {
             $parent_post_id = get_val($post, 'post_parent', null);
             if (! empty($parent_post_id)) {
@@ -676,33 +786,107 @@ function icf_build_the_product_button($post_id, $text='', $attrs=null) {
             }
         }
         else {
+            /**
+             * 2. Is there a product_html value?
+             */
             $button_html = get_post_meta($post_id, 'purchase_html', true);
             if (! empty($button_html)) {
                 $the_button = $button_html;
             }
             else {
+                /**
+                 * 3. Is there a product_shortcode value?
+                 */
                 $shortcode = get_post_meta($post_id, 'product_shortcode', true);
                 if (is_shortcode($shortcode)) {
                     $the_button = do_shortcode($shortcode);
                 }
                 else {
-                    $button_url = get_the_permalink($post->ID);
-                    $attrs_str = '';
-                    $attrs = array_merge(array(
-                        'class' => 'icf-button icf-buy-button'
-                    ), $attrs);
+                    /**
+                     * 4-7. Run through the icf_permalink structure.
+                     */
+                    return icf_link_button($text, array_merge(array(
+                        'href'   => icf_get_permalink( $post->ID ),
+                        'class'  => 'icf-button icf-buy-button',
+                        'target' => '_blank'
+                    ), $attrs));
 
-                    if (is_array($attrs)) {
-                        foreach ($attrs as $attr => $value) {
-                            $attrs_str .= " {$attr}=\"{$value}\" ";
-                        }
-                    }
-                    $the_button = "<a href=\"{$button_url}\" target=\"_blank\" {$attrs_str}>{$text}</a>\n";
                 }
             }
         }
     }
     return $the_button;
+}
+
+/**
+ * This function contains the real logic for icf_the_permalink. Since
+ * icons can belong to iconsets and we want to link to the iconset,
+ * we first check the current post for a product_link custom field.
+ * If it doesn't have one, it _might_ be an icon and not an iconset
+ * so we check to see if it has a parent_post_id so we return the
+ * product link of the parent.
+ * @param integer $post_id
+ * @return string
+ * @since 1.1.0
+ */
+function icf_get_permalink( $post_id ) {
+
+    /**
+     * 1. Product link
+     * 2. Parent post
+     * 3. GUID
+     * 4. Manually build link
+     * 5. Fall back to regular permalink
+     */
+
+    /**
+     * 1. Do we have a product_link custom field?
+     */
+    $permalink  = get_post_meta($post_id, 'product_link', true);
+
+    /**
+     * 2. Is this an icon post_type?
+     */
+    if (empty($permalink)) {
+        $post = get_post($post_id);
+        if (is_object($post)) {
+            if ($post->post_type == 'icon') {
+                $parent_post_id = get_val($post, 'post_parent', null);
+                if (! empty($parent_post_id)) {
+                    $permalink = get_the_permalink($parent_post_id);
+                }
+            }
+        }
+    }
+
+    /**
+     * 3. Is there a GUID set?
+     */
+    if (empty($permalink)) {
+        $permalink = get_post_meta( $post->ID, 'guid', true );
+    }
+
+    /**
+     * 4. Can we manually build a link to Iconfinder?
+     */
+    if (empty($permalink)) {
+        $identifier = get_post_meta($post_id, 'iconset_identifier', true);
+        if (empty($identifier)) {
+            $identifier = get_post_meta($post_id, 'iconset_id', true);
+        }
+        if (! empty($identifier)) {
+            $permalink = ICONFINDER_LINK_ICONSETS . $identifier;
+        }
+    }
+
+    /**
+     * 5. Use the default permalink.
+     */
+    if (empty($permalink)) {
+        $permalink = get_the_permalink( $post_id );
+    }
+
+    return add_referral_code( $permalink );
 }
 
 /**
@@ -760,41 +944,6 @@ function add_referral_code($link) {
         $link .= "?ref={$username}";
     }
     return $link;
-}
-
-/**
- * This function contains the real logic for icf_the_permalink. Since 
- * icons can belong to iconsets and we want to link to the iconset, 
- * we first check the current post for a product_link custom field. 
- * If it doesn't have one, it _might_ be an icon and not an iconset
- * so we check to see if it has a parent_post_id so we return the 
- * product link of the parent.
- * @param integer $post_id
- * @return string
- * @since 1.1.0
- */
-function icf_get_permalink($post_id) {
-    
-    $permalink  = get_post_meta($post_id, 'product_link', true);
-    
-    if (empty($permalink)) {
-        $parent_post_id = get_post_meta($post_id, 'parent_post_id', true);
-        if (! empty($parent_post_id)) {
-            $permalink  = icf_buffer_shortcode(
-                get_post_meta($parent_post_id, 'product_link', true)
-            );
-        }
-    }
-    if (empty($permalink)) {
-        $identifier = get_post_meta($post_id, 'iconset_identifier', true);
-        if (empty($identifier)) {
-            $identifier = get_post_meta($post_id, 'iconset_id', true);
-        }
-        if (! empty($identifier)) {
-            $permalink = ICONFINDER_LINK_ICONSETS . $identifier;
-        }
-    }        
-    return add_referral_code($permalink);
 }
 
 /**

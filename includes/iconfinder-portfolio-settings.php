@@ -5,8 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Iconfinder portfolio global settings
  */
- 
-# define( 'ICF_PLUGIN_NAME', 'iconfinder-portfolio' );
+
 define('ICONFINDER_DOMAIN',        'iconfinder.com');
 define('ICONFINDER_URL',           'http://iconfinder.com/'); 
 define('ICONFINDER_API_URL',       'https://api.iconfinder.com/v2/');
@@ -14,9 +13,11 @@ define('ICONFINDER_CDN_URL',       'https://cdn4.iconfinder.com/');
 define('ICONFINDER_LINK_ICONS',    'https://www.iconfinder.com/icons/');
 define('ICONFINDER_LINK_ICONSETS', 'https://www.iconfinder.com/iconsets/');
 
-// We define this here and take an indirect approach to using it
-// so that if details like the locations of images changes on the
-// Iconfinder side, we only have one file to update in the WP Plugin
+/**
+ * We define this here and take an indirect approach to using it
+ * so that if details like the locations of images changes on the
+ * Iconfinder side, we only have one file to update in the WP Plugin
+ */
 
 define('ICF_TOKEN_SIZE', '@SIZE');
 define('ICF_TOKEN_IDENTIFIER', '@IDENTIFIER');
@@ -81,8 +82,6 @@ define('ICF_SEARCH_POSTS_PER_PAGE_MAX', 100);
 define('ICF_DEFAULT_PREVIEW_SIZE', 'medium-2x');
 define('ICF_DEFAULT_ICON_PREVIEW_SIZE', '@128');
 
-
-
 /**
  * We use a function here rather than a variable so that we don't need to use globals.
  * Use icf_settings() in 
@@ -93,29 +92,41 @@ function _icf_settings() {
     return array(
         
         'icf_post_types' => array(ICF_POST_TYPE_ICON, ICF_POST_TYPE_ICONSET),
-    
-        // We don't want to import all of the preview images so 
-        // we limit what is imported to only a few reasonable sizes.
+
+        /**
+         * We don't want to import all of the preview images so
+         * we limit what is imported to only a few reasonable sizes.
+         */
 
         'icon_import_sizes' => array('@64', '@128', '@256', '@512'),
 
-        // The default preview size that is set as the post thubmnail (featured image)
+        /**
+         * The default preview size that is set as the post thubmnail (featured image)
+         */
 
         'icon_default_preview_size' => ICF_DEFAULT_ICON_PREVIEW_SIZE ,
-        
-        // Default iconset preview image size
+
+        /**
+         * Default iconset preview image size
+         */
         
         'iconset_default_preview_size' => ICF_DEFAULT_PREVIEW_SIZE,
-        
-        // Available iconset preview sizes
+
+        /**
+         * Available iconset preview sizes
+         */
         
         'iconset_preview_sizes' => array('medium', 'medium-2x', 'large'),
-        
-        // Valid API sub-paths
+
+        /**
+         * Valid API sub-paths
+         */
         
         'valid_api_channels' => array('iconsets', 'collections', 'categories', 'styles'),
-        
-        // Commonly-used synonyms for different icon styles (we allow all of these)
+
+        /**
+         * Commonly-used synonyms for different icon styles (we allow all of these)
+         */
         
         'style_aliases' => array(
             'line'        => 'outline',
@@ -130,15 +141,31 @@ function _icf_settings() {
             'filled'      => 'filled_outline',
             '3-d'         => '3d'
         ),
-        
-        // Default posts, search results per page. This setting will only 
-        // apply to results shown within the Iconfinder Porfolio output.
-        // It does not affect the global WP settings and overrides 
-        // the global WP settins inside the plugin.
+
+        /**
+         * The default template for the iconste search shortcode output.
+         */
+
+        'iconset_search_shortcode_template' => 'iconset-search-body.php',
+
+        /**
+         * The default template for the icon search shortcode output.
+         */
+
+        'icon_search_shortcode_template' => 'icon-search-body.php',
+
+        /**
+         * Default posts, search results per page. This setting will only
+         * apply to results shown within the Iconfinder Porfolio output.
+         * It does not affect the global WP settings and overrides
+         * the global WP settins inside the plugin.
+         */
         
         'posts_per_page' => ICF_SEARCH_POSTS_PER_PAGE,
-        
-        // Shortcode default values
+
+        /**
+         * Shortcode default values
+         */
         
         'shortcode_defaults' => array(
                 'id'         => '',
@@ -159,8 +186,10 @@ function _icf_settings() {
                 'show_price' => true,
                 'buy_link'   => true
         ),
-        
-        // Default options for the plugin
+
+        /**
+         * Default options for the plugin
+         */
         
         'plugin_default_options'  => array(
             'api_client_id'       => null,
@@ -174,12 +203,17 @@ function _icf_settings() {
     );
 }
 
+/**
+ * @return mixed
+ */
 function register_default_settings() {
     return icf_get_setting('plugin_default_options');
 }
 
 /**
- * Default options for the Gee Search Engine
+ * Default options for the Gee Search Engine. We are not running the plugin as a plugin
+ * but rather as a behind-the-scenese search engine inside of our plugin. There is no
+ * UI for the search engine so we hard-code the settings.
  * @return array
  */
 function _gee_searchplus_options() {

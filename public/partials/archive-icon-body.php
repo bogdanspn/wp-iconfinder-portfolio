@@ -1,8 +1,9 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
 /**
- * The template for display portfolio post archives
- *
- * @since 3.0
+ * @package Iconfinder Portfolio
  */
 ?>
 <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->

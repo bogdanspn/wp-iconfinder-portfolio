@@ -3,19 +3,9 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Provide a admin area view for the plugin
- *
- * This file is used to markup the admin-facing aspects of the plugin.
- *
- * @link       http://iconify.it
- * @since      1.0.0
- *
- * @package    Iconfinder_Portfolio
- * @subpackage Iconfinder_Portfolio/admin/partials
+ * @package Iconfinder Portfolio
  */
 ?>
-
-<!-- This file should primarily consist of HTML with a little bit of PHP. -->
 <div class="wrap">
     <div id="poststuff" class="clear">
         <div id="post-body" class="metabox-holder">

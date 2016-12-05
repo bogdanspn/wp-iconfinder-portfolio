@@ -478,20 +478,25 @@ function get_icons_from_api($identifier) {
 
 /**
  * Makes the api call.
- * @param $api_url
- * @param string $cache_key
+ * @param $api_url The url to which to make the call
+ * @param string $cache_key A unique key matching the call path for caching the results
+ * @param bool $from_cache Whether or not to pull requests from the cache first
  * @return array|mixed|null|object
  * @throws Exception
  */
-function iconfinder_call_api($api_url, $cache_key='') {
+function iconfinder_call_api( $api_url, $cache_key = '', $from_cache = false ) {
 
     // Always try the local cache first. If we get a hit, just return the stored data.
 
-    $response = icf_get_cache( $cache_key );
+    $response = null;
+
+    if ( $from_cache ) {
+        $response = icf_get_cache( $cache_key );
+    }
     
     // If there is no cached data, make the API cale.
     
-    if (empty($response)) {
+    if ( empty($response) || ! $from_cache ) {
         try {
             $response = json_decode(
                 wp_remote_retrieve_body(
