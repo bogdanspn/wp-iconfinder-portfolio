@@ -896,6 +896,7 @@ div.button-row {
 .drib-shots .info {
 
     font-size: .8em;
+    height: 30px;
 }
 
 .drib-shots .info .price {
@@ -903,4 +904,297 @@ div.button-row {
     float: right !important; 
     margin-right: 10px;
     display: inline-block;
+}
+
+.powered-by-iconfinder {
+    
+    clear: both;
+    float: left;
+    background: #31373b;
+    height: 50px;
+    text-align: center;
+    width: 100%;
+}
+
+.powered-by-iconfinder a {
+    
+    font-size: 12px !important;
+    text-transform: uppercase;
+    line-height: 50px;
+    color: #aaa;
+}
+
+.powered-by-iconfinder a:hover {
+    
+    color: #ff5949;
+}
+
+.navigation li a,
+.navigation li a:hover,
+.navigation li.active a,
+.navigation li.disabled {
+	color: #fff;
+	text-decoration:none;
+}
+
+.navigation li {
+	display: inline;
+}
+
+.navigation li a,
+.navigation li a:hover,
+.navigation li.active a,
+.navigation li.disabled {
+	background-color: #6FB7E9;
+	border-radius: 3px;
+	cursor: pointer;
+	padding: 12px;
+	padding: 0.75rem;
+}
+
+.navigation li a:hover,
+.navigation li.active a {
+	background-color: #3C8DC5;
+}
+
+.wpbeginner-pagenav {
+    margin: 30px auto !important;
+}
+
+.icf-searchform {
+    margin: 50px auto 0 auto !important;
+    padding: 20px 20px 0 20px !important;
+    /* border-bottom: 1px solid #555; */
+/*    max-width: 1130px !important;*/
+}
+
+.iconset.icf-searchform {
+    margin: 50px auto 0 auto !important;
+    padding: 20px 20px 0 20px !important;
+    /* border-bottom: 1px solid #555; */
+/*    max-width: 1130px !important;*/
+}
+
+.icf-searchform .search-field {
+    
+    width: 90%;
+    float: left;
+}
+
+.icf-searchform .submit {
+
+    float: right;    
+}
+
+
+.the-search-form {
+    bottom: 0px;
+    box-sizing: border-box;
+    color: rgb(107, 116, 122);
+    float: left;
+    height: 62px;
+    left: 0px;
+    position: relative;
+    right: 0px;
+    top: 0px;
+    width: 100%;
+    column-rule-color: rgb(107, 116, 122);
+    perspective-origin: 529.938px 31px;
+    transform-origin: 529.938px 31px;
+    border: 1px solid rgb(238, 238, 238);
+    border-radius: 3px 3px 3px 3px;
+    font: normal normal normal normal 18px / 28.8px Roboto, "Helvetica Neue", Helvetica, sans-serif;
+    margin: 20px 0px 20px;
+    outline: rgb(107, 116, 122) none 0px;
+}/*.the-search-form*/
+
+.the-search-form:after {
+    box-sizing: border-box;
+    clear: both;
+    color: rgb(107, 116, 122);
+    content: '""';
+    display: block;
+    visibility: hidden;
+    width: 100%;
+    column-rule-color: rgb(107, 116, 122);
+    perspective-origin: 528.938px 0px;
+    transform-origin: 528.938px 0px;
+    border: 0px none rgb(107, 116, 122);
+    font: normal normal normal normal 0px / 0px Roboto, "Helvetica Neue", Helvetica, sans-serif;
+    outline: rgb(107, 116, 122) none 0px;
+}/*.the-search-form:after*/
+
+.the-search-form:before {
+    box-sizing: border-box;
+    color: rgb(107, 116, 122);
+    display: table;
+    column-rule-color: rgb(107, 116, 122);
+    border: 0px none rgb(107, 116, 122);
+    font: normal normal normal normal 18px / 28.8px Roboto, "Helvetica Neue", Helvetica, sans-serif;
+    outline: rgb(107, 116, 122) none 0px;
+}/*.the-search-form:before*/
+
+.the-search-fieldset {
+    box-sizing: border-box;
+    color: rgb(107, 116, 122);
+    height: 60px;
+    width: 100%;
+    column-rule-color: rgb(107, 116, 122);
+    perspective-origin: 528.938px 30px;
+    transform-origin: 528.938px 30px;
+    border: 0px none rgb(107, 116, 122);
+    font: normal normal normal normal 18px / 28.8px Roboto, "Helvetica Neue", Helvetica, sans-serif;
+    margin: 0px;
+    outline: rgb(107, 116, 122) none 0px;
+    padding: 0px;
+}
+
+.the-search-field {
+    bottom: 0px;
+    color: rgb(107, 116, 122);
+    height: 60px;
+    left: 0px;
+    max-height: 60px;
+    min-height: 60px;
+    position: relative;
+    right: 0px;
+    top: 0px;
+    vertical-align: middle;
+    width: 100%;
+    column-rule-color: rgb(107, 116, 122);
+    perspective-origin: 528.938px 30px;
+    transform-origin: 528.938px 30px;
+    background: rgb(238, 238, 238) none repeat scroll 0% 0% / auto padding-box border-box;
+    border: 0px none rgb(107, 116, 122);
+    border-radius: 3px 3px 3px 3px;
+    font: normal normal normal normal 20px / 24px Roboto, "Helvetica Neue", Helvetica, sans-serif;
+    outline: rgb(107, 116, 122) none 0px;
+    padding: 15px 86px 15px 20px;
+}/*#INPUT_3*/
+
+
+.the-search-button {
+    bottom: 0px;
+    color: rgb(255, 255, 255);
+    cursor: default;
+    display: inline-block;
+    height: 60px !important;
+/*    left: 977.875px;*/
+/*    position: absolute;*/
+    float: right;
+    right: 0px;
+    text-align: center;
+    top: 0px;
+    vertical-align: middle;
+    white-space: pre;
+    width: 80px;
+    column-rule-color: rgb(255, 255, 255);
+    align-items: flex-start;
+    perspective-origin: 40px 30px;
+    transform-origin: 40px 30px;
+    user-select: none;
+    background: rgb(72, 173, 216) none repeat scroll 0% 0% / auto padding-box border-box;
+    border: 0px none rgb(255, 255, 255);
+    border-radius: 0 2px 2px 0;
+    font: normal normal bold normal 18px / normal arial, sans-serif;
+    outline: rgb(255, 255, 255) none 0px;
+    padding: 0px;
+    transition: all 0.07s ease-in 0s;
+}/*#INPUT_1*/
+
+.the-search-button:after {
+    bottom: 0px;
+    box-sizing: border-box;
+    color: rgb(255, 255, 255);
+    content: '""';
+    cursor: default;
+    display: block;
+    height: 60px;
+    left: 0px;
+    position: absolute;
+    right: 0px;
+    text-align: center;
+    top: 0px;
+    white-space: pre;
+    width: 80px;
+    column-rule-color: rgb(255, 255, 255);
+    align-self: flex-start;
+    perspective-origin: 40px 30px;
+    transform-origin: 40px 30px;
+    user-select: none;
+    border: 0px none rgb(255, 255, 255);
+    font: normal normal bold normal 20px / normal FontAwesome;
+    outline: rgb(255, 255, 255) none 0px;
+}/*#INPUT_1:after*/
+
+.icon-item a.icon-preview,
+.iconset-item a.iconset-preview {
+    
+    display: block;
+}
+
+.icon-item a.icon-preview img,
+.iconset-item a.iconset-preview img {
+    
+    cursor: pointer;
+}
+
+a, a img, a img.wp-post-image { cursor: pointer; }
+
+.iconfinder-portfolio .edd-add-to-cart,
+.iconfinder-portfolio .edd-submit.button.blue, 
+.iconfinder-portfolio .entry-subtitle .buy-now a, 
+.iconfinder-portfolio .iconset-item .icf-buy-button,
+.iconfinder-portfolio .iconset-item .edd-submit.button.blue,
+.iconfinder-portfolio .iconset-item .entry-subtitle .buy-now a {
+
+    height: auto !important;
+    line-height: 20px !important;
+    transition: all 0.2s ease-in-out 0s;
+    float: left !important;
+    padding: 8px 16px;
+    margin-left: 0;
+}
+
+.icf-icon-advanced .icf-button-bar .icf-buy-button {
+      
+    margin: 0 !important;
+    float: none;
+    padding: 16px 32px;
+}
+
+.iconfinder-portfolio .iconset-item  .edd-add-to-cart-label {
+    
+    display: inline-block;
+    line-height: 20px;
+    height: 20px;
+}
+
+.icf-icon-advanced .iconset-item h2, 
+.icf-icon-advanced .iconset-item .icf-button {
+    
+    display: inline-block;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    margin-right: 20px;
+    height: auto;
+    text-transform: uppercase;
+}
+
+.icf-icon-advanced .iconset-item h2 .price {
+    
+     color: #A00;
+}
+
+.post-content .icf-icon-advanced h2 {
+   
+    margin: 0 !important;
+    height: 60px;
+    line-height: 60px;
+}
+
+.icf-icon-advanced .icf-button-bar .row {
+    
+    margin-bottom: 20px;
 }
