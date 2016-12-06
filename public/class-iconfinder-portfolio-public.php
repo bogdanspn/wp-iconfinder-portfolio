@@ -409,13 +409,30 @@ class Iconfinder_Portfolio_Public {
 
         $post_type = get_val($query_args, 'post_type', 'iconset');
 
-        $theme_name = "single-{$post_type}-body.php";
+        /**
+         * The theme hierarchy is:
+         *
+         * - /wp-content/theme/{theme-name}/{shortcode-theme-param}-shortcode-{post_type}.php
+         * - /wp-content/plugins/iconfinder-portfolio/public/partials/{shortcode-theme-param}-shortcode-{post_type}.php
+         * - /wp-content/theme/{theme-name}/shortcode-{post_type}.php
+         * - /wp-content/plugins/iconfinder-portfolio/public/partials/shortcode-{post_type}.php
+         */
+
+        $template = null;
+
+        /**
+         * Try the templates specified by the shortcode.
+         */
+
         if (! empty($theme)) {
-            $theme_name = "{$theme}-{$post_type}.php";
+            $template = icf_locate_template("{$theme}-shortcode-{$post_type}.php");
         }
-        $template = icf_locate_template($theme_name);
+
+        /**
+         * If the shortcode did not specify a template, try the theme directory.
+         */
         if (empty($template)) {
-            $template = icf_locate_template("single-{$post_type}-body.php");
+            $template = icf_locate_template("shortcode-{$post_type}.php");
         }
 
         if (! empty($template)) {

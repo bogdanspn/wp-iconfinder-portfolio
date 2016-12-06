@@ -6,7 +6,6 @@
  */
 ?>
 <!-- Default template: <?php echo basename(__FILE__); ?> -->
-
 <?php do_action('icf_iconset_searchform'); ?>
 
 <section class="main search-results-main iconset-search-results icf-search-results iconfinder-portfolio">
@@ -16,12 +15,12 @@
                 <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                     <div class="col-md-4 drib-shots iconset-item iconset-<?php icf_the_iconset_id(); ?>">
                         <?php if (icf_show_links()) : ?>
-                        <a href="<?php icf_the_permalink(); ?>" target="_blank" class="iconset-preview">
-                            <?php endif; ?>
+                            <a href="<?php icf_the_permalink(); ?>" target="_blank" class="iconset-preview">
+                        <?php endif; ?>
                             <?php icf_the_preview(icf_the_icon_id(), 'medium'); ?>
-                            <?php if (icf_show_links()) : ?>
-                        </a>
-                    <?php endif; ?>
+                        <?php if (icf_show_links()) : ?>
+                            </a>
+                        <?php endif; ?>
                         <div class="info">
                             <?php if (icf_show_links()) : ?>
                                 <?php $elattrs = array('class' => 'icf-buy-button'); ?>

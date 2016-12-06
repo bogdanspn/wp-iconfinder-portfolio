@@ -5,7 +5,6 @@
  * @since 1.0
  */
 get_header(); ?>
-    <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
 		<header class="page-titles">
 			<div class="container clearfix">
 				<div class="page-titles-wrap">
