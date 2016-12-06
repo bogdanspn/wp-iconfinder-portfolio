@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 <div class="wrap">
     <h2 style="margin: 20px 0;"><?php echo esc_html(get_admin_page_title()); ?></h2>
     <?php if (! isset($items) || empty($items)) : ?>
-    	<p><?php _e(@$message, $this->plugin_name ); ?></p>
+        <p><?php _e(@$message, $this->plugin_name ); ?></p>
     <?php else : ?>
         <div class="inner">
             <div class="icf-admin-pagination top">
