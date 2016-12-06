@@ -167,7 +167,7 @@ body.toplevel_page_iconfinder-portfolio form p {
 
 .iconset-card {
 
-    float: left;
+    display: inline-block;
     margin: 0 10px 10px 0;
     padding: 0px;
     border: 1px solid #ddd;
@@ -211,6 +211,13 @@ body.toplevel_page_iconfinder-portfolio form p {
 
     padding-bottom: 0;
     margin-bottom: 0;
+    height: 264px;
+}
+
+.iconset-card .top .preview {
+
+    height: 190px;
+    float: none;
 }
 
 .iconset-card img {
@@ -265,6 +272,13 @@ body.toplevel_page_iconfinder-portfolio form p {
     clear: both;
     background: #fff;
     border: 1px solid #ddd;
+}
+
+.icf-admin-pagination .download-stats {
+
+    position: absolute;
+    width: 25%;
+    float: left;
 }
 
 .icf-admin-pagination.top .tablenav .tablenav-pages {
