@@ -25,6 +25,8 @@ $col_count = 4;
                 <div class="row">
             <?php if ($content['type'] == 'iconsets') : ?>
                 <?php foreach ($content['items'] as $iconset) : ?>
+                    <?php if (empty($iconset['preview'])) : continue; endif; ?>
+                    <?php if (empty($iconset['permalink'])) : continue; endif; ?>
                     <div class="col-md-<?php echo $col_count; ?> drib-shots iconset-<?php echo $iconset['identifier']; ?>">
                         <?php if ($options['show_links']) : ?>
                             <a href="<?php echo $iconset['permalink']; ?>" target="_blank">
