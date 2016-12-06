@@ -144,43 +144,43 @@ function add_icons_post_type() {
  */
 function register_icon_taxonomies() {
     // Register the icon categories taxonomy
-	register_taxonomy(
-		'icon_category',
-		array('icon', 'iconset', 'collection'),
-		array(
-			'label' => __( 'Iconfinder Categories' ),
-			'rewrite' => array( 'slug' => 'icon-category' ),
-			'capabilities' => array(
-				'manage_terms' => 'manage_custom_tax',
+    register_taxonomy(
+        'icon_category',
+        array('icon', 'iconset', 'collection'),
+        array(
+            'label' => __( 'Iconfinder Categories' ),
+            'rewrite' => array( 'slug' => 'icon-category' ),
+            'capabilities' => array(
+                'manage_terms' => 'manage_custom_tax',
                 'edit_terms'   => 'manage_custom_tax',
                 'delete_terms' => 'manage_custom_tax',
                 'assign_terms' => 'edit_posts'
-			),
+            ),
             'show_ui' => true,
             'show_in_menu' => true,
             'hierarchical' => true,
             'show_admin_column' => true,
             'publicly_queryable' => true
-		)
-	);
+        )
+    );
     // Register the icon tags taxonomy
     register_taxonomy(
-		'icon_tag',
-		array('icon', 'iconset', 'collection'),
-		array(
-			'label' => __( 'Iconfinder Tags' ),
-			'rewrite' => array( 'slug' => 'icon-tags' ),
-			'capabilities' => array(
-				'manage_terms' => 'manage_custom_tax',
+        'icon_tag',
+        array('icon', 'iconset', 'collection'),
+        array(
+            'label' => __( 'Iconfinder Tags' ),
+            'rewrite' => array( 'slug' => 'icon-tags' ),
+            'capabilities' => array(
+                'manage_terms' => 'manage_custom_tax',
                 'edit_terms'   => 'manage_custom_tax',
                 'delete_terms' => 'manage_custom_tax',
                 'assign_terms' => 'edit_posts'
-			),
+            ),
             'show_ui' => true,
             'show_in_menu' => true,
             'show_admin_column' => true,
             'publicly_queryable' => true
-		)
-	);
+        )
+    );
 }
 add_action( 'init', 'register_icon_taxonomies' );

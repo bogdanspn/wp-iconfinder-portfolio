@@ -215,7 +215,7 @@ function get_api_cache_key($api_path) {
  * @since 1.0.0
  */
 function icf_get_cache_keys() {
-	
+        
     return get_option( 'icf_cache_keys', array() );
 }
 
@@ -1067,7 +1067,7 @@ function create_iconset_post($iconset_id, $attrs=array()) {
         // of the icons that are imported so we can add their tags to 
         // the iconset so when you search iconsets, you are also, 
         // in effect, searching the metadata of the icons in the set.
-		
+                
         $icon_post_ids = import_icon_previews($iconset);
         
         // If the imports failed, we can't do anything else
@@ -1613,8 +1613,8 @@ function get_all_iconsets() {
 function icf_get_post($meta_value, $meta_key, $post_type) {
     $result = null;
     $posts = get_posts(array(
-        'numberposts'	=> 1,
-        'post_type'		=> $post_type,
+        'numberposts'        => 1,
+        'post_type'                => $post_type,
         'meta_key'      => $meta_key,
         'meta_value'    => $meta_value
     ));
@@ -1642,8 +1642,8 @@ function icf_get_post($meta_value, $meta_key, $post_type) {
  */
 function icf_get_all_posts($meta_value, $meta_key, $post_type) {
     $posts = get_posts(array(
-        'numberposts'	=> -1,
-        'post_type'		=> $post_type,
+        'numberposts'        => -1,
+        'post_type'                => $post_type,
         'meta_key'      => $meta_key,
         'meta_value'    => $meta_value
     ));

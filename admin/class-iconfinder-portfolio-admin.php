@@ -24,36 +24,36 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Iconfinder_Portfolio_Admin {
 
-	/**
-	 * The ID of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
-	 */
-	private $plugin_name;
+    /**
+     * The ID of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $plugin_name    The ID of this plugin.
+     */
+    private $plugin_name;
 
-	/**
-	 * The version of this plugin.
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
-	 */
-	private $version;
+    /**
+     * The version of this plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     * @var      string    $version    The current version of this plugin.
+     */
+    private $version;
 
-	/**
-	 * Initialize the class and set its properties.
-	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
-	 */
-	public function __construct( $plugin_name, $version ) {
+    /**
+     * Initialize the class and set its properties.
+     *
+     * @since    1.0.0
+     * @param      string    $plugin_name       The name of this plugin.
+     * @param      string    $version    The version of this plugin.
+     */
+    public function __construct( $plugin_name, $version ) {
 
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-	}
+        $this->plugin_name = $plugin_name;
+        $this->version = $version;
+    }
     
     /**
      * Get the current plugin mode.
@@ -68,82 +68,82 @@ class Iconfinder_Portfolio_Admin {
         return $plugin_mode;
     }
 
-	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_styles() {
+    /**
+     * Register the stylesheets for the admin area.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_styles() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Iconfinder_Portfolio_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Iconfinder_Portfolio_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+        /**
+         * This function is provided for demonstration purposes only.
+         *
+         * An instance of this class should be passed to the run() function
+         * defined in Iconfinder_Portfolio_Loader as all of the hooks are defined
+         * in that particular class.
+         *
+         * The Iconfinder_Portfolio_Loader will then create the relationship
+         * between the defined hooks and the functions defined in this
+         * class.
+         */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/iconfinder-portfolio-admin.css', array(), $this->version, 'all' );
+        wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/iconfinder-portfolio-admin.css', array(), $this->version, 'all' );
 
-	}
+    }
 
-	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
-	 */
-	public function enqueue_scripts() {
+    /**
+     * Register the JavaScript for the admin area.
+     *
+     * @since    1.0.0
+     */
+    public function enqueue_scripts() {
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Iconfinder_Portfolio_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Iconfinder_Portfolio_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+        /**
+         * This function is provided for demonstration purposes only.
+         *
+         * An instance of this class should be passed to the run() function
+         * defined in Iconfinder_Portfolio_Loader as all of the hooks are defined
+         * in that particular class.
+         *
+         * The Iconfinder_Portfolio_Loader will then create the relationship
+         * between the defined hooks and the functions defined in this
+         * class.
+         */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/iconfinder-portfolio-admin.js', array( 'jquery' ), $this->version, false );
+        wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/iconfinder-portfolio-admin.js', array( 'jquery' ), $this->version, false );
 
-	}
-	
-	/**
-	 * Register the administration menu for this plugin into the WordPress Dashboard menu.
-	 *
-	 * @since    1.0.0
-	 */
-	public function add_plugin_admin_menu() {
-		/*
-		 * Add a settings page for this plugin to the Admin.
-		 *
-		 * NOTE:  Alternative menu locations are available via WordPress administration menu functions.
-		 *
-		 *        Administration Menus: http://codex.wordpress.org/Administration_Menus
-		 *
-		 */
+    }
+    
+    /**
+     * Register the administration menu for this plugin into the WordPress Dashboard menu.
+     *
+     * @since    1.0.0
+     */
+    public function add_plugin_admin_menu() {
+        /*
+         * Add a settings page for this plugin to the Admin.
+         *
+         * NOTE:  Alternative menu locations are available via WordPress administration menu functions.
+         *
+         *        Administration Menus: http://codex.wordpress.org/Administration_Menus
+         *
+         */
         $iconsets_menu_text = 'Iconsets Shortcodes';
         if ($this->get_mode() == ICF_PLUGIN_MODE_ADVANCED) {
             $iconsets_menu_text = 'Import Manager';
         }
-		add_menu_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name);
+        add_menu_page( 'Iconfinder Portfolio Setup', 'Iconfinder Portfolio', 'manage_options', $this->plugin_name);
         add_submenu_page( $this->plugin_name, $iconsets_menu_text, $iconsets_menu_text, 'manage_options', $this->plugin_name . '-iconsets', array($this, 'display_iconsets_page'));
-		add_submenu_page( $this->plugin_name, 'Collections Shortcodes', 'Collections Shortcodes', 'manage_options', $this->plugin_name . '-collections', array($this, 'display_collections_page'));
+        add_submenu_page( $this->plugin_name, 'Collections Shortcodes', 'Collections Shortcodes', 'manage_options', $this->plugin_name . '-collections', array($this, 'display_collections_page'));
         add_submenu_page( $this->plugin_name, 'Settings', 'Settings', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
-		add_submenu_page( $this->plugin_name, 'Documentation', 'Documentation', 'manage_options', $this->plugin_name . '-documentation', array($this, 'display_plugin_documentation'));
+        add_submenu_page( $this->plugin_name, 'Documentation', 'Documentation', 'manage_options', $this->plugin_name . '-documentation', array($this, 'display_plugin_documentation'));
         
         // Only show these in advanced mode after API credentials are set
         
         if ($this->get_mode() == ICF_PLUGIN_MODE_ADVANCED) {
             # add_submenu_page( $this->plugin_name, 'Importer', 'Importer', 'manage_options', $this->plugin_name . '-importer', array($this, 'display_plugin_importer'));
         }
-	}
+    }
 
     /**
      * Add settings action link to the plugins page.
@@ -151,98 +151,98 @@ class Iconfinder_Portfolio_Admin {
      * @return array
      * @since 1.1.0
      */
-	public function add_action_links( $links ) {
-		/*
-		*  Documentation : https://codex.wordpress.org/Plugin_API/Filter_Reference/plugin_action_links_(plugin_file_name)
-		    */
-		$settings_link = array(
-			'<a href="' . admin_url( 'options-general.php?page=' . $this->plugin_name ) . '">' . __('Settings', $this->plugin_name) . '</a>',
-		);
-		return array_merge(  $settings_link, $links );
-	}
-	
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
-	public function display_plugin_setup_page() {
-	
-	    echo $this->apply_admin_theme(null, 'iconfinder-portfolio-admin-settings.php');
-	}
-	
-	/**
-	 * Render the documentation page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
-	public function display_plugin_documentation() {
-	
-	    $_options = get_option( ICF_PLUGIN_NAME );
-		$username = isset($_options['username']) ? $_options['username'] : null;
+    public function add_action_links( $links ) {
+        /*
+        *  Documentation : https://codex.wordpress.org/Plugin_API/Filter_Reference/plugin_action_links_(plugin_file_name)
+            */
+        $settings_link = array(
+            '<a href="' . admin_url( 'options-general.php?page=' . $this->plugin_name ) . '">' . __('Settings', $this->plugin_name) . '</a>',
+        );
+        return array_merge(  $settings_link, $links );
+    }
+    
+    /**
+     * Render the settings page for this plugin.
+     *
+     * @since    1.0.0
+     */
+    public function display_plugin_setup_page() {
+    
+        echo $this->apply_admin_theme(null, 'iconfinder-portfolio-admin-settings.php');
+    }
+    
+    /**
+     * Render the documentation page for this plugin.
+     *
+     * @since    1.0.0
+     */
+    public function display_plugin_documentation() {
+    
+        $_options = get_option( ICF_PLUGIN_NAME );
+        $username = isset($_options['username']) ? $_options['username'] : null;
 
-		$data = null;
+        $data = null;
 
-	    $response = iconfinder_call_api(
+        $response = iconfinder_call_api(
             get_api_url(get_api_path('categories')),
             icf_get_cache_key($username, 'categories')
         );
         
         if (isset($response['categories'])) {
-	    	$data['categories'] = $response['categories'];
-	    }
-	    
-	    $response = iconfinder_call_api(
+            $data['categories'] = $response['categories'];
+        }
+        
+        $response = iconfinder_call_api(
             get_api_url(get_api_path('styles')),
             icf_get_cache_key($username, 'styles')
         );
         
         if (isset($response['styles'])) {
-	    	$data['styles'] = $response['styles'];
-	    }
-	
-	    echo $this->apply_admin_theme($data, 'iconfinder-portfolio-documentation.php');
-	}
-	
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
-	public function display_collections_page() {
-	
-	    # Grab the collections from the API
-	    
-	    $_options = get_option( ICF_PLUGIN_NAME );
-		$username = isset($_options['username']) ? $_options['username'] : null;
-	    
-	    $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
-	    
-	    $response = iconfinder_call_api(
+            $data['styles'] = $response['styles'];
+        }
+    
+        echo $this->apply_admin_theme($data, 'iconfinder-portfolio-documentation.php');
+    }
+    
+    /**
+     * Render the settings page for this plugin.
+     *
+     * @since    1.0.0
+     */
+    public function display_collections_page() {
+    
+        # Grab the collections from the API
+        
+        $_options = get_option( ICF_PLUGIN_NAME );
+        $username = isset($_options['username']) ? $_options['username'] : null;
+        
+        $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
+        
+        $response = iconfinder_call_api(
             get_api_url(get_api_path('collections')),
             icf_get_cache_key($username, 'collections')
         );
-	    
-	    if (isset($response['items'])) {
-	    	$data['items'] = $response['items'];
-	    }
-	    
-	    echo $this->apply_admin_theme($data, 'iconfinder-portfolio-admin-collections.php');
-	}
+        
+        if (isset($response['items'])) {
+            $data['items'] = $response['items'];
+        }
+        
+        echo $this->apply_admin_theme($data, 'iconfinder-portfolio-admin-collections.php');
+    }
 
-	/**
-	 * Render the settings page for this plugin.
-	 *
-	 * @since    1.0.0
-	 */
-	public function display_iconsets_page() {
-	
-		// Grab the iconsets from the API
-		
-	    $_options = get_option( ICF_PLUGIN_NAME );
-		$username = isset( $_options['username'] ) ? $_options['username'] : null;
+    /**
+     * Render the settings page for this plugin.
+     *
+     * @since    1.0.0
+     */
+    public function display_iconsets_page() {
+    
+        // Grab the iconsets from the API
+        
+        $_options = get_option( ICF_PLUGIN_NAME );
+        $username = isset( $_options['username'] ) ? $_options['username'] : null;
 
-		$current_page = icf_get_page_number();
+        $current_page = icf_get_page_number();
 
         $more_args = null;
         if ($current_page > 1) {
@@ -250,8 +250,8 @@ class Iconfinder_Portfolio_Admin {
                 'after' => get_transient(ICF_KEY_LAST_ICONSET_ID)
             );
         }
-		
-		$data = array( 
+        
+        $data = array( 
             'message' => ICF_ENTER_API_CREDENTIALS,
             'items'   => array()
         );
@@ -262,35 +262,35 @@ class Iconfinder_Portfolio_Admin {
             false
         );
 
-	    if (isset($response['items'])) {
-	    	$data['items'] = paginate_items($response['items'], 100, $current_page);
-	    }
+        if (isset($response['items'])) {
+            $data['items'] = paginate_items($response['items'], 100, $current_page);
+        }
 
-	    $data['page_count'] = ceil(get_val($response, 'total_count', 100) / 100);
-	    $data['current_page'] = $current_page;
+        $data['page_count'] = ceil(get_val($response, 'total_count', 100) / 100);
+        $data['current_page'] = $current_page;
 
-	    $offset = count($data['items']);
-	    $offset = $offset > 0 ? $offset - 1 : 0 ;
-	    if (isset($data['items'][$offset])) {
+        $offset = count($data['items']);
+        $offset = $offset > 0 ? $offset - 1 : 0 ;
+        if (isset($data['items'][$offset])) {
             set_transient(ICF_KEY_LAST_ICONSET_ID, $data['items'][$offset]['iconset_id']);
         }
-	    
-	    if (count($data['items'])) {
-	        foreach ($data['items'] as &$item) {
-	            if (isset($item['categories'])) {
-	                $categories = array();
-	                foreach ($item['categories'] as $category) {
-	                    array_push($categories, $category['identifier']);
-	                }
-	                $item['category_string'] = implode(',', $categories);
-	            }
-	            if (isset($item['styles'])) {
-	                $styles = array();
-	                foreach ($item['styles'] as $style) {
-	                    array_push($styles, $style['identifier']);
-	                }
-	                $item['styles_string'] = implode(',', $styles);
-	            }
+        
+        if (count($data['items'])) {
+            foreach ($data['items'] as &$item) {
+                if (isset($item['categories'])) {
+                    $categories = array();
+                    foreach ($item['categories'] as $category) {
+                        array_push($categories, $category['identifier']);
+                    }
+                    $item['category_string'] = implode(',', $categories);
+                }
+                if (isset($item['styles'])) {
+                    $styles = array();
+                    foreach ($item['styles'] as $style) {
+                        array_push($styles, $style['identifier']);
+                    }
+                    $item['styles_string'] = implode(',', $styles);
+                }
                 $item['is_imported'] = false;
 
                 if ($this->get_mode() == ICF_PLUGIN_MODE_ADVANCED) {
@@ -303,10 +303,10 @@ class Iconfinder_Portfolio_Admin {
                         $item['latest_sync'] = get_post_meta( $iconset_post->ID, 'latest_sync', true );
                     }
                 }
-	        }
-	    }
-		echo $this->apply_admin_theme($data, 'iconfinder-portfolio-admin-iconsets.php');
-	}
+            }
+        }
+        echo $this->apply_admin_theme($data, 'iconfinder-portfolio-admin-iconsets.php');
+    }
 
     /**
      * Determine correct API URl from the shortcode attrs
@@ -314,14 +314,14 @@ class Iconfinder_Portfolio_Admin {
      * @param array $args
      * @return null|string|WP_Error
      */
-	private function get_admin_api_url($channel, $args=array()) {
+    private function get_admin_api_url($channel, $args=array()) {
 
-	    if (! is_array($args)) $args = array();
-	
-		$_options = get_option( ICF_PLUGIN_NAME );
-		
+        if (! is_array($args)) $args = array();
+    
+        $_options = get_option( ICF_PLUGIN_NAME );
+        
         $valid_channels = icf_get_setting('valid_api_channels', array());
-		
+        
         $client_id     = get_val($_options, 'api_client_id');
         $client_secret = get_val($_options, 'api_client_secret');
         $username      = get_val($_options, 'username');
@@ -330,7 +330,7 @@ class Iconfinder_Portfolio_Admin {
         if (! verify_credentials()) {
             $result = new WP_Error('error', 'No valid API credentials');
         }
-		else {
+        else {
             if (in_array($channel, $valid_channels)) {
                 $api_path = "users/{$username}/{$channel}";
             }
@@ -349,8 +349,8 @@ class Iconfinder_Portfolio_Admin {
             $result = ICONFINDER_API_URL . "{$api_path}?" . $query_string ;
         }
 
-		return $result;
-	}
+        return $result;
+    }
 
     /**
      * Apply the custom or default theme to the output
@@ -358,31 +358,31 @@ class Iconfinder_Portfolio_Admin {
      * @param string $filename
      * @return string
      */
-	private function apply_admin_theme($data, $filename) {
+    private function apply_admin_theme($data, $filename) {
 
-		$output = "";
-		
-		$admin_file = null;
-	    if ($filename != "") {
-	        $admin_file = plugin_dir_path( __FILE__ ) . "partials/$filename";
-	    }
-	    
-	    $items = array();
-	    if (isset($data['items'])) {
-	        $items = $data['items'];
-	    }
-	    
-	    $message = 'Nothing to display';
-	    if (isset($data['message'])) {
-	        $message = $data['message'];
-	    }
+        $output = "";
         
-		ob_start();
-		include $admin_file;
-		$output = ob_get_contents();
-		ob_end_clean();
-		return $output;
-	}
+        $admin_file = null;
+        if ($filename != "") {
+            $admin_file = plugin_dir_path( __FILE__ ) . "partials/$filename";
+        }
+        
+        $items = array();
+        if (isset($data['items'])) {
+            $items = $data['items'];
+        }
+        
+        $message = 'Nothing to display';
+        if (isset($data['message'])) {
+            $message = $data['message'];
+        }
+        
+        ob_start();
+        include $admin_file;
+        $output = ob_get_contents();
+        ob_end_clean();
+        return $output;
+    }
 
     public function process_iconset_admin_post() {
         
@@ -467,39 +467,39 @@ class Iconfinder_Portfolio_Admin {
     }
     
     /**
-	 * Sync local content with source.
-	 *
-	 * @since 1.1.0
-	 */
-	public function sync_content() {
-	
-	    // Sync local content with source
+     * Sync local content with source.
+     *
+     * @since 1.1.0
+     */
+    public function sync_content() {
+    
+        // Sync local content with source
 
-	    wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
-	}
-	
-    	
-	/**
-	*  Save the plugin options
-	*
-	* @since    1.0.0
-	*/
-	public function options_update() {
+        wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
+    }
+    
+        
+    /**
+    *  Save the plugin options
+    *
+    * @since    1.0.0
+    */
+    public function options_update() {
 
-		register_setting( ICF_PLUGIN_NAME, ICF_PLUGIN_NAME, array($this, 'validate') );
-	}
-	
-	/**
-	 * Performs the cache purge
-	 * @param bool $redirect
-	 * @since 1.0.0
-	 */
-	public function purge_cache($redirect=true) {
+        register_setting( ICF_PLUGIN_NAME, ICF_PLUGIN_NAME, array($this, 'validate') );
+    }
+    
+    /**
+     * Performs the cache purge
+     * @param bool $redirect
+     * @since 1.0.0
+     */
+    public function purge_cache($redirect=true) {
 
-	    $action = get_val($_REQUEST, 'submit', 'purge-cache');
-	    $action = strtolower(str_replace(' ', '-', $action));
+        $action = get_val($_REQUEST, 'submit', 'purge-cache');
+        $action = strtolower(str_replace(' ', '-', $action));
 
-	    if ($action == 'refresh-cache') {
+        if ($action == 'refresh-cache') {
             refresh_cache();
         }
         else if ($action == 'clear-cache') {
@@ -507,21 +507,21 @@ class Iconfinder_Portfolio_Admin {
         }
 
         if ( $redirect === false ) { return; }
-	    wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
-	}
+        wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
+    }
 
     /**
-	 * Validate all options fields
-	 * @param array $input
+     * Validate all options fields
+     * @param array $input
      * @return array
-	 * @since 1.0.0
-	 */
-	public function validate($input) {
-		$valid = array();
-		
-		$valid['api_client_id']       = get_val( $input, 'api_client_id', null );
-		$valid['api_client_secret']   = get_val( $input, 'api_client_secret', null );
-		$valid['username']            = get_val( $input, 'username', null );
+     * @since 1.0.0
+     */
+    public function validate($input) {
+        $valid = array();
+        
+        $valid['api_client_id']       = get_val( $input, 'api_client_id', null );
+        $valid['api_client_secret']   = get_val( $input, 'api_client_secret', null );
+        $valid['username']            = get_val( $input, 'username', null );
         
         $valid['plugin_mode']         = get_val( $input, 'plugin_mode', 'basic' );
         $valid['use_powered_by_link'] = get_val( $input, 'use_powered_by_link', true );
@@ -557,6 +557,6 @@ class Iconfinder_Portfolio_Admin {
             }
         }
         return $valid;
-	}
-	
+    }
+    
 }

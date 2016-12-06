@@ -13,8 +13,8 @@
 ?>
 <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
 <div class="gs_drib_area gs_drib_theme1 iconfinder-portfolio">
-	<div class="container">
-		<div class="row">
+        <div class="container">
+                <div class="row">
             <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
                 <div class="col-md-4 drib-shots iconset-item iconset-<?php icf_the_iconset_id(); ?>">
                     <?php if (icf_show_links()) : ?>
@@ -47,8 +47,8 @@
             <?php else: ?>
                 <h3><?php _e( 'Nothing found', ICF_PLUGIN_NAME ); ?></h3>
             <?php endif; ?>
-		</div>
-	</div>
+                </div>
+        </div>
 </div>
 <div class="container clearfix">
     <?php icf_pagination(); ?>

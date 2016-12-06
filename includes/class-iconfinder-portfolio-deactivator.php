@@ -24,21 +24,21 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Iconfinder_Portfolio_Deactivator {
 
-	/**
-	 * Deactivate the plugin
-	 *
-	 * Deactivates the plugin and removes all custom post types and stored data.
-	 *
-	 * @since    1.0.0
-	 */
-	public static function deactivate() {
+    /**
+     * Deactivate the plugin
+     *
+     * Deactivates the plugin and removes all custom post types and stored data.
+     *
+     * @since    1.0.0
+     */
+    public static function deactivate() {
 
         self::remove_custom_post_types();
         self::remove_iconfinder_data();
         self::remove_cache_data();
         
         unregister_setting( ICF_PLUGIN_NAME, ICF_PLUGIN_NAME);
-	}
+    }
 
     /**
      * Remove the Custom post types.
@@ -65,13 +65,13 @@ class Iconfinder_Portfolio_Deactivator {
      */
     public static function remove_cache_data() {
         $cache_keys = icf_get_cache_keys();
-	    
-	    foreach ( $cache_keys as $cache_key ) {
-	    
-	        delete_option( $cache_key );
-	    }
-	    
-	    update_option( 'icf_cache_keys', array() );
+        
+        foreach ( $cache_keys as $cache_key ) {
+        
+            delete_option( $cache_key );
+        }
+        
+        update_option( 'icf_cache_keys', array() );
     }
 
 }

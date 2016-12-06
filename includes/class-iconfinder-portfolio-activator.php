@@ -24,19 +24,19 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Iconfinder_Portfolio_Activator {
 
-	/**
-	 * Active the plugin.
-	 *
-	 * Activate the plugin and create the necessary content types for storing 
+    /**
+     * Active the plugin.
+     *
+     * Activate the plugin and create the necessary content types for storing 
      * iconfinder porfolio data locally (to make is searchable).
-	 *
-	 * @since    1.1.0
-	 */
-	public static function activate() {
+     *
+     * @since    1.1.0
+     */
+    public static function activate() {
         register_setting( 
             ICF_PLUGIN_NAME, 
             ICF_PLUGIN_NAME, 
             'register_default_settings'
         );
-	}
+    }
 }

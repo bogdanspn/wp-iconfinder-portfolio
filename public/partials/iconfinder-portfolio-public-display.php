@@ -21,8 +21,8 @@ $col_count = 4;
 ?>
 <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
 <div class="gs_drib_area gs_drib_theme1">
-	<div class="container">
-		<div class="row">
+        <div class="container">
+                <div class="row">
             <?php if ($content['type'] == 'iconsets') : ?>
                 <?php foreach ($content['items'] as $iconset) : ?>
                     <div class="col-md-<?php echo $col_count; ?> drib-shots iconset-<?php echo $iconset['identifier']; ?>">
@@ -73,6 +73,6 @@ $col_count = 4;
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
-		</div>
-	</div>
+                </div>
+        </div>
 </div>
