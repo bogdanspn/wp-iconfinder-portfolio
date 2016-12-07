@@ -71,7 +71,7 @@ class Iconfinder_Portfolio {
     public function __construct() {
 
         $this->plugin_name = 'iconfinder-portfolio';
-        $this->version = '1.1.0';
+        $this->version = '2.0';
 
         $this->load_dependencies();
         $this->set_locale();
