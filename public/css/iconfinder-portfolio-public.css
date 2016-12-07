@@ -1210,3 +1210,8 @@ a, a img, a img.wp-post-image { cursor: pointer; }
   max-width: 1200px;
   padding: 3% 1% 0 1%;
 }
+
+body.single-iconset #content {
+
+  width: 100%;
+}
