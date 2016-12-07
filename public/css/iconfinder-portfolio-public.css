@@ -1005,7 +1005,7 @@ div.button-row {
     border: 1px solid rgb(238, 238, 238);
     border-radius: 3px 3px 3px 3px;
     font: normal normal normal normal 18px / 28.8px Roboto, "Helvetica Neue", Helvetica, sans-serif;
-    margin: 20px 0px 20px;
+    margin: 0;
     outline: rgb(107, 116, 122) none 0px;
 }/*.the-search-form*/
 
@@ -1207,5 +1207,6 @@ a, a img, a img.wp-post-image { cursor: pointer; }
 
 .main.icf-search-form .container {
 
-  padding: 0;
+  max-width: 1200px;
+  padding: 3% 2% 0 2%;
 }

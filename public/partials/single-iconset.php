@@ -17,9 +17,9 @@ get_header(); ?>
         </div>
     </div>
 </header>
+<?php do_action( 'icf_icon_searchform', array( 'search_iconset_id' => get_post_meta( $post->ID, 'iconset_id', true ) )); ?>
 <section class="main">
     <div class="container">
-        <?php do_action( 'icf_icon_searchform', array( 'search_iconset_id' => get_post_meta( $post->ID, 'iconset_id', true ) )); ?>
         <div id="content">
             <div class="posts">
                 <?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
