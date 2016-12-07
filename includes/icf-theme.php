@@ -347,7 +347,7 @@ function icf_get_the_post_tags($post_id=null) {
 }
 
 function icf_pagination() {
-    wpbeginner_numeric_posts_nav();
+    checkout_page_navs();
 }
 
 /**

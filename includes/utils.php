@@ -272,6 +272,7 @@ add_action( 'admin_notices' , 'icf_admin_notices' );
  * @author WPBeginner
  * @link http://www.wpbeginner.com/wp-themes/how-to-add-numeric-pagination-in-your-wordpress-theme/
  * @since 1.1.0
+ * @deprecated
  */
 function wpbeginner_numeric_posts_nav() {
 
@@ -341,6 +342,46 @@ function wpbeginner_numeric_posts_nav() {
         printf( '<li>%s</li>' . "\n", get_next_posts_link() );
 
     echo '</ul></div>' . "\n";
+}
+
+/**
+ * Credit where credit is due, this navigation was borrowed from
+ * the Checkout theme by Array Themes.
+ */
+/**
+ * Displays post pagination links
+ *
+ * @since checkout 1.0
+ */
+function checkout_page_navs( $query = false ) {
+
+    global $wp_query;
+    if( $query ) {
+        $temp_query = $wp_query;
+        $wp_query = $query;
+    }
+
+    // Return early if there's only one page.
+    if ( $GLOBALS['wp_query']->max_num_pages < 2 ) {
+        return;
+    } ?>
+    <div class="navigation">
+        <?php
+        $big = 999999999; // need an unlikely integer
+
+        echo paginate_links( array(
+            'base'    => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+            'format'  => '?paged=%#%',
+            'current' => max( 1, get_query_var('paged') ),
+            'total'   => $wp_query->max_num_pages,
+            'type'    => 'list'
+        ) );
+        ?>
+    </div>
+    <?php
+    if( isset( $temp_query ) ) {
+        $wp_query = $temp_query;
+    }
 }
 
 /**
@@ -598,7 +639,13 @@ function is_limited_search() {
 function add_iconset_meta_query($query) {
 
     $search_iconset_id = get_val($_REQUEST, 'search_iconset_id', null);
-    $post_type  = get_query_var('post_type');
+    $post_type = get_query_var('post_type');
+    $search_query = get_search_query();
+
+    /**
+     * If the search is empty
+     */
+    # if (trim($search_query) === "") return $query;
 
     /**
      * Check to see if the search is being limited to a specific collection.
@@ -609,8 +656,6 @@ function add_iconset_meta_query($query) {
          * Perform some sanity checks. Make sure it's a number within reasonable bounds.
          */
         if ( is_numeric($search_iconset_id) && intval($search_iconset_id) < pow(2, 24) ) {
-            set_query_var( 'meta_key', 'collection_id' );
-            set_query_var( 'meta_value', $search_iconset_id );
 
             $meta_query = array(
                 array(
