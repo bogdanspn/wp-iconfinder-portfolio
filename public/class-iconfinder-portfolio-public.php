@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://iconify.it
+ * @link       http://iconfinder.com
  * @since      1.0.0
  *
  * @package    Iconfinder_Portfolio
@@ -18,7 +18,7 @@
  *
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/public
- * @author     Scott Lewis <scott@iconify.it>
+ * @author     Iconfinder <support@iconfinder.com>
  */
 class Iconfinder_Portfolio_Public {
 

@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * The admin-specific functionality of the plugin.
  *
- * @link       http://iconify.it
+ * @link       http://iconfinder.com
  * @since      1.0.0
  *
  * @package    Iconfinder_Portfolio
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/admin
- * @author     Scott Lewis <scott@iconify.it>
+ * @author     Iconfinder <support@iconfinder.com>
  */
 class Iconfinder_Portfolio_Admin {
 

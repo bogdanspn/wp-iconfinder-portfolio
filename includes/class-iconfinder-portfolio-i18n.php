@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * Loads and defines the internationalization files for this plugin
  * so that it is ready for translation.
  *
- * @link       http://iconify.it
+ * @link       http://iconfinder.com
  * @since      1.0.0
  *
  * @package    Iconfinder_Portfolio
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @since      1.0.0
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/includes
- * @author     Scott Lewis <scott@iconify.it>
+ * @author     Iconfinder <support@iconfinder.com>
  */
 class Iconfinder_Portfolio_i18n {
 
