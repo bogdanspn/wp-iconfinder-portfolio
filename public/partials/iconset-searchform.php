@@ -15,7 +15,6 @@ if (! isset($search_collection_id) || empty($search_collection_id) ) {
 <?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <div class="container clearfix icf-searchform iconset">
     <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform" class="search-form the-search-form clearfix">
-        <?php wp_nonce_field( "search_iconsets" ); ?>
         <fieldset class="the-search-fieldset">
             <input type="text" class="search-form-input text the-search-field" name="s" placeholder="Search Icons" value="<?php echo get_query_var('s'); ?>">
             <input type="submit" value="Search" class="submit the-search-button">
