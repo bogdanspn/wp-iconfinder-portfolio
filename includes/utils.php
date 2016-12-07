@@ -502,67 +502,36 @@ function all_search_words($str) {
 }
 
 /**
- * Load the icon search form.
- * @since 1.1.0
+ * Loads the icon search form.
+ * @param array $args An array of named variables to pass to the form.
+ *
+ * @return null
  */
-function icon_searchform() {
+function icon_searchform($args=array()) {
     if (! icf_is_advanced_mode()) {
         return null;
     }
     if (locate_template('icon-searchform.php') === '') {
-        require_once(ICF_TEMPLATE_PATH . 'icon-searchform.php');
+        echo do_buffer(ICF_TEMPLATE_PATH . 'icon-searchform.php', $args);
     }
 }
 add_action('icf_icon_searchform', 'icon_searchform');
 
 /**
  * Load the iconset search form.
- * @since 1.1.0
+ * @param array $args An array of named variables to pass to the form.
+ *
+ * @return null
  */
-function iconset_searchform() {
+function iconset_searchform($args=array()) {
     if (! icf_is_advanced_mode()) {
         return null;
     }
     if (locate_template('iconset-searchform.php') === '') {
-        require_once(ICF_TEMPLATE_PATH . 'iconset-searchform.php');
+        echo do_buffer(ICF_TEMPLATE_PATH . 'iconset-searchform.php', $args);
     }
 }
 add_action('icf_iconset_searchform', 'iconset_searchform');
-
-/**
- * Adds the Iconfinder Porfolio template directory to the locate_template search. Always search
- * the wp-content/theme/{current-theme} folder first. But if the template isn't found, we
- * can fall back on the default theme that comes with the plugin.
- * @global \WP_Query $wp_query
- * @param string $template
- * @return string
- * @since 1.1.0
- */
-function template_chooser($template) {
-
-    if (! is_iconfinder()) {
-        return $template;
-    }
-
-    $post_type = get_query_var('post_type');
-    if (empty($post_type)) {
-        $post_type = $_REQUEST['post_type'];
-        if (! empty($post_type)) {
-            set_query_var($post_type);
-        }
-    }
-
-    $template_filename = basename($template);
-    $find_file = locate_template($template_filename, false);
-
-    if (empty($find_file)) {
-        if ( file_exists(ICF_TEMPLATE_PATH . $template_filename)) {
-            $template = ICF_TEMPLATE_PATH . $template_filename;
-        }
-    }
-    return $template;
-}
-add_filter('template_include', 'template_chooser');
 
 /**
  * Determine if the current code is being executed
@@ -584,10 +553,14 @@ function is_iconfinder() {
 }
 
 /**
- * @param \WP_Query $query
- * @return \WP_Query
+ * Sets the posts_per_page for the plugin output and limits search
+ * to iconset or collection if indicated.
+ *
+ *@param \WP_Query $query
+ *
+*@return \WP_Query
  */
-function set_posts_per_page( $query ) {
+function icf_adjust_query( $query ) {
 
     if ( is_iconfinder() ) {
         if ( is_archive() || is_search() ) {
@@ -596,9 +569,97 @@ function set_posts_per_page( $query ) {
             ));
         }
     }
+
+    if ( is_search() ) {
+        $query = add_iconset_meta_query($query);
+        // TODO: Not yet implemented
+        // $query = add_collection_meta_query($query);
+    }
     return $query;
 }
-add_action( 'pre_get_posts', 'set_posts_per_page' );
+add_action( 'pre_get_posts', 'icf_adjust_query' );
+
+/**
+ * Checks to see if the current request is a search limited to a specific iconset or collection.
+ * @return bool
+ */
+function is_limited_search() {
+    $search_iconset    = get_val($_REQUEST, 'search_iconset_id');
+    $search_collection = get_val($_REQUEST, 'search_collection_id');
+    return is_search() && ( ! empty($search_iconset) || ! empty($search_collection) );
+}
+
+/**
+ * Add a meta_query clause to the main query to limit the search to a specific iconset.
+ * @param \WP_Query $query
+ *
+ * @return \WP_Query
+ */
+function add_iconset_meta_query($query) {
+
+    $search_iconset_id = get_val($_REQUEST, 'search_iconset_id', null);
+    $post_type  = get_query_var('post_type');
+
+    /**
+     * Check to see if the search is being limited to a specific collection.
+     */
+    if ( ! empty($search_iconset_id) && $post_type == 'icon' ) {
+
+        /**
+         * Perform some sanity checks. Make sure it's a number within reasonable bounds.
+         */
+        if ( is_numeric($search_iconset_id) && intval($search_iconset_id) < pow(2, 24) ) {
+            set_query_var( 'meta_key', 'collection_id' );
+            set_query_var( 'meta_value', $search_iconset_id );
+
+            $meta_query = array(
+                array(
+                    'key' =>'iconset_id',
+                    'value'=> $search_iconset_id,
+                    'compare' => '=',
+                ),
+            );
+            $query->set('meta_query',$meta_query);
+        }
+    }
+    return $query;
+}
+
+/**
+ * Add a meta_query clause to the main query to limit the search to a specific collection.
+ * @param \WP_Query $query
+ *
+ * @return \WP_Query
+ */
+function add_collection_meta_query($query) {
+
+    $search_collection_id = get_val($_REQUEST, 'search_collection_id', null);
+    $post_type  = get_query_var('post_type');
+
+    /**
+     * Check to see if the search is being limited to a specific collection.
+     */
+    if ( ! empty($search_collection_id) && $post_type == 'iconset' ) {
+
+        /**
+         * Perform some sanity checks. Make sure it's a number within reasonable bounds.
+         */
+        if ( is_numeric($search_collection_id) && intval($search_collection_id) < pow(2, 24) ) {
+            set_query_var( 'meta_key', 'collection_id' );
+            set_query_var( 'meta_value', $search_collection_id );
+
+            $meta_query = array(
+                array(
+                    'key' =>'collection_id',
+                    'value'=> $search_collection_id,
+                    'compare' => '=',
+                ),
+            );
+            $query->set('meta_query',$meta_query);
+        }
+    }
+    return $query;
+}
 
 /**
  * Buffers the output from a file and returns the contents as a string.
@@ -701,25 +762,166 @@ function icf_set_theme_vars($theme_vars) {
 }
 
 /**
- * Search for one of our templates in the plugin theme path
- * first, then our plugin partials path.
+ * Adds the Iconfinder Porfolio template directory to the locate_template search. Always search
+ * the wp-content/theme/{current-theme} folder first. But if the template isn't found, we
+ * can fall back on the default theme that comes with the plugin.
+ * @global \WP_Query $wp_query
  * @param string $template
  * @return string
  * @since 1.1.0
  */
-function icf_locate_template($template) {
-    $found_path = null;
-    $theme_path = locate_template($template, false);
-    if ($theme_path === '') {
-        $test_path = ICF_TEMPLATE_PATH . $template;
-        if (file_exists($test_path)) {
-            $found_path = $test_path;
+function template_chooser($template) {
+
+    if (! is_iconfinder()) {
+        return $template;
+    }
+
+    $post_type = get_query_var('post_type');
+    if (empty($post_type)) {
+        $post_type = $_REQUEST['post_type'];
+        if (! empty($post_type)) {
+            set_query_var($post_type);
         }
     }
-    else {
-        $found_path = $theme_path;
+    return icf_locate_template($template);
+}
+add_filter('template_include', 'template_chooser');
+
+/**
+ * Search for one of our templates in the plugin theme path
+ * first, then our plugin partials path.
+ * @param string $template
+ * @param bool $is_ours  If the theme is one of ourse, we search for it differently.
+ * @return string
+ * @since 1.1.0
+ */
+function icf_locate_template($template, $is_ours=false) {
+    $found_path = null;
+
+    if (! is_iconfinder()) {
+        return locate_template($template, false);
     }
-    return $found_path;
+
+    /**
+     * Check for post_type-template.php
+     */
+
+    $post_type  = get_query_var('post_type', 'iconset');
+
+    /**
+     * We're going to use the existing theme path as our fallback
+     */
+
+    $theme_path = locate_template($template, false);
+
+    /**
+     * Our preference is for theme that exactly matches our post_type-template.php
+     * in the active theme directory.
+     */
+
+    $preferred_template = $template;
+    if (! $is_ours) {
+        $preferred_template = icf_preferred_template($template);
+    }
+
+    $test_path = locate_template($preferred_template);
+
+    /**
+     * If the preferred template is empty, try the plugin's default theme.
+     */
+
+    if (trim($test_path) === '') {
+        $test_path = ICF_TEMPLATE_PATH . $preferred_template;
+        if (file_exists($test_path)) {
+            $theme_path = $test_path;
+        }
+    }
+
+    return $theme_path;
+}
+
+/**
+ * Parse the current template name and over-ride it with our preferred
+ * name based on context and post_type.
+ * @param $template
+ *
+ * @return string
+ */
+function icf_preferred_template($template) {
+
+    if (! is_iconfinder()) return $template;
+
+    $pathinfo  = pathinfo(basename($template));
+    $filename  = get_val($pathinfo, 'filename');
+    $extension = get_val($pathinfo, 'extension');
+    if (! empty($filename) && ! empty($extension)) {
+        $post_type = get_query_var('post_type');
+        $template = "{$filename}-{$post_type}.{$extension}";
+    }
+    return $template;
+}
+
+/**
+ * Get the current WP context.
+ * @return string
+ */
+function icf_get_context() {
+
+    $context = 'index';
+
+    if ( is_home() ) {
+        // Blog Posts Index
+        $context = 'home';
+        if ( is_front_page() ) {
+            // Front Page
+            $context = 'front-page';
+        }
+    }
+    else if ( is_date() ) {
+        // Date Archive Index
+        $context = 'date';
+    }
+    else if ( is_author() ) {
+        // Author Archive Index
+        $context = 'author';
+    }
+    else if ( is_category() ) {
+        // Category Archive Index
+        $context = 'category';
+    }
+    else if ( is_tag() ) {
+        // Tag Archive Index
+        $context = 'tag';
+    }
+    else if ( is_tax() ) {
+        // Taxonomy Archive Index
+        $context = 'taxonomy';
+    }
+    else if ( is_archive() ) {
+        // Archive Index
+        $context = 'archive';
+    }
+    else if ( is_search() ) {
+        // Search Results Page
+        $context = 'search';
+    }
+    else if ( is_404() ) {
+        // Error 404 Page
+        $context = '404';
+    }
+    else if ( is_attachment() ) {
+        // Attachment Page
+        $context = 'attachment';
+    }
+    else if ( is_single() ) {
+        // Single Blog Post
+        $context = 'single';
+    }
+    else if ( is_page() ) {
+        // Static Page
+        $context = 'page';
+    }
+    return $context;
 }
 
 /**

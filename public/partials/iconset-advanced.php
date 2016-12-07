@@ -11,7 +11,7 @@
  * @subpackage Iconfinder_Portfolio/public/partials
  */
 ?>
-<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <div class="gs_drib_area gs_drib_theme1 iconfinder-portfolio">
         <div class="container">
                 <div class="row">

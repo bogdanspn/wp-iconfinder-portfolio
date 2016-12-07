@@ -6,13 +6,14 @@
  * and open the template in the editor.
  */
 ?>
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <header class="page-titles">
     <div class="container clearfix">
         <h1 class="entry-title"><?php echo __( 'Search Icon Sets', ICF_PLUGIN_NAME ) ?></h1>
         <h3 class="entry-subtitle"><?php echo __( 'Icon Set Search Result for ', ICF_PLUGIN_NAME ) . "`$s`" ?></h3>
     </div>
 </header>
-<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
+<?php echo "<!-- Default template: " . basename(__FILE__) . "-->"; ?>
 <?php do_action('icf_iconset_searchform'); ?>
 <section class="main search-results-main iconset-search-results icf-search-results iconfinder-portfolio">
     <div class="gs_drib_area gs_drib_theme1">

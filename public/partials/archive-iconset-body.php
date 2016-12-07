@@ -1,9 +1,10 @@
 <?php
 /**
- * The template for display portfolio post archives
+ * The template to display iconset archives.
  *
- * @since 3.0
+ * @since 2.0
  */
+
 ?>
 <!-- Default template: <?php echo basename(__FILE__); ?> -->
 

@@ -133,6 +133,35 @@ function get_val($subject, $key, $default=null) {
 }
 
 /**
+ * Returns a strictly typed and scrubbed string or number from an array or object.
+ * @param array|object $subject The array or object to search
+ * @param string $key The key within the object or array to get
+ * @param string $type
+ * @param |null $default
+ * @return string|number|null
+ */
+function get_scrubbed($subject, $key, $type='string', $default=null) {
+    $scrubbed = null;
+    $value = get_val($subject, $key, $default);
+    if ($type == 'string') {
+        if (is_string($value) && strlen($value) < pow(2, 16) ) {
+            $scrubbed = sanitize_text_field($value);
+        }
+    }
+    else if ($type == 'number') {
+        if (is_numeric($value)) {
+            if (is_float($value)) {
+                $scrubbed = floatval($value);
+            }
+            else {
+                $scrubbed = intval($value);
+            }
+        }
+    }
+    return $scrubbed;
+}
+
+/**
  * Converts a shortcode comma-delimited list into a PHP array
  * 
  * @param string $str
@@ -1838,18 +1867,22 @@ function setup_search_posts() {
 # add_action('wp', 'setup_search_posts');
 
 /**
- * @param $defaults
+ * @param array $columns The array of column names.
  * @return mixed
  *
  * @see https://code.tutsplus.com/articles/quick-tip-make-your-custom-column-sortable--wp-25095
  */
-function icf_columns_head($defaults) {
-    $defaults['iconset_style'] = 'Style';
-    $defaults['iconset_identifier'] = 'Identifier';
-    $defaults['iconset_id'] = 'Iconset ID';
-    $defaults['iconset_icons_count'] = 'Icons Count';
-    $defaults['iconset_is_premium'] = 'License Type';
-    return $defaults;
+function icf_columns_head($columns) {
+
+    $columns['iconset_style'] = 'Style';
+    $columns['iconset_identifier'] = 'Identifier';
+    $columns['iconset_id'] = 'Iconset ID';
+    $columns['iconset_icons_count'] = 'Icons Count';
+    $columns['iconset_is_premium'] = 'License Type';
+    if ( isset($columns['taxonomy-icon_tag']) ) {
+        unset($columns['taxonomy-icon_tag']);
+    }
+    return $columns;
 }
 
 /**
@@ -1857,7 +1890,7 @@ function icf_columns_head($defaults) {
  * @param $post_id
  */
 function icf_columns_content($column_name, $post_id) {
-    # if (get_query_var('post_type') != 'iconset') { return; }
+
     if ($column_name == 'iconset_style') {
         echo get_post_meta($post_id, 'iconset_style_name', true);
     }
@@ -1924,8 +1957,8 @@ function iconset_orderby( $query ) {
     }
 }
 
-add_filter('manage_iconset_posts_columns', 'icf_columns_head');
-add_action('manage_iconset_posts_custom_column', 'icf_columns_content', 10, 2);
+add_filter( 'manage_iconset_posts_columns', 'icf_columns_head' );
+add_action( 'manage_iconset_posts_custom_column', 'icf_columns_content', 10, 2 );
 add_filter( 'manage_edit-iconset_sortable_columns', 'iconset_sortable_columns' );
 add_action( 'pre_get_posts', 'iconset_orderby' );
 
@@ -1991,7 +2024,7 @@ function icon_orderby( $query ) {
     }
 }
 
-add_filter('manage_icon_posts_columns', 'icf_icon_columns_head');
-add_action('manage_icon_posts_custom_column', 'icf_icon_columns_content', 10, 2);
+add_filter( 'manage_icon_posts_columns', 'icf_icon_columns_head' );
+add_action( 'manage_icon_posts_custom_column', 'icf_icon_columns_content', 10, 2 );
 add_filter( 'manage_edit-icon_sortable_columns', 'icon_sortable_columns' );
 add_action( 'pre_get_posts', 'icon_orderby' );

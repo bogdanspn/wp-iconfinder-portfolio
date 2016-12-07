@@ -19,7 +19,7 @@ if (! isset($options)) $options = array(
 $col_count = 4;
 
 ?>
-<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <div class="gs_drib_area gs_drib_theme1">
         <div class="container">
                 <div class="row">

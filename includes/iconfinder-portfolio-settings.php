@@ -184,7 +184,8 @@ function _icf_settings() {
                 'img_size'   => ICF_DEFAULT_PREVIEW_SIZE,
                 'show_links' => true,
                 'show_price' => true,
-                'buy_link'   => true
+                'buy_link'   => true,
+                'paginate'   => false
         ),
 
         /**

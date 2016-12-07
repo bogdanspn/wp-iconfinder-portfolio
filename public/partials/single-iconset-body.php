@@ -6,8 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  * @package Iconfinder Portfolio
  */
 ?>
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <?php if ( have_posts() ) : while ( have_posts() ) : the_post(); ?>
-    <!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
     <div class="icf-icon-advanced">
         <!-- iconset -->
         <div class="gs_drib_area gs_drib_theme1 iconset-item iconfinder-portfolio icf-button-bar">

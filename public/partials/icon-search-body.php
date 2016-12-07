@@ -3,7 +3,7 @@
  * Icon search results.
  */
 ?>
-<!--<?php echo basename(__FILE__); ?>-iconfinder-default-template-->
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <header class="page-titles">
     <div class="container clearfix">
         <h1 class="entry-title"><?php echo __( 'Search Icons', ICF_PLUGIN_NAME ) ?></h1>

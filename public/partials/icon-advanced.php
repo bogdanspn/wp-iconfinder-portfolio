@@ -18,6 +18,7 @@
  * scope automatically in the vairable '$iconset_post'
  */
 ?>
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 <div class="icf-icon-advanced">
     <?php if (! empty($iconset_post)) : ?>
         <?php $iconset_post_id = get_val($iconset_post, 'ID'); ?>

@@ -5,8 +5,7 @@
  * @since 3.0
  */
 ?>
-<!-- Default template: <?php echo basename(__FILE__); ?> -->
-<?php do_action('icf_iconset_searchform'); ?>
+<?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
 
 <section class="main search-results-main iconset-search-results icf-search-results iconfinder-portfolio">
     <div class="gs_drib_area gs_drib_theme1 iconfinder-portfolio">
@@ -47,7 +46,9 @@
             </div>
         </div>
     </div>
-    <div class="container clearfix">
-        <?php icf_pagination(); ?>
-    </div>
+    <?php if ($paginate) : ?>
+        <div class="container clearfix wpbeginner-pagenav">
+            <?php icf_pagination(); ?>
+        </div>
+    <?php endif; ?>
 </section>
