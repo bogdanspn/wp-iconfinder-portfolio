@@ -16,7 +16,7 @@
  * Plugin Name:       Iconfinder Portfolio
  * Plugin URI:        http://iconfinder.com
  * Description:       A plugin for displaying content from the Iconfinder API in a WordPress site.
- * Version:           1.0.0
+ * Version:           2.0.0
  * Author:            Scott Lewis
  * Author URI:        http://iconify.it
  * License:           GPL-2.0+
