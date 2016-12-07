@@ -1204,3 +1204,8 @@ a, a img, a img.wp-post-image { cursor: pointer; }
 
   padding: 0 !important;
 }
+
+.main.icf-search-form .container {
+
+  padding: 0;
+}
