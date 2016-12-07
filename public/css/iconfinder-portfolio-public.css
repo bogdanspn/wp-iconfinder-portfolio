@@ -824,7 +824,8 @@
 
 
 .drib-shots {
-    margin: 5px 0;
+
+    margin: 5px 0 20px 0;
 }
 .drib-shots a {
     outline: none;
@@ -1197,4 +1198,9 @@ a, a img, a img.wp-post-image { cursor: pointer; }
 .icf-icon-advanced .icf-button-bar .row {
     
     margin-bottom: 20px;
+}
+
+.main.icf-search-form {
+
+  padding: 0 !important;
 }

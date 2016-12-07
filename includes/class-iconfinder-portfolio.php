@@ -221,8 +221,8 @@ class Iconfinder_Portfolio {
 
         $plugin_public = new Iconfinder_Portfolio_Public( $this->get_plugin_name(), $this->get_version() );
 
-        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles', null, 11 );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts', null, 11 );
         $this->loader->add_action( 'init', $plugin_public, 'load_search_engine' );
     }
 

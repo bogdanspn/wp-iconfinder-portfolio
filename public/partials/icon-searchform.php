@@ -13,13 +13,19 @@ if (! isset($search_iconset_id) || empty($search_iconset_id) ) {
 }
 ?>
 <?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
-<div class="container clearfix icf-searchform iconset">
-    <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform" class="search-form the-search-form clearfix">
-        <fieldset class="the-search-fieldset">
-            <input type="text" class="search-form-input text the-search-field" name="s" placeholder="Search Icons" value="<?php echo get_query_var('s'); ?>">
-            <input type="submit" value="Search" class="submit the-search-button">
-            <input type="hidden" name="post_type" value="icon" />
-            <input type="hidden" name="search_iconset_id" value="<?php echo $search_iconset_id; ?>" />
-        </fieldset>
-    </form>
-</div>
+<section class="main iconfinder-portfolio icf-search-form icf-icon-search-form">
+    <div class="container">
+        <div class="row">
+            <div class="container clearfix icf-searchform iconset">
+                <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform" class="search-form the-search-form clearfix">
+                    <fieldset class="the-search-fieldset">
+                        <input type="text" class="search-form-input text the-search-field" name="s" placeholder="Search Icons" value="<?php echo get_query_var('s'); ?>">
+                        <input type="submit" value="Search" class="submit the-search-button">
+                        <input type="hidden" name="post_type" value="icon" />
+                        <input type="hidden" name="search_iconset_id" value="<?php echo $search_iconset_id; ?>" />
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
