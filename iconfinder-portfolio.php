@@ -14,7 +14,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Iconfinder Portfolio
- * Plugin URI:        http://iconfinder.com
+ * Plugin URI:        https://github.com/iconfinder/wp-iconfinder-portfolio
  * Description:       A plugin for displaying content from the Iconfinder API in a WordPress site.
  * Version:           2.0.0
  * Author:            Iconfinder
