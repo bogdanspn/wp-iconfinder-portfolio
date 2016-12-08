@@ -12,17 +12,10 @@ function iconset_to_post($iconset, $post=null, $collection=null) {
 
     $default_content  = get_val($iconset, 'name', 'Untitled Iconset description');
     $post_title       = get_val($post, 'post_title', 'Untitled Iconset');
-    $post_content     = get_val($post, 'post_content', $default_content);
-    
     $icon_post_title  = get_val($iconset, 'name', $post_title);
     $iconset_id       = get_val($iconset, 'iconset_id', null);
-    
-    $identifier = get_val($iconset, 'identifier', $iconset_id);
-    
-    if (! empty($iconset_id)) {
-        # $icon_post_title .= " - ({$iconset_id})";
-    }
-    
+    $identifier       = get_val($iconset, 'identifier', $iconset_id);
+
     return array(
         'ID'             => get_val($iconset, 'ID', null),
         'post_title'     => $icon_post_title,
@@ -83,7 +76,7 @@ function icon_to_post($icon, $post=null, $iconset=null) {
     
     $post_title = "Icon {$icon['icon_id']}";
     
-    if (! empty($iconset) && isset($iconset['identifier'])) {
+    if (! empty($iconset) && isset($iconset['identifier']) ) {
         $post_title = "{$iconset['identifier']} - Icon {$icon['icon_id']}";
     }
     

@@ -13,7 +13,7 @@ if (! isset($search_iconset_id) || empty($search_iconset_id) ) {
 }
 ?>
 <?php echo "<!-- Default template: " . basename(__FILE__) . " -->"; ?>
-<section class="main iconfinder-portfolio icf-search-form icf-icon-search-form">
+<section class="main icf-search-form icf-icon-search-form">
     <div class="container">
         <div class="row">
             <form role="search" action="<?php echo site_url('/'); ?>" method="get" id="searchform" class="search-form the-search-form clearfix">

@@ -137,12 +137,6 @@ class Iconfinder_Portfolio_Admin {
         add_submenu_page( $this->plugin_name, 'Collections Shortcodes', 'Collections Shortcodes', 'manage_options', $this->plugin_name . '-collections', array($this, 'display_collections_page'));
         add_submenu_page( $this->plugin_name, 'Settings', 'Settings', 'manage_options', $this->plugin_name, array($this, 'display_plugin_setup_page'));
         add_submenu_page( $this->plugin_name, 'Documentation', 'Documentation', 'manage_options', $this->plugin_name . '-documentation', array($this, 'display_plugin_documentation'));
-        
-        // Only show these in advanced mode after API credentials are set
-        
-        if ($this->get_mode() == ICF_PLUGIN_MODE_ADVANCED) {
-            # add_submenu_page( $this->plugin_name, 'Importer', 'Importer', 'manage_options', $this->plugin_name . '-importer', array($this, 'display_plugin_importer'));
-        }
     }
 
     /**
@@ -152,9 +146,9 @@ class Iconfinder_Portfolio_Admin {
      * @since 1.1.0
      */
     public function add_action_links( $links ) {
-        /*
-        *  Documentation : https://codex.wordpress.org/Plugin_API/Filter_Reference/plugin_action_links_(plugin_file_name)
-            */
+        /**
+         *@see https://codex.wordpress.org/Plugin_API/Filter_Reference/plugin_action_links_(plugin_file_name)
+         */
         $settings_link = array(
             '<a href="' . admin_url( 'options-general.php?page=' . $this->plugin_name ) . '">' . __('Settings', $this->plugin_name) . '</a>',
         );
@@ -346,7 +340,7 @@ class Iconfinder_Portfolio_Admin {
 
             $query_string = http_build_query($query_args);
 
-            $result = ICONFINDER_API_URL . "{$api_path}?" . $query_string ;
+            $result = ICONFINDER_API_URL . "{$api_path}?{$query_string}" ;
         }
 
         return $result;
@@ -364,7 +358,7 @@ class Iconfinder_Portfolio_Admin {
         
         $admin_file = null;
         if ($filename != "") {
-            $admin_file = plugin_dir_path( __FILE__ ) . "partials/$filename";
+            $admin_file = plugin_dir_path( __FILE__ ) . "partials/{$filename}";
         }
         
         $items = array();
@@ -372,7 +366,7 @@ class Iconfinder_Portfolio_Admin {
             $items = $data['items'];
         }
         
-        $message = 'Nothing to display';
+        $message = __( 'Nothing to display', $this->plugin_name );
         if (isset($data['message'])) {
             $message = $data['message'];
         }
@@ -392,7 +386,7 @@ class Iconfinder_Portfolio_Admin {
         $iconset_id = get_val( $post_data, 'iconset_id', null );
         
         if (empty($iconset_id) || empty($action)) {
-            $result = icf_append_error($result, null, "Iconset could not be found");
+            $result = icf_append_error($result, null, __( "Iconset could not be found", $this->plugin_name ));
         }
         else {
             // Do the thing
@@ -406,14 +400,13 @@ class Iconfinder_Portfolio_Admin {
                         $delete = delete_iconset_post($iconset_id);
                         if (is_wp_error($delete)) {
                             $result = icf_append_error(
-                                $result, 
-                                $delete,
-                                "Iconset ID {$iconset_id} could not be deleted"
+                                $result, $delete,
+                                __( "Iconset ID {$iconset_id} could not be deleted", $this->plugin_name )
                             );
                         }
                         else {
                             icf_queue_notices(
-                                "Iconset `{$iconset->post_title}` was successfully deleted.",
+                                __( "Iconset `{$iconset->post_title}` was successfully deleted.", $this->plugin_name ),
                                 'success'
                             );
                         }
@@ -423,14 +416,13 @@ class Iconfinder_Portfolio_Admin {
                         $post_id = update_iconset_post($iconset_id, array());
                         if (is_wp_error($post_id)) {
                             $result = icf_append_error(
-                                $result, 
-                                $post_id,
-                                "Iconset ID {$iconset_id} could not be updated"
+                                $result, $post_id,
+                                __( "Iconset ID {$iconset_id} could not be updated", $this->plugin_name )
                             );
                         }
                         else {
                             icf_queue_notices(
-                                "Iconset `{$iconset['identifier']}` was successfully updated.",
+                                __( "Iconset `{$iconset['identifier']}` was successfully updated.", $this->plugin_name ),
                                 'success'
                             );
                         }
@@ -441,15 +433,14 @@ class Iconfinder_Portfolio_Admin {
                 $post_id = create_iconset_post($iconset_id, array());
                 if (is_wp_error($post_id)) {
                     $result = icf_append_error(
-                        $result, 
-                        $post_id,
-                        "Iconset ID {$iconset_id} could not be imported"
+                        $result, $post_id,
+                        __( "Iconset ID {$iconset_id} could not be imported", $this->plugin_name )
                     );
                 }
                 else {
                     $post = get_post($post_id);
                     icf_queue_notices(
-                        "Iconset `{$post->post_title}` was successfully imported.",
+                        __( "Iconset `{$post->post_title}` was successfully imported.", $this->plugin_name ),
                         'success'
                     );
                 }
@@ -457,27 +448,11 @@ class Iconfinder_Portfolio_Admin {
         }
         
         if (is_wp_error($result)) {
-            icf_queue_notices(
-                $result->get_error_messages(),
-                'error'
-            );
+            icf_queue_notices($result->get_error_messages(), 'error' );
         }
 
         wp_redirect( admin_url( "admin.php?page=iconfinder-portfolio-iconsets" . icf_get_page_query() ) );
     }
-    
-    /**
-     * Sync local content with source.
-     *
-     * @since 1.1.0
-     */
-    public function sync_content() {
-    
-        // Sync local content with source
-
-        wp_redirect( admin_url( 'admin.php?page=' . ICF_PLUGIN_NAME ) );
-    }
-    
         
     /**
     *  Save the plugin options
@@ -487,6 +462,10 @@ class Iconfinder_Portfolio_Admin {
     public function options_update() {
 
         register_setting( ICF_PLUGIN_NAME, ICF_PLUGIN_NAME, array($this, 'validate') );
+        icf_queue_notices(
+            __( 'Your settings have been updated.', ICF_PLUGIN_NAME ),
+            'success'
+        );
     }
     
     /**
@@ -529,28 +508,14 @@ class Iconfinder_Portfolio_Admin {
         $valid['posts_per_page']      = get_val( $input, 'posts_per_page', ICF_SEARCH_POSTS_PER_PAGE );
         $valid['currency_symbol']     = get_val( $input, 'currency_symbol', ICF_DEFAULT_CURRENCY );
         $valid['show_price']          = get_val( $input, 'show_price', true );
-        
-        // We need to have at least one preview size at all times, 
-        // so if none are selected, use the default.
-        $icon_preview_sizes = get_val( $input, 'icon_preview_sizes');
-        if (! is_array($icon_preview_sizes) || empty($icon_preview_sizes)) {
-            $icon_preview_sizes = array(icf_get_setting('icon_default_preview_size'));
-        }
-        $valid['icon_preview_sizes'] = $icon_preview_sizes;
-        
-        // We need to have an iconset preview size at all times.
-        // If none is selected or set, use the default.
-        $iconset_preview_size = get_val( $input, 'iconset_preview_size');
-        if (empty($iconset_preview_size)) {
-            $iconset_preview_size = icf_get_setting('iconset_default_preview_size');
-        }
-        $valid['iconset_preview_size'] = $iconset_preview_size;
-        
-        // If we are currently in basic mode, and changing to 
-        // advanced mode, clear the cache. We don't want to leave 
-        // garbage behind. If the user switches back to basic mode,
-        // the plugin will create a new cache on the first 
-        // page requests.
+
+        /**
+         * If we are currently in basic mode, and changing to
+         * advanced mode, clear the cache. We don't want to leave
+         * garbage behind. If the user switches back to basic mode,
+         * the plugin will create a new cache on the first
+         * page requests.
+         */
         if ($valid['plugin_mode'] === ICF_PLUGIN_MODE_ADVANCED) {
             if (icf_get_option('plugin_mode') === ICF_PLUGIN_MODE_BASIC) {
                 $this->purge_cache( false );

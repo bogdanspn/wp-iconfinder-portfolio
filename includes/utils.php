@@ -111,7 +111,10 @@ function icf_count_posts($post_type) {
  */
 function icf_get_setting($key, $default=null) {
     
-    $settings = _icf_settings();
+    static $settings = null;
+    if (empty($settings)) {
+        $settings = _icf_settings();
+    }
     $value = $default ;
     if (! empty($key) && isset($settings[$key])) {
         $value = $settings[$key];
@@ -243,7 +246,7 @@ function icf_queue_notices($notices, $type='success') {
  */
 function icf_admin_notices() {
     
-    $types = array('success', 'error');
+    $types = array( 'success', 'error', 'info', 'warning' );
 
     foreach ($types as $type) {
         $transient_key = ICF_PLUGIN_NAME . '_' . $type;
@@ -257,7 +260,10 @@ function icf_admin_notices() {
                 $messages = array($messages);
             }
             foreach ($messages as $message) {
-                printf( '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>', $type, __( $message, ICF_PLUGIN_NAME) ); 
+                printf(
+                    '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+                    $type, __( $message, ICF_PLUGIN_NAME)
+                );
             }
             $message = null;
         }
@@ -266,89 +272,9 @@ function icf_admin_notices() {
 add_action( 'admin_notices' , 'icf_admin_notices' );
 
 /**
- * Create numeric paginated results.
- * @global \WP_Query $wp_query
- * @return void
- * @author WPBeginner
- * @link http://www.wpbeginner.com/wp-themes/how-to-add-numeric-pagination-in-your-wordpress-theme/
- * @since 1.1.0
- * @deprecated
- */
-function wpbeginner_numeric_posts_nav() {
-
-    if( is_singular() )
-        return;
-
-    global $wp_query;
-
-    $links = null;
-
-    /** Stop execution if there's only 1 page */
-    if( $wp_query->max_num_pages <= 1 )
-        return;
-
-    $paged = get_query_var( 'paged' ) ? absint( get_query_var( 'paged' ) ) : 1;
-    $max   = intval( $wp_query->max_num_pages );
-
-    /**        Add current page to the array */
-    if ( $paged >= 1 )
-        $links[] = $paged;
-
-    /**        Add the pages around the current page to the array */
-    if ( $paged >= 3 ) {
-        $links[] = $paged - 1;
-        $links[] = $paged - 2;
-    }
-
-    if ( ( $paged + 2 ) <= $max ) {
-        $links[] = $paged + 2;
-        $links[] = $paged + 1;
-    }
-
-    echo '<div class="navigation"><ul>' . "\n";
-
-    /**        Previous Post Link */
-    if ( get_previous_posts_link() )
-        printf( '<li>%s</li>' . "\n", get_previous_posts_link() );
-
-    /**        Link to first page, plus ellipses if necessary */
-    if ( ! in_array( 1, $links ) ) {
-        $class = 1 == $paged ? ' class="active"' : '';
-
-    printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( 1 ) ), '1' );
-
-    if ( ! in_array( 2, $links ) )
-        echo '<li>…</li>';
-    }
-
-    /**        Link to current page, plus 2 pages in either direction if necessary */
-    sort( $links );
-    foreach ( (array) $links as $link ) {
-        $class = $paged == $link ? ' class="active"' : '';
-        printf( "<li%s><a href=\"%s\">%s</a></li>\n", $class, esc_url( get_pagenum_link( $link ) ), $link );
-    }
-
-    /**        Link to last page, plus ellipses if necessary */
-    if ( ! in_array( $max, $links ) ) {
-        if ( ! in_array( $max - 1, $links ) )
-            echo '<li>…</li>' . "\n";
-
-        $class = $paged == $max ? ' class="active"' : '';
-        printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( $max ) ), $max );
-    }
-
-    /**        Next Post Link */
-    if ( get_next_posts_link() )
-        printf( '<li>%s</li>' . "\n", get_next_posts_link() );
-
-    echo '</ul></div>' . "\n";
-}
-
-/**
  * Credit where credit is due, this navigation was borrowed from
  * the Checkout theme by Array Themes.
- */
-/**
+ *
  * Displays post pagination links
  *
  * @since checkout 1.0
@@ -365,18 +291,20 @@ function checkout_page_navs( $query = false ) {
     if ( $GLOBALS['wp_query']->max_num_pages < 2 ) {
         return;
     } ?>
-    <div class="navigation">
-        <?php
-        $big = 999999999; // need an unlikely integer
+    <div class="container clearfix icf-pagination">
+        <div class="navigation">
+            <?php
+            $big = 999999999; // need an unlikely integer
 
-        echo paginate_links( array(
-            'base'    => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
-            'format'  => '?paged=%#%',
-            'current' => max( 1, get_query_var('paged') ),
-            'total'   => $wp_query->max_num_pages,
-            'type'    => 'list'
-        ) );
-        ?>
+            echo paginate_links( array(
+                'base'    => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+                'format'  => '?paged=%#%',
+                'current' => max( 1, get_query_var('paged') ),
+                'total'   => $wp_query->max_num_pages,
+                'type'    => 'list'
+            ) );
+            ?>
+        </div>
     </div>
     <?php
     if( isset( $temp_query ) ) {
@@ -414,9 +342,7 @@ function icf_admin_iconsets_pagination($page_count, $current_page=1) {
  */
 function paginate_items($items, $items_per_page, $page_num) {
 
-    $subset = array();
     $item_count = count($items);
-    $page_count = ceil($item_count/$items_per_page);
 
     /*
      * By default we return the full set of items
@@ -473,6 +399,8 @@ function get_num_in_rang($num, $max, $min=1) {
 /**
  * Builds the pagination query to append to a URL.
  * @param string $delim
+ *
+ * @return string
  */
 function icf_get_page_query( $delim = "&" ) {
     $page_query = "";
@@ -545,7 +473,6 @@ function all_search_words($str) {
 /**
  * Loads the icon search form.
  * @param array $args An array of named variables to pass to the form.
- *
  * @return null
  */
 function icon_searchform($args=array()) {
@@ -561,7 +488,6 @@ add_action('icf_icon_searchform', 'icon_searchform');
 /**
  * Load the iconset search form.
  * @param array $args An array of named variables to pass to the form.
- *
  * @return null
  */
 function iconset_searchform($args=array()) {
@@ -596,10 +522,8 @@ function is_iconfinder() {
 /**
  * Sets the posts_per_page for the plugin output and limits search
  * to iconset or collection if indicated.
- *
- *@param \WP_Query $query
- *
-*@return \WP_Query
+ * @param \WP_Query $query
+ * @return \WP_Query
  */
 function icf_adjust_query( $query ) {
 
@@ -1154,7 +1078,7 @@ function is_shortcode($str) {
             && array_key_exists(2, $matches))
     {
         return true;
-        }
+    }
     return false;
 }
 
@@ -1180,18 +1104,20 @@ function add_referral_code($link) {
  * @return string
  */
 function coerce_img_size($img_size) {
-    if ($img_size === 'medium') {
-        $img_size = 'medium-2x';
-    }
-    else if (in_array($img_size, array('small', 'normal', 'default'))) {
-        $img_size = 'medium';
-    }
-    else if (! in_array($img_size, array('normal', 'large'))) {
-        $img_size = 'medium';
-    }
+
+    $img_size = get_val(
+        icf_get_setting('image_size_map'),
+        $img_size, $img_size
+    );
     return $img_size;
 }
 
+/**
+ * Coerce style values to Iconfinder system names.
+ * @param $styles
+ *
+ * @return array|string
+ */
 function coerce_style_values($styles) {
     $new_styles = array();
     $aliases = icf_get_setting('style_aliases');
@@ -1213,6 +1139,13 @@ function coerce_style_values($styles) {
     return $new_styles;
 }
 
+/**
+ * Create a currency selector element.
+ * @param string $selected
+ * @param string $selector_name
+ *
+ * @return string
+ */
 function icf_currency_selector($selected=ICF_DEFAULT_CURRENCY, $selector_name='currency') {
     $currency_symbols = icf_get_currencies();
     $html  = "\n";
@@ -1227,6 +1160,12 @@ function icf_currency_selector($selected=ICF_DEFAULT_CURRENCY, $selector_name='c
         return $html;
 }
 
+/**
+ * Map currency abbreviation to the symbol.
+ * @param $abbrev
+ *
+ * @return mixed|null
+ */
 function icf_get_currency_symbol($abbrev) {
     $currency_symbols = icf_get_currencies();
     if (isset($currency_symbols[$abbrev])) {

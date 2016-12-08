@@ -98,7 +98,7 @@ function _icf_settings() {
          * we limit what is imported to only a few reasonable sizes.
          */
 
-        'icon_import_sizes' => array('@64', '@128', '@256', '@512'),
+        'icon_preview_sizes' => array('@63', '@128', '@256', '@512'),
 
         /**
          * The default preview size that is set as the post thubmnail (featured image)
@@ -117,6 +117,15 @@ function _icf_settings() {
          */
         
         'iconset_preview_sizes' => array('medium', 'medium-2x', 'large'),
+
+        /**
+         * Maps user-friendly image size names to Iconfinder's names.
+         */
+        'image_size_map' => array(
+            'small'  => 'medium',
+            'medium' => 'medium-2x',
+            'large'  => 'large'
+        ),
 
         /**
          * Valid API sub-paths

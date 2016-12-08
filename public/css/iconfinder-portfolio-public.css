@@ -35,6 +35,7 @@
 .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12 {
   float: left;
 }
+
 .col-xs-12 {
   width: 100%;
 }
@@ -823,15 +824,16 @@
 }
 
 
-.drib-shots {
+.icf-item {
 
     margin: 5px 0 20px 0;
 }
-.drib-shots a {
+
+.icf-item a {
     outline: none;
 }
 
-.drib-shots a img {
+.icf-item a img {
 
     box-shadow: 0 1px 2px rgba(0,0,0,0.07);
     -webkit-border-radius: 4px;
@@ -841,10 +843,6 @@
     -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.07);
     -moz-box-shadow: 0 1px 2px rgba(0,0,0,0.07);
     box-shadow: 0 1px 2px rgba(0,0,0,0.07);
-}
-
-.gs_drib_area {
-
 }
 
 h2 { clear: both; margin-top: 20px; }
@@ -873,7 +871,6 @@ div.button-row {
   margin: 20px 0 0 0 !important;
   text-decoration: none;
   display: inline-block;  
-  /* float: right; */
 }
 
 .read-more .right-arrow {
@@ -958,22 +955,18 @@ div.button-row {
 	background-color: #3C8DC5;
 }
 
-.wpbeginner-pagenav {
+.icf-pagination {
     margin: 30px auto !important;
 }
 
 .icf-searchform {
     margin: 50px auto 0 auto !important;
     padding: 20px 20px 0 20px !important;
-    /* border-bottom: 1px solid #555; */
-/*    max-width: 1130px !important;*/
 }
 
 .iconset.icf-searchform {
     margin: 50px auto 0 auto !important;
     padding: 20px 20px 0 20px !important;
-    /* border-bottom: 1px solid #555; */
-/*    max-width: 1130px !important;*/
 }
 
 .icf-searchform .search-field {
@@ -1007,7 +1000,7 @@ div.button-row {
     font: normal normal normal normal 18px / 28.8px Roboto, "Helvetica Neue", Helvetica, sans-serif;
     margin: 0;
     outline: rgb(107, 116, 122) none 0px;
-}/*.the-search-form*/
+}
 
 .the-search-form:after {
     box-sizing: border-box;
@@ -1023,7 +1016,7 @@ div.button-row {
     border: 0px none rgb(107, 116, 122);
     font: normal normal normal normal 0px / 0px Roboto, "Helvetica Neue", Helvetica, sans-serif;
     outline: rgb(107, 116, 122) none 0px;
-}/*.the-search-form:after*/
+}
 
 .the-search-form:before {
     box-sizing: border-box;
@@ -1033,7 +1026,7 @@ div.button-row {
     border: 0px none rgb(107, 116, 122);
     font: normal normal normal normal 18px / 28.8px Roboto, "Helvetica Neue", Helvetica, sans-serif;
     outline: rgb(107, 116, 122) none 0px;
-}/*.the-search-form:before*/
+}
 
 .the-search-fieldset {
     box-sizing: border-box;
@@ -1071,8 +1064,7 @@ div.button-row {
     font: normal normal normal normal 20px / 24px Roboto, "Helvetica Neue", Helvetica, sans-serif;
     outline: rgb(107, 116, 122) none 0px;
     padding: 15px 86px 15px 20px;
-}/*#INPUT_3*/
-
+}
 
 .the-search-button {
     bottom: 0px;
@@ -1080,8 +1072,6 @@ div.button-row {
     cursor: default;
     display: inline-block;
     height: 60px !important;
-/*    left: 977.875px;*/
-/*    position: absolute;*/
     float: right;
     right: 0px;
     text-align: center;
@@ -1101,7 +1091,7 @@ div.button-row {
     outline: rgb(255, 255, 255) none 0px;
     padding: 0px;
     transition: all 0.07s ease-in 0s;
-}/*#INPUT_1*/
+}
 
 .the-search-button:after {
     bottom: 0px;
@@ -1126,7 +1116,7 @@ div.button-row {
     border: 0px none rgb(255, 255, 255);
     font: normal normal bold normal 20px / normal FontAwesome;
     outline: rgb(255, 255, 255) none 0px;
-}/*#INPUT_1:after*/
+}
 
 .icon-item a.icon-preview,
 .iconset-item a.iconset-preview {
@@ -1176,9 +1166,8 @@ a, a img, a img.wp-post-image { cursor: pointer; }
     
     display: inline-block;
     width: auto;
-    margin: 0;
+    margin: 0 20px 0 0;
     padding: 0;
-    margin-right: 20px;
     height: auto;
     text-transform: uppercase;
 }

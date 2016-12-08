@@ -414,20 +414,28 @@ function get_api_path($which, $args=array()) {
 
     $path = array( $which );
     if ($which === 'iconsets') {
-        // https://api.iconfinder.com/v2/users/iconify/iconsets
+        /**
+         * https://api.iconfinder.com/v2/users/iconify/iconsets
+         */
         $path = array('users', api_username(), 'iconsets');
     }
     else if ($which === 'collections') {
-        // https://api.iconfinder.com/v2/users/iconify/collections
+        /**
+         * https://api.iconfinder.com/v2/users/iconify/collections
+         */
         $path = array('users', api_username(), 'collections');
     }
     else if ($which === 'collection') {
-        // https://api.iconfinder.com/v2/collections/$identifier/iconsets
+        /**
+         * https://api.iconfinder.com/v2/collections/$identifier/iconsets
+         */
         $identifier = get_val($args, 'identifier');
         $path = array('collections', $identifier, 'iconsets');
     }
     else if ($which === 'icons') {
-        // https://api.iconfinder.com/v2/iconsets/dog-activities-extended-license/icons
+        /**
+         * https://api.iconfinder.com/v2/iconsets/dog-activities-extended-license/icons
+         */
         $identifier = get_val($args, 'identifier');
         $path = array( 'iconsets', $identifier, 'icons' );
     }
@@ -544,8 +552,10 @@ function iconfinder_call_api( $api_url, $cache_key = '', $from_cache = false ) {
                 throw new Exception("[Exception] - {$response['detail']}");
             }
 
-            // a bit kludgy, but I want to normalize the response fields here
-            // instead of having a bunch of conditional checks elsewhere.
+            /**
+             * a bit kludgy, but I want to normalize the response fields here
+             * instead of having a bunch of conditional checks elsewhere.
+             */
             if (isset($response['iconsets']) && ! isset($response['items'])) {
                 $response['items'] = $response['iconsets'];
                 $response['data_type'] = 'iconsets';
@@ -664,7 +674,10 @@ function iconfinder_conditional_actions() {
     }
 }
 add_action( 'init', 'iconfinder_conditional_actions' );
-    
+
+/**
+ * Add the different metabox actions.
+ */
 function add_iconfinder_meta_boxes() {
     
     add_meta_box( 'collections_metabox', 'Iconsets', 'show_collections_metabox', 'collection', 'side', 'high');
@@ -829,39 +842,38 @@ function get_all_attachments($post_id) {
  * 
  * @since 1.1.0
  */
-function import_icon_previews($iconset) {
+function import_iconset_icons($iconset) {
     
     $result = null;
-    
-    // If we don't have the iconset_id, we can't do anything and 
-    // something was done wrong before calling this method.
+
+    /**
+     * If we don't have the iconset_id, we can't do anything and
+     * something was done wrong before calling this method.
+     */
     if (! isset($iconset['iconset_id']) || empty($iconset['iconset_id'])) {
         return icf_append_error(
             $result, 
             null, 
-            "Could not import iconset previews. Iconset not well-formed"
+            __( 'Could not import iconset previews. Iconset not well-formed', ICF_PLUGIN_NAME )
         );
     }
     
     $icons = get_icons_from_api($iconset['identifier']);
 
-    // If there are no icons, nothing to do.
+    /**
+     * If there are no icons, nothing to do.
+     */
     if (! count($icons)) {
         return null;
     }
 
-    $import_sizes = icf_get_option('icon_preview_sizes');
-    $default_preview_size = icf_get_setting('icon_default_preview_size');
+    $icon_preview_sizes = icf_get_setting( 'icon_preview_sizes' );
 
     $post_ids = array();
+
     foreach ($icons as $icon) {
 
         $icon_post_id = create_icon_post($icon, $iconset);
-        $icon_post    = get_post($icon_post_id);
-        if (count($icon['tags']) > 12) {
-            $icon['tags'] = array_slice($icon['tags'], 0, 12);
-        }
-        $alt_text = "Icons related to " . ucwords(implode(' ', $icon['tags']));
 
         if (is_wp_error($icon_post_id)) {
             $result = icf_append_error($result, $icon_post_id);
@@ -869,52 +881,23 @@ function import_icon_previews($iconset) {
         else {
             
             $post_ids[] = $icon_post_id;
-            add_icon_post_meta($icon_post_id, $iconset, $icon);
+            add_icon_post_meta( $icon_post_id, $iconset, $icon );
 
-            // Loop through the allowed sizes and attach them if they exist.
-            if (is_array($import_sizes) && count($import_sizes)) {
-                foreach ($import_sizes as $key) {
+            /**
+             * Loop through the allowed sizes and attach them if they exist.
+             */
+            if (is_array($icon_preview_sizes) && count($icon_preview_sizes)) {
+                foreach ($icon_preview_sizes as $key) {
+
                     if (! is_array($icon)) { continue; }
                     if (! isset($icon['previews'])) { continue; }
                     if (! isset($icon['previews'][$key])) { continue; }
-                    if ($key === $default_preview_size) { continue; }
 
                     $preview = $icon['previews'][$key];
+
                     if (isset($preview['src']) && ! empty($preview['src'])) {
-                        $src = media_sideload_image( $preview['src'], $icon_post_id, $alt_text, 'src' );
-                        if (is_wp_error($src)) {
-                            $result = icf_append_error($result, $src);
-                        }
-                        else {
-                            $preview['src'] = $src;
-                            add_post_meta( $icon_post_id, "preview-{$key}" , $preview['src'], true );
-                            add_post_meta( $icon_post_id, "parent_post_id" , $iconset['post_id'], true );
-                            $media = get_last_attachment($icon_post->ID);
-                            if (! empty($media)) {
-                                update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Set the featured image for the icon post.
-            if (isset($icon['previews'][$default_preview_size])) {
-                $preview = $icon['previews'][$default_preview_size];
-                $src = media_sideload_image( $preview['src'], $icon_post_id, $alt_text, 'src' );
-                if (is_wp_error($src)) {
-                    $result = icf_append_error($result, $src);
-                }
-                else {
-                    add_post_meta( $icon_post_id, "preview-{$default_preview_size}" , $preview['src'], true );
-                    add_post_meta( $icon_post_id, "parent_post_id" , $iconset['post_id'], true );
-                    $media = get_last_attachment($icon_post->ID);
-                    if (! empty($media)) {
-                        update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
-                        $thumb_id = set_preview($icon_post_id, $media);
-                        if (is_wp_error($thumb_id)) {
-                            $result = icf_append_error($result, $thumb_id);
-                        }
+                        add_post_meta( $icon_post_id, "preview_image_{$key}", $preview['src'], true );
+                        add_post_meta( $icon_post_id, "parent_post_id" , $iconset['post_id'], true );
                     }
                 }
             }
@@ -948,28 +931,6 @@ function set_preview($post_id, $image) {
 }
 
 /**
- * Upload and attach an image by URL
- * @param string $url
- * @param integer (optional) $post_id
- * @return integer or \WP_Error
- * 
- * @since 1.1.0
- */
-function upload_and_attach_img($url, $post_id=null) {
-    $filename = basename($url);
-    $result = media_sideload_image( 
-        $url, 
-        $post_id, 
-        "Icon preview image `{$filename}` for icon ID {$post_id}", 
-        'src' 
-    );
-    if (! is_wp_error($result)) {
-         add_post_meta( $post_id, "preview-{$post_id}" , $url, true );
-    }
-    return $result;
-}
-
-/**
  * Create a new iconset post.
  * @param $iconset_id
  * @param array $attrs
@@ -980,34 +941,43 @@ function create_iconset_post($iconset_id, $attrs=array()) {
     $result = null;
 
     $attrs = ! is_array($attrs) ? array() : $attrs ;
-    
-    // If the post already exists, throw an error and return.
+
+    /**
+     * If the post already exists, throw an error and return.
+     */
+
     if (icf_post_exists($iconset_id)) {
         return icf_append_error(
-            $result,
-            null,
-            "Iconset with ID `{$iconset_id}` already exists. Use update_iconset_post instead"
+            $result, null,
+            __( "Iconset with ID `{$iconset_id}` already exists. Use update_iconset_post instead", ICF_PLUGIN_NAME )
         );
     }
 
-    // Get the iconset from the API data. If we do not find any data 
-    // from the API, obviously something went wrong, so return 
-    // an error.
+    /**
+     * Get the iconset from the API data. If we do not find any data
+     * from the API, obviously something went wrong, so return
+     * an error.
+     */
 
     $iconset = empty($attrs) ? get_one_iconset($iconset_id) : $attrs;
 
+    $identifier = get_val( $iconset, 'identifier' );
+
     if (! is_array($iconset) || ! isset($iconset['iconset_id'])) {
         return icf_append_error(
-            $result,
-            null,
-            "Iconset with ID `{$iconset_id}` could not be found via the Iconfinder API"
+            $result, null,
+            __( "Iconset with ID `{$iconset_id}` could not be found via the Iconfinder API", ICF_PLUGIN_NAME )
         );
     }
-    
-    // We have all of the data we need so far, let's continue.
-    
-    // Try to insert the new iconset_post. If we can't insert the post, 
-    // there is nothing else we can do set set the error and exit.
+
+    /**
+     * We have all of the data we need so far, let's continue.
+     */
+
+    /**
+     * Try to insert the new iconset_post. If we can't insert the post,
+     * there is nothing else we can do set set the error and exit.
+     */
 
     $post_id = wp_insert_post(
         iconset_to_post($iconset)
@@ -1018,90 +988,63 @@ function create_iconset_post($iconset_id, $attrs=array()) {
         $result = icf_append_error($result, $post_id);
     } 
     else {
-        
-        
-        // Add the post_id to the Iconset data so we don't have to 
-        // pass it as a separate argument while we are working on the 
-        // import.
+
+        /**
+         * Add the post_id to the Iconset data so we don't have to
+         * pass it as a separate argument while we are working on the
+         * import.
+         */
         
         $iconset['post_id'] = $post_id;
         $iconset['guid']    = $iconset_post->guid;
         
         //TODO: if the collection doesn't exist, add it
         //TOD: add collection_id relationship field
-        // @deferred
+        //@deferred
         
         add_iconset_meta($post_id, $iconset);
 
-        // Import the preview images
+        /**
+         * Add links to previews as meta_data
+         */
 
-        // Loop through the allowed sizes and attach them if they exist.
-        // $import_sizes = icf_get_setting('iconset_preview_sizes');
-        
-        $default_preview_size = icf_get_option(
-            'iconset_preview_size', 
-            icf_get_setting('iconset_default_preview_size')
-        );
-        
+        $iconset_preview_sizes = icf_get_setting( 'iconset_preview_sizes' );
+
+        foreach ($iconset_preview_sizes as $size) {
+            add_post_meta(
+                $post_id,
+                "preview_image_{$size}",
+                get_iconfinder_preview_url($size, $identifier),
+                true
+            );
+        }
+
         //TODO: Consider importing more than a single iconset preview.
-        
-        // Let's convert the category name, which theoretically should 
-        // be SEO-friendly to alt and title attributes to help 
-        // improve the SEO of the preview image.
-        
-        $alt_text = '';
-        foreach ($iconset['categories'] as $category) {
-            $alt_text .= ' ' . ucwords($category['name']) ;
-        }
-        $alt_text .= ' Preview';
-        
-        // Import and set the featured image.
-        
-        $src = media_sideload_image( 
-            get_iconfinder_preview_url($default_preview_size, $iconset['identifier']),
-            $post_id, 
-            $alt_text, 
-            'src'
-        );
-            
-        // If there was an error we can't really continue with any 
-        // further manipulation of the preview image attachment.
-            
-        if (is_wp_error($src)) {
-            $result = icf_append_error($result, $src);
-        }
-        else {
-            
-            // Add the preview image URL as a custom metadata field.
-            
-            add_post_meta( $post_id, "preview-{$default_preview_size}" , $src, true );
-            
-            // Get the last attachment (the preview image) and set its
-            // Alt tag to the one we created earlier.
-            
-            $media = get_last_attachment($iconset_post->ID);
-            if (isset($media->ID)) {
-                update_post_meta($media->ID, '_wp_attachment_image_alt', $alt_text);
-            }
+
+        /**
+         * Let's convert the category name, which theoretically should
+         * be SEO-friendly to alt and title attributes to help
+         * improve the SEO of the preview image.
+         *
+         */
+
+        $category_names = array_column( $iconset['categories'], 'name' );
+        $alt_text = terms_to_sentence('Iconsets', $category_names, 12);
+        add_post_meta( $post_id, "image_alt" , $alt_text, true );
+
+        /**
+         * Import the icons and icon images. We want to capture the post_ids
+         * of the icons that are imported so we can add their tags to
+         * the iconset so when you search iconsets, you are also,
+         * in effect, searching the metadata of the icons in the set.
+         */
                 
-            // Set the featured image for the iconset post.
-            
-            $thumb_id = set_preview($post_id, get_last_attachment($post_id));
-            if (is_wp_error($thumb_id)) {
-                $result = icf_append_error($result, $thumb_id);
-            }
-        }
-        
-        // Import the icons and icon images. We want to capture the post_ids
-        // of the icons that are imported so we can add their tags to 
-        // the iconset so when you search iconsets, you are also, 
-        // in effect, searching the metadata of the icons in the set.
-                
-        $icon_post_ids = import_icon_previews($iconset);
-        
-        // If the imports failed, we can't do anything else
-        // with them, so skip it.
-        
+        $icon_post_ids = import_iconset_icons($iconset);
+
+        /**
+         * If the imports failed, we can't do anything else with them, so skip it.
+         */
+
         if (is_wp_error($icon_post_ids)) {
             $result = icf_append_error($result, $icon_post_ids);
         }
@@ -1109,8 +1052,10 @@ function create_iconset_post($iconset_id, $attrs=array()) {
             $iconset['tags'] = get_post_tags($icon_post_ids);
         }
 
-        // Now we can add the tags of the individual icons to the iconset.
-        
+        /**
+         * Now we can add the tags of the individual icons to the iconset.
+         */
+
         add_iconset_terms($post_id, $iconset);
         
         if (! is_wp_error($result)) {
@@ -1148,7 +1093,7 @@ function get_all_tags($post_ids) {
         $post_ids = array($post_ids);
     }
     foreach ($post_ids as $post_id) {
-        $terms = wp_get_post_terms($post_id, 'icon_tag');
+        $terms = wp_get_post_terms( $post_id, 'icon_tag' );
         if (is_array($terms) && count($terms)) {
             foreach ($terms as $term) {
                 if (! in_array($term->slug, $tags)) {
@@ -1199,70 +1144,89 @@ function update_iconset_post($iconset_id, $attrs) {
     
     $result = null;
     $new_icon_ids = array();
+
+    /**
+     * API data
+     */
     
-    // API data
-    
-    $iconset      = empty($attrs) ? get_one_iconset($iconset_id) : $attrs ;
-    $icons        = get_icons_from_api($iconset['identifier']);
-    $icon_ids     = array_column($icons, 'icon_id');
-    
-    // WP Post imports
+    $iconset  = empty($attrs) ? get_one_iconset($iconset_id) : $attrs ;
+    $icons    = get_icons_from_api($iconset['identifier']);
+    $icon_ids = array_column($icons, 'icon_id');
+
+    /**
+     * WP Post imports
+     */
     
     $iconset_post = get_post_by_iconset_id($iconset_id);
 
-    // We do not have an iconset from the API, nothing we can do.
+    /**
+     * We do not have an iconset from the API, nothing we can do.
+     */
     
     if (empty($iconset)) {
-        return icf_append_error($result, null, "No iconset was found to update");
+        return icf_append_error($result, null, __( "No iconset was found to update", ICF_PLUGIN_NAME ));
     }
-    
-    // We do not have a local iconset post, we could create one,
-    // but this is not the place. We cannot proceed.
-    
-    if (! is_object($iconset_post) || ! isset($iconset_post->ID)) {
-        return icf_append_error($result, null, "No iconset_post was found to update");
-    }
-    
-    // We have all the data we need to proceed.
 
-    // First, update the WP iconset post.
+    /**
+     * We do not have a local iconset post, we could create one,
+     * but this is not the place. We cannot proceed.
+     */
+
+    if (! is_object($iconset_post) || ! isset($iconset_post->ID)) {
+        return icf_append_error($result, null, __( "No iconset was found to update", ICF_PLUGIN_NAME ));
+    }
+
+    /**
+     * We have all the data we need to proceed.
+     */
+
+    /**
+     * First, update the WP iconset post.
+     */
     
     $result = update_post(
         get_post_by_iconset_id($iconset_id),
         iconset_to_post($iconset, $iconset_post)
     );
-    
-    // If we encounter an error, display the error and exit.
+
+    /**
+     * If we encounter an error, display the error and exit.
+     */
     
     if (is_wp_error($result)) {
         return $result;
     }
     
     add_iconset_terms($iconset_post->ID, $iconset);
-    
-    // If we don't have any icons, there are two possible causes:
-    // 1. There was an error communicating with Iconfinder, so we exit.
-    // 2. The icons were deleted on Iconfinder. We don't want to assume 
-    //    this, however, so it's best to just exit. The proper way to 
-    //    Remove icons is to delete the iconset on Iconfinder.
-    //    We will just play it safe and assume there was an error 
-    //   and just exit without doing any damage.
-    
+
+    /**
+     * If we don't have any icons, there are two possible causes:
+     * 1. There was an error communicating with Iconfinder, so we exit.
+     * 2. The icons were deleted on Iconfinder. We don't want to assume
+     *    this, however, so it's best to just exit. The proper way to
+     *    Remove icons is to delete the iconset on Iconfinder.
+     *    We will just play it safe and assume there was an error
+     *    and just exit without doing any damage.
+     */
+
     if (! count($icons)) {
         return icf_append_error(
-            $result,
-            null, 
-            "No icons found for Iconset `{$iconset['identifier']}` with id `{$iconset_id}`"
+            $result, null,
+            __( "No icons found for Iconset `{$iconset['identifier']}` with id `{$iconset_id}`", ICF_PLUGIN_NAME )
         );
     }
     // We have some icons from the API.
-    
     else {
-        // Grab all of the icon posts.
+
+        /**
+         * Grab all of the icon posts.
+         */
         
         $icon_posts = get_icons_by_iconset_id($iconset_id);
-        
-        // Delete local copies that are no longer in the API results.
+
+        /**
+         * Delete local copies that are no longer in the API results.
+         */
         
         if (count($icon_posts)) {
             foreach ($icon_posts as $icon_post) {
@@ -1274,17 +1238,22 @@ function update_iconset_post($iconset_id, $attrs) {
                 }
             }
         }
-        
-        // Loop through the API results
-        // Add or update the remaining API results.
+
+        /**
+         * Loop through the API results, Add or update the remaining API results.
+         */
         
         foreach ($icons as $icon) {
-            
-            // See if we have a local copy.
+
+            /**
+             * See if we have a local copy.
+             */
             
             $icon_post = get_post_by_icon_id($icon['icon_id']);
-            
-            // We have a local copy, update it.
+
+            /**
+             * We have a local copy, update it.
+             */
             
             if (! empty($icon_post)) {
                 $update_post_id = update_icon_post($icon['icon_id'], $icon);
@@ -1396,9 +1365,8 @@ function update_icon_post($icon_id, $attrs) {
     }
     else {
         $result = icf_append_error(
-            $result, 
-            null, 
-            "The post for Iconset ID {$iconset_id} could not be found"
+            $result, null,
+            __( "The post for Iconset ID {$iconset_id} could not be found", ICF_PLUGIN_NAME )
         );
     }
     return $result;
@@ -1414,36 +1382,46 @@ function update_icon_post($icon_id, $attrs) {
 function delete_iconset_post($iconset_id) {
     
     $result = null;
-    $post = get_post_by_iconset_id($iconset_id);
-    if (is_object($post) && isset($post->ID)) {
-        $attachments = get_all_attachments($post->ID);
-        if (is_array($attachments) && count($attachments)) {
-            foreach ($attachments as $attachment) {
-                $delete = wp_delete_post( $attachment->ID, true );
-                if (is_wp_error($delete)) {
-                    $result = icf_append_error($result, $delete);
-                    $delete = null;
+    try {
+        $post = get_post_by_iconset_id($iconset_id);
+        if (is_object($post) && isset($post->ID)) {
+            $attachments = get_all_attachments($post->ID);
+            if (is_array($attachments) && count($attachments)) {
+                foreach ($attachments as $attachment) {
+                    if (! is_object($attachment) || ! isset($attachment->ID)) {
+                        continue;
+                    }
+                    $delete = wp_delete_post( $attachment->ID, true );
+                    if (is_wp_error($delete)) {
+                        $result = icf_append_error($result, $delete);
+                        $delete = null;
+                    }
                 }
             }
+            $result = wp_delete_post( $post->ID, true );
         }
-        $result = wp_delete_post( $post->ID, true );
+        else {
+            $result = icf_append_error(
+                $result, null,
+                __( "The post matching Iconset {$iconset_id} could not be deleted, because it was not found.", ICF_PLUGIN_NAME )
+            );
+        }
+        $delete = null;
+        if (! is_wp_error($result)) {
+            $delete = delete_icons_in_iconset($iconset_id);
+        }
+        if (is_wp_error($delete)) {
+            $result = icf_append_error($result, $delete);
+        }
+        if (! is_wp_error($result) && isset($post->ID) ) {
+            $result = $post->ID;
+        }
     }
-    else {
+    catch(Exception $ex) {
         $result = icf_append_error(
-            $result, 
-            null, 
-            "The post matching Iconset {$iconset_id} could not be deleted, because it was not found."
+            $result, null,
+            $ex->getMessage()
         );
-    }
-    $delete = null;
-    if (! is_wp_error($result)) {
-        $delete = delete_icons_in_iconset($iconset_id);
-    }
-    if (is_wp_error($delete)) {
-        $result = icf_append_error($result, $delete);
-    }
-    if (! is_wp_error($result)) {
-        $result = $post->ID;
     }
     return $result;
 }
@@ -1476,8 +1454,10 @@ function delete_icon_post($icon_id) {
     $post = get_post_by_icon_id($icon_id);
     if (is_object($post) && isset($post->ID)) {
         $images = get_attached_media( 'image', $post->ID );
-        
-        // Try to delete the images first
+
+        /**
+         * Try to delete the images first
+         */
         if (count($images)) {
             foreach ($images as $image) {
                 $delete = wp_delete_post( $image->ID, true );
@@ -1486,7 +1466,9 @@ function delete_icon_post($icon_id) {
                 }
             }
         }
-        // If there were no errors or no images, delete the post
+        /**
+         * If there were no errors or no images, delete the post
+         */
         if (! is_wp_error($result)) {
             $delete = wp_delete_post( $post->ID, true );
             if (is_wp_error($delete)) {
@@ -1496,9 +1478,8 @@ function delete_icon_post($icon_id) {
     }
     else {
         $result = icf_append_error(
-            $result, 
-            null, 
-            "Icon post matching icon_id `{$icon_id}` could not be found."
+            $result, null,
+            __( "Icon post matching icon_id `{$icon_id}` could not be found.", ICF_PLUGIN_NAME )
         );
     }
     return $result;
@@ -1520,7 +1501,9 @@ function delete_icons_in_iconset($iconset_id) {
     }
 
     foreach ( $posts as $post ) {
-        // Try to delete the images first.
+        /**
+         * Try to delete the images first.
+         */
         $images = get_attached_media( 'image', $post->ID );
         if (count($images)) {
             foreach ($images as $image) {
@@ -1530,7 +1513,9 @@ function delete_icons_in_iconset($iconset_id) {
                 }
             }
         }
-        // If there are no errors or no images, delete the icon post.
+        /**
+         * If there are no errors or no images, delete the icon post.
+         */
         if (! is_wp_error($result)) {
             $delete = wp_delete_post( $post->ID, true );
             if (is_wp_error( $delete )) {
@@ -1556,7 +1541,7 @@ function update_post($post, $updates_array) {
         $result = wp_update_post($updates_array, true);
     }
     else {
-        $result = icf_append_error($result, null, "No post to update");
+        $result = icf_append_error($result, null, __( "No post to update", ICF_PLUGIN_NAME ));
     }
     return $result;
 }
@@ -1654,7 +1639,7 @@ function icf_get_post($meta_value, $meta_key, $post_type) {
     else {
         $result = icf_append_error(
             $result, null, 
-            "Post with `{$meta_key}={$meta_value}` could not be found."
+            __( "Post with `{$meta_key}={$meta_value}` could not be found.", ICF_PLUGIN_NAME )
         );
     }
     return $result;
@@ -1714,6 +1699,9 @@ function add_icon_post_meta($post_id, $iconset, $icon) {
     $meta_ids[] = add_post_meta( $post_id, 'price', $icon['price']['price'], true );
     $meta_ids[] = add_post_meta( $post_id, 'license', $icon['price']['license']['url'], true );
     $meta_ids[] = add_post_meta( $post_id, 'latest_sync', date('Y-m-d H:i:s'), true );
+
+    $alt_text = terms_to_sentence('Icons', $icon['tags'], 12);
+    add_post_meta( $post_id, "image_alt", $alt_text, true );
     
     $term_ids[] = icf_set_categories( $post_id, $icon['categories']);
     $term_ids[] = icf_set_tags( $post_id, $icon['tags']);
@@ -1722,6 +1710,75 @@ function add_icon_post_meta($post_id, $iconset, $icon) {
         'meta_ids' => $meta_ids,
         'term_ids' => $term_ids
     );
+}
+
+/**
+ * Converts an array of image tags into a proper sentence.
+ * @param sring $subject
+ * @param array|string $words
+ * @param int $lenth
+ *
+ * @return string
+ */
+function terms_to_sentence($subject, $words, $max=12) {
+
+    /**
+     * If $words is not an array, no need to go further.
+     */
+    if (! is_array($words)) {
+        return "{$subject} related to {$words}";
+    }
+
+    /**
+     * Let's make sure we don't exceed the max length.
+     */
+    if (count($words) > $max) {
+        $words = array_slice($words, 0, $max);
+    }
+
+    /**
+     * If any of the 'words' have an ampersand or 'and', let's add more words.
+     */
+    $more_words = array();
+    foreach ($words as $word) {
+        $more_words = array_merge($more_words, explode('&', $word) );
+    }
+
+    /**
+     * Look for ' and ' and convert to comma-separated words.
+     */
+    $words = $more_words;
+    foreach ($words as $word) {
+        $more_words = array_merge($more_words, explode(' and ', $word) );
+    }
+
+    /**
+     * Trim any trailing/leading white space to be neat.
+     */
+    $words = array_map( 'trim', $more_words );
+
+    /**
+     * Grab all but the last word ...
+     */
+
+    $first = implode(', ', array_slice( $words, 0, count($words) -1 ));
+
+    /**
+     * Let's add the Oxford comma.
+     * (Yes, we are that anal ... and pedantic) :-)
+     */
+    if (count($words) > 2) $first .= ",";
+
+    /**
+     * Get the very last word.
+     */
+    $last  = end($words);
+
+    /**
+     * And put them together in a sentence
+     * of which the Queen herself would be proud.
+     */
+    return "{$subject} related to {$first} and {$last}";
 }
 
 /**get_val($iconset, 'is_premium')
@@ -1860,12 +1917,6 @@ function icf_set_categories($post_id, $categories) {
     return wp_set_post_terms( $post_id, $post_categories, 'icon_category', false);
 }
 
-function setup_search_posts() {
-    global $wp_the_query;
-    $wp_the_query->posts = icf_setup_posts($wp_the_query->posts);
-}
-# add_action('wp', 'setup_search_posts');
-
 /**
  * @param array $columns The array of column names.
  * @return mixed
@@ -1962,9 +2013,14 @@ add_action( 'manage_iconset_posts_custom_column', 'icf_columns_content', 10, 2 )
 add_filter( 'manage_edit-iconset_sortable_columns', 'iconset_sortable_columns' );
 add_action( 'pre_get_posts', 'iconset_orderby' );
 
-
-// Make sortable: 
-// https://code.tutsplus.com/articles/quick-tip-make-your-custom-column-sortable--wp-25095
+/**
+ * Make columns sortable.
+ * @param array $defaults
+ *
+ * @return mixed
+ *
+ * @see https://code.tutsplus.com/articles/quick-tip-make-your-custom-column-sortable--wp-25095
+ */
 function icf_icon_columns_head($defaults) {
 
     $defaults['iconset_identifier'] = 'Identifier';
@@ -1973,6 +2029,11 @@ function icf_icon_columns_head($defaults) {
     return $defaults;
 }
 
+/**
+ * Add out custom columns content.
+ * @param string $column_name
+ * @param int $post_id
+ */
 function icf_icon_columns_content($column_name, $post_id) {
 
     if ($column_name == 'iconset_is_premium') {
@@ -1991,7 +2052,12 @@ function icf_icon_columns_content($column_name, $post_id) {
     }
 }
 
-
+/**
+ * Make the icon list table sortable.
+ * @param $columns
+ *
+ * @return mixed
+ */
 function icon_sortable_columns( $columns ) {
     
     $columns['iconset_identifier'] = 'identifier';
