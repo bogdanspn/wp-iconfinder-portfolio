@@ -3,7 +3,7 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       http://iconify.it
+ * @link       http://iconfinder.com
  * @since      1.0.0
  *
  * @package    Iconfinder_Portfolio
@@ -18,7 +18,7 @@
  *
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/public
- * @author     Scott Lewis <scott@iconify.it>
+ * @author     Iconfinder <support@iconfinder.com>
  */
 class Iconfinder_Portfolio_Public {
 
@@ -138,8 +138,6 @@ class Iconfinder_Portfolio_Public {
         $collection = get_val($attrs, 'collection');
         $iconset    = get_val($attrs, 'iconset');
 
-        # icf_dump($attrs);
-
         $args = array();
         $channel = 'iconsets';
 
@@ -151,9 +149,6 @@ class Iconfinder_Portfolio_Public {
             $channel = 'collection';
             $args = array('identifier' => $collection);
         }
-
-        # icf_dump(get_api_path($channel, $args));
-        # icf_dump(get_api_url(get_api_path($channel, $args), array('count' => ICONFINDER_API_MAX_COUNT)));
 
         return get_api_url(get_api_path($channel, $args), array('count' => ICONFINDER_API_MAX_COUNT));
     }
@@ -377,7 +372,8 @@ class Iconfinder_Portfolio_Public {
         $theme_args = array(
             'img_size'   => get_val($options, 'img_size', null),
             'show_price' => get_val($options, 'show_price', true),
-            'show_links' => get_val($options, 'show_links', true)
+            'show_links' => get_val($options, 'show_links', true),
+            'paginate'   => is_true(get_val($options, 'paginate', false))
         );
 
         icf_set_theme_vars($theme_args);
@@ -399,7 +395,8 @@ class Iconfinder_Portfolio_Public {
             $attrs,
             icf_setup_posts(
                 query_posts($query_args)
-            ));
+            )
+        );
 
         $post_count            = count($scrubbed);
         $wp_query->posts       = $scrubbed;
@@ -425,14 +422,14 @@ class Iconfinder_Portfolio_Public {
          */
 
         if (! empty($theme)) {
-            $template = icf_locate_template("{$theme}-shortcode-{$post_type}.php");
+            $template = icf_locate_template("{$theme}-shortcode-{$post_type}.php", true);
         }
 
         /**
          * If the shortcode did not specify a template, try the theme directory.
          */
         if (empty($template)) {
-            $template = icf_locate_template("shortcode-{$post_type}.php");
+            $template = icf_locate_template("shortcode-{$post_type}.php", true);
         }
 
         if (! empty($template)) {

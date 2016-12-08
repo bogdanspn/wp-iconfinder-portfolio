@@ -83,45 +83,58 @@ function icf_get_the_product_button($post_id=null, $text='', $attrs=null) {
 }
 
 /**
- * @param int $post_id
- * @param string $size
- * @param array|null $attr
- */
-function icf_the_preview_by_id($post_id, $size='full', $attr=null) {
-    echo icf_get_the_preview_by_id( $post_id, $size, $attr );
-}
-
-/**
- * @param int $post_id
- * @param string $size
- * @param array|null $attr
+ * Substitute for WP's the_image_thumbnail. This links to Iconfinder's CDN
+ * instead of a local image attachment.
+ * @param $post_id
+ * @param string $size small, medium, or large for iconsets. @64, @128, @256, @512 for icons.
+ * @param array $attrs Specify and override any of the anchors attributes
+ *
  * @return string
  */
-function icf_get_the_preview_by_id($post_id, $size='full', $attr=null) {
-    return get_the_post_thumbnail( $post_id, $size, $attr );
-}
+function icf_the_post_thumbnail( $post_id, $size='medium', $attrs=array() ) {
 
-/**
- * @param null|int $post_id
- * @param string $size
- * @param array|null $attr
- */
-function icf_the_preview($post_id=null, $size='full', $attr=null) {
-    echo icf_get_the_preview($post_id, $size, $attr);
-}
+    $output = "";
+    $image_attrs = "";
+    $image_src = icf_get_post_thumbnail( $post_id, $size, $attrs );
+    $image_alt = get_post_meta( $post_id, "image_alt", true );
 
-/**
- * @param null|int $post_id
- * @param string $size
- * @param array|null $attr
- * @param int|null $post_id
- * @return string
- */
-function icf_get_the_preview($post_id=null, $size='full', $attr=null, $post_id=null) {
-    if (empty($post_id)) {
-        $post_id = get_the_ID();
+    if (! empty($image_src)) {
+        $image_attrs_arr = array_merge(array(
+            'src'   => $image_src,
+            'alt'   => $image_alt,
+            'title' => $image_alt,
+            'class' => 'icf-icon-preview'
+        ), $attrs);
+        foreach ($image_attrs_arr as $key=>$value) {
+            $image_attrs .= "{$key}=\"{$value}\" ";
+        }
+        $output = "<img {$image_attrs}/>\n";
     }
-    return get_the_post_thumbnail($post_id, $size, $attr);
+    echo $output;
+}
+
+/**
+ * Substitute for WP's get_image_thumbnail. This links to Iconfinder's CDN
+ * instead of a local image attachment.
+ * @param $post_id
+ * @param string $size
+ * @param array $attrs
+ *
+ * @return mixed
+ */
+function icf_get_post_thumbnail( $post_id, $size='medium', $attrs=array() ) {
+
+    /**
+     * To make the template hooks easier to use, we use 'small, medium, large' as
+     * the image size names. But Iconfinder's image sizes are different so we map
+     * the user-requested size to the corresponding image size.
+     * small == medium
+     * medium == medium-2x
+     * large == large
+     */
+    $size = coerce_img_size($size);
+
+    return get_post_meta( $post_id, "preview_image_{$size}", true );
 }
 
 /**
@@ -343,11 +356,14 @@ function icf_get_the_post_tags($post_id=null) {
     if (empty($post_id)) {
         $post_id = get_the_ID();
     }
-    return implode(', ', wp_get_post_terms( $post_id, 'icon_tag', array('fields' => 'names')));
+    return implode(
+        ', ',
+        wp_get_post_terms( $post_id, 'icon_tag', array('fields' => 'names'))
+    );
 }
 
 function icf_pagination() {
-    wpbeginner_numeric_posts_nav();
+    checkout_page_navs();
 }
 
 /**
@@ -411,10 +427,16 @@ function icf_get_children($post_id=null, $args=null, $all=true) {
     return get_children($args);
 }
 
+/**
+ * Alias to display the icon search form.
+ */
 function icf_icon_searchform() {
     icon_searchform();
 }
 
+/**
+ * Alias to display the iconset search form.
+ */
 function icf_iconset_searchform() {
     iconset_searchform();
 }

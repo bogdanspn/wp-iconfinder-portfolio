@@ -8,17 +8,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://iconify.it
+ * @link              http://iconfinder.com
  * @since             1.0.0
  * @package           Iconfinder_Portfolio
  *
  * @wordpress-plugin
  * Plugin Name:       Iconfinder Portfolio
- * Plugin URI:        http://iconfinder.com
+ * Plugin URI:        https://github.com/iconfinder/wp-iconfinder-portfolio
  * Description:       A plugin for displaying content from the Iconfinder API in a WordPress site.
- * Version:           1.0.0
- * Author:            Scott Lewis
- * Author URI:        http://iconify.it
+ * Version:           2.0.0
+ * Author:            Iconfinder
+ * Author URI:        http://iconfinder.com
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       iconfinder-portfolio

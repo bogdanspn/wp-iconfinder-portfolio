@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Register all actions and filters for the plugin
  *
- * @link       http://iconify.it
+ * @link       http://iconfinder.com
  * @since      1.0.0
  *
  * @package    Iconfinder_Portfolio
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *
  * @package    Iconfinder_Portfolio
  * @subpackage Iconfinder_Portfolio/includes
- * @author     Scott Lewis <scott@iconify.it>
+ * @author     Iconfinder <support@iconfinder.com>
  */
 class Iconfinder_Portfolio_Loader {
 

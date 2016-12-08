@@ -96,55 +96,6 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                                 </div>
                                 <?php if ($plugin_mode == ICF_PLUGIN_MODE_ADVANCED) : ?>
                                 <div class="form-row">
-                                    <label class="form-label" for="<?php echo $this->plugin_name; ?>-plugin_options">
-                                        <?php esc_attr_e('Preview Image Sizes', $this->plugin_name); ?>
-                                    </label>
-                                    <div class="form-option">
-                                        <legend class="screen-reader-text"><span><?php _e('Iconfinder Preview Import Settings', $this->plugin_name); ?></span></legend>
-                                        <p><?php _e( 'Be aware that importing more previews per icon will cause the imports to take longer. Fewer is better.', $this->plugin_name ); ?></p>
-                                        <?php $preview_sizes = icf_get_setting('icon_import_sizes'); ?>
-                                        <?php foreach ($preview_sizes as $size): ?> 
-                                            <?php 
-                                                $checked = null; 
-                                                if (in_array($size, $selected_sizes)) {
-                                                    $checked = ' checked="checked" ';
-                                                }
-                                            ?>
-                                            <input type="checkbox" name="<?php echo $this->plugin_name; ?>[icon_preview_sizes][]" value="<?php echo $size; ?>" <?php echo $checked; ?> /><?php echo $size; ?> pixels&nbsp;&nbsp;&nbsp;
-                                            <?php $checked = null; ?>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                                <div class="form-row">
-                                    <label class="form-label" for="<?php echo $this->plugin_name; ?>-plugin_options">
-                                        <?php esc_attr_e('Iconset Preview Size', $this->plugin_name); ?>
-                                    </label>
-                                    <div class="form-option">
-                                        <legend class="screen-reader-text"><span><?php _e('Iconfinder Iconset Preview Image Size', $this->plugin_name); ?></span></legend>
-                                        <p><?php _e( 'Select the size of the iconset preview image you want to import from Iconfinder.', $this->plugin_name ); ?></p>
-                                        <?php $preview_sizes = icf_get_setting('iconset_preview_sizes'); ?>
-                                        <?php foreach ($preview_sizes as $size): ?> 
-                                            <?php 
-                                                $checked = null; 
-                                                if ($size === $iconset_img_size) {
-                                                    $checked = ' checked="checked" ';
-                                                }
-                                                $size_label = $size;
-                                                switch ($size) {
-                                                    case 'medium':
-                                                        $size_label = 'small';
-                                                        break;
-                                                    case 'medium-2x':
-                                                        $size_label = 'medium';
-                                                        break;
-                                                }
-                                            ?>
-                                            <input type="radio" name="<?php echo $this->plugin_name; ?>[iconset_preview_size]" value="<?php echo $size; ?>" <?php echo $checked; ?> /> <?php echo $size_label; ?>&nbsp;&nbsp;&nbsp;
-                                            <?php $checked = null; ?>
-                                        <?php endforeach; ?>
-                                    </div>
-                                </div>
-                                <div class="form-row">
                                     <label class="form-label" for="<?php echo $this->plugin_name; ?>-posts-per-page">
                                         <?php esc_attr_e('Search Resulets Per Page', $this->plugin_name); ?>
                                     </label>

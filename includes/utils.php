@@ -111,7 +111,10 @@ function icf_count_posts($post_type) {
  */
 function icf_get_setting($key, $default=null) {
     
-    $settings = _icf_settings();
+    static $settings = null;
+    if (empty($settings)) {
+        $settings = _icf_settings();
+    }
     $value = $default ;
     if (! empty($key) && isset($settings[$key])) {
         $value = $settings[$key];
@@ -243,7 +246,7 @@ function icf_queue_notices($notices, $type='success') {
  */
 function icf_admin_notices() {
     
-    $types = array('success', 'error');
+    $types = array( 'success', 'error', 'info', 'warning' );
 
     foreach ($types as $type) {
         $transient_key = ICF_PLUGIN_NAME . '_' . $type;
@@ -257,7 +260,10 @@ function icf_admin_notices() {
                 $messages = array($messages);
             }
             foreach ($messages as $message) {
-                printf( '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>', $type, __( $message, ICF_PLUGIN_NAME) ); 
+                printf(
+                    '<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
+                    $type, __( $message, ICF_PLUGIN_NAME)
+                );
             }
             $message = null;
         }
@@ -266,81 +272,44 @@ function icf_admin_notices() {
 add_action( 'admin_notices' , 'icf_admin_notices' );
 
 /**
- * Create numeric paginated results.
- * @global \WP_Query $wp_query
- * @return void
- * @author WPBeginner
- * @link http://www.wpbeginner.com/wp-themes/how-to-add-numeric-pagination-in-your-wordpress-theme/
- * @since 1.1.0
+ * Credit where credit is due, this navigation was borrowed from
+ * the Checkout theme by Array Themes.
+ *
+ * Displays post pagination links
+ *
+ * @since checkout 1.0
  */
-function wpbeginner_numeric_posts_nav() {
-
-    if( is_singular() )
-        return;
+function checkout_page_navs( $query = false ) {
 
     global $wp_query;
+    if( $query ) {
+        $temp_query = $wp_query;
+        $wp_query = $query;
+    }
 
-    $links = null;
-
-    /** Stop execution if there's only 1 page */
-    if( $wp_query->max_num_pages <= 1 )
+    // Return early if there's only one page.
+    if ( $GLOBALS['wp_query']->max_num_pages < 2 ) {
         return;
+    } ?>
+    <div class="container clearfix icf-pagination">
+        <div class="navigation">
+            <?php
+            $big = 999999999; // need an unlikely integer
 
-    $paged = get_query_var( 'paged' ) ? absint( get_query_var( 'paged' ) ) : 1;
-    $max   = intval( $wp_query->max_num_pages );
-
-    /**        Add current page to the array */
-    if ( $paged >= 1 )
-        $links[] = $paged;
-
-    /**        Add the pages around the current page to the array */
-    if ( $paged >= 3 ) {
-        $links[] = $paged - 1;
-        $links[] = $paged - 2;
+            echo paginate_links( array(
+                'base'    => str_replace( $big, '%#%', esc_url( get_pagenum_link( $big ) ) ),
+                'format'  => '?paged=%#%',
+                'current' => max( 1, get_query_var('paged') ),
+                'total'   => $wp_query->max_num_pages,
+                'type'    => 'list'
+            ) );
+            ?>
+        </div>
+    </div>
+    <?php
+    if( isset( $temp_query ) ) {
+        $wp_query = $temp_query;
     }
-
-    if ( ( $paged + 2 ) <= $max ) {
-        $links[] = $paged + 2;
-        $links[] = $paged + 1;
-    }
-
-    echo '<div class="navigation"><ul>' . "\n";
-
-    /**        Previous Post Link */
-    if ( get_previous_posts_link() )
-        printf( '<li>%s</li>' . "\n", get_previous_posts_link() );
-
-    /**        Link to first page, plus ellipses if necessary */
-    if ( ! in_array( 1, $links ) ) {
-        $class = 1 == $paged ? ' class="active"' : '';
-
-    printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( 1 ) ), '1' );
-
-    if ( ! in_array( 2, $links ) )
-        echo '<li>…</li>';
-    }
-
-    /**        Link to current page, plus 2 pages in either direction if necessary */
-    sort( $links );
-    foreach ( (array) $links as $link ) {
-        $class = $paged == $link ? ' class="active"' : '';
-        printf( "<li%s><a href=\"%s\">%s</a></li>\n", $class, esc_url( get_pagenum_link( $link ) ), $link );
-    }
-
-    /**        Link to last page, plus ellipses if necessary */
-    if ( ! in_array( $max, $links ) ) {
-        if ( ! in_array( $max - 1, $links ) )
-            echo '<li>…</li>' . "\n";
-
-        $class = $paged == $max ? ' class="active"' : '';
-        printf( '<li%s><a href="%s">%s</a></li>' . "\n", $class, esc_url( get_pagenum_link( $max ) ), $max );
-    }
-
-    /**        Next Post Link */
-    if ( get_next_posts_link() )
-        printf( '<li>%s</li>' . "\n", get_next_posts_link() );
-
-    echo '</ul></div>' . "\n";
 }
 
 /**
@@ -373,9 +342,7 @@ function icf_admin_iconsets_pagination($page_count, $current_page=1) {
  */
 function paginate_items($items, $items_per_page, $page_num) {
 
-    $subset = array();
     $item_count = count($items);
-    $page_count = ceil($item_count/$items_per_page);
 
     /*
      * By default we return the full set of items
@@ -432,6 +399,8 @@ function get_num_in_rang($num, $max, $min=1) {
 /**
  * Builds the pagination query to append to a URL.
  * @param string $delim
+ *
+ * @return string
  */
 function icf_get_page_query( $delim = "&" ) {
     $page_query = "";
@@ -502,67 +471,34 @@ function all_search_words($str) {
 }
 
 /**
- * Load the icon search form.
- * @since 1.1.0
+ * Loads the icon search form.
+ * @param array $args An array of named variables to pass to the form.
+ * @return null
  */
-function icon_searchform() {
+function icon_searchform($args=array()) {
     if (! icf_is_advanced_mode()) {
         return null;
     }
     if (locate_template('icon-searchform.php') === '') {
-        require_once(ICF_TEMPLATE_PATH . 'icon-searchform.php');
+        echo do_buffer(ICF_TEMPLATE_PATH . 'icon-searchform.php', $args);
     }
 }
 add_action('icf_icon_searchform', 'icon_searchform');
 
 /**
  * Load the iconset search form.
- * @since 1.1.0
+ * @param array $args An array of named variables to pass to the form.
+ * @return null
  */
-function iconset_searchform() {
+function iconset_searchform($args=array()) {
     if (! icf_is_advanced_mode()) {
         return null;
     }
     if (locate_template('iconset-searchform.php') === '') {
-        require_once(ICF_TEMPLATE_PATH . 'iconset-searchform.php');
+        echo do_buffer(ICF_TEMPLATE_PATH . 'iconset-searchform.php', $args);
     }
 }
 add_action('icf_iconset_searchform', 'iconset_searchform');
-
-/**
- * Adds the Iconfinder Porfolio template directory to the locate_template search. Always search
- * the wp-content/theme/{current-theme} folder first. But if the template isn't found, we
- * can fall back on the default theme that comes with the plugin.
- * @global \WP_Query $wp_query
- * @param string $template
- * @return string
- * @since 1.1.0
- */
-function template_chooser($template) {
-
-    if (! is_iconfinder()) {
-        return $template;
-    }
-
-    $post_type = get_query_var('post_type');
-    if (empty($post_type)) {
-        $post_type = $_REQUEST['post_type'];
-        if (! empty($post_type)) {
-            set_query_var($post_type);
-        }
-    }
-
-    $template_filename = basename($template);
-    $find_file = locate_template($template_filename, false);
-
-    if (empty($find_file)) {
-        if ( file_exists(ICF_TEMPLATE_PATH . $template_filename)) {
-            $template = ICF_TEMPLATE_PATH . $template_filename;
-        }
-    }
-    return $template;
-}
-add_filter('template_include', 'template_chooser');
 
 /**
  * Determine if the current code is being executed
@@ -584,10 +520,12 @@ function is_iconfinder() {
 }
 
 /**
+ * Sets the posts_per_page for the plugin output and limits search
+ * to iconset or collection if indicated.
  * @param \WP_Query $query
  * @return \WP_Query
  */
-function set_posts_per_page( $query ) {
+function icf_adjust_query( $query ) {
 
     if ( is_iconfinder() ) {
         if ( is_archive() || is_search() ) {
@@ -596,9 +534,101 @@ function set_posts_per_page( $query ) {
             ));
         }
     }
+
+    if ( is_search() ) {
+        $query = add_iconset_meta_query($query);
+        // TODO: Not yet implemented
+        // $query = add_collection_meta_query($query);
+    }
     return $query;
 }
-add_action( 'pre_get_posts', 'set_posts_per_page' );
+add_action( 'pre_get_posts', 'icf_adjust_query' );
+
+/**
+ * Checks to see if the current request is a search limited to a specific iconset or collection.
+ * @return bool
+ */
+function is_limited_search() {
+    $search_iconset    = get_val($_REQUEST, 'search_iconset_id');
+    $search_collection = get_val($_REQUEST, 'search_collection_id');
+    return is_search() && ( ! empty($search_iconset) || ! empty($search_collection) );
+}
+
+/**
+ * Add a meta_query clause to the main query to limit the search to a specific iconset.
+ * @param \WP_Query $query
+ *
+ * @return \WP_Query
+ */
+function add_iconset_meta_query($query) {
+
+    $search_iconset_id = get_val($_REQUEST, 'search_iconset_id', null);
+    $post_type = get_query_var('post_type');
+    $search_query = get_search_query();
+
+    /**
+     * If the search is empty
+     */
+    # if (trim($search_query) === "") return $query;
+
+    /**
+     * Check to see if the search is being limited to a specific collection.
+     */
+    if ( ! empty($search_iconset_id) && $post_type == 'icon' ) {
+
+        /**
+         * Perform some sanity checks. Make sure it's a number within reasonable bounds.
+         */
+        if ( is_numeric($search_iconset_id) && intval($search_iconset_id) < pow(2, 24) ) {
+
+            $meta_query = array(
+                array(
+                    'key' =>'iconset_id',
+                    'value'=> $search_iconset_id,
+                    'compare' => '=',
+                ),
+            );
+            $query->set('meta_query',$meta_query);
+        }
+    }
+    return $query;
+}
+
+/**
+ * Add a meta_query clause to the main query to limit the search to a specific collection.
+ * @param \WP_Query $query
+ *
+ * @return \WP_Query
+ */
+function add_collection_meta_query($query) {
+
+    $search_collection_id = get_val($_REQUEST, 'search_collection_id', null);
+    $post_type  = get_query_var('post_type');
+
+    /**
+     * Check to see if the search is being limited to a specific collection.
+     */
+    if ( ! empty($search_collection_id) && $post_type == 'iconset' ) {
+
+        /**
+         * Perform some sanity checks. Make sure it's a number within reasonable bounds.
+         */
+        if ( is_numeric($search_collection_id) && intval($search_collection_id) < pow(2, 24) ) {
+            set_query_var( 'meta_key', 'collection_id' );
+            set_query_var( 'meta_value', $search_collection_id );
+
+            $meta_query = array(
+                array(
+                    'key' =>'collection_id',
+                    'value'=> $search_collection_id,
+                    'compare' => '=',
+                ),
+            );
+            $query->set('meta_query',$meta_query);
+        }
+    }
+    return $query;
+}
 
 /**
  * Buffers the output from a file and returns the contents as a string.
@@ -701,25 +731,166 @@ function icf_set_theme_vars($theme_vars) {
 }
 
 /**
- * Search for one of our templates in the plugin theme path
- * first, then our plugin partials path.
+ * Adds the Iconfinder Porfolio template directory to the locate_template search. Always search
+ * the wp-content/theme/{current-theme} folder first. But if the template isn't found, we
+ * can fall back on the default theme that comes with the plugin.
+ * @global \WP_Query $wp_query
  * @param string $template
  * @return string
  * @since 1.1.0
  */
-function icf_locate_template($template) {
-    $found_path = null;
-    $theme_path = locate_template($template, false);
-    if ($theme_path === '') {
-        $test_path = ICF_TEMPLATE_PATH . $template;
-        if (file_exists($test_path)) {
-            $found_path = $test_path;
+function template_chooser($template) {
+
+    if (! is_iconfinder()) {
+        return $template;
+    }
+
+    $post_type = get_query_var('post_type');
+    if (empty($post_type)) {
+        $post_type = $_REQUEST['post_type'];
+        if (! empty($post_type)) {
+            set_query_var($post_type);
         }
     }
-    else {
-        $found_path = $theme_path;
+    return icf_locate_template($template);
+}
+add_filter('template_include', 'template_chooser');
+
+/**
+ * Search for one of our templates in the plugin theme path
+ * first, then our plugin partials path.
+ * @param string $template
+ * @param bool $is_ours  If the theme is one of ourse, we search for it differently.
+ * @return string
+ * @since 1.1.0
+ */
+function icf_locate_template($template, $is_ours=false) {
+    $found_path = null;
+
+    if (! is_iconfinder()) {
+        return locate_template($template, false);
     }
-    return $found_path;
+
+    /**
+     * Check for post_type-template.php
+     */
+
+    $post_type  = get_query_var('post_type', 'iconset');
+
+    /**
+     * We're going to use the existing theme path as our fallback
+     */
+
+    $theme_path = locate_template($template, false);
+
+    /**
+     * Our preference is for theme that exactly matches our post_type-template.php
+     * in the active theme directory.
+     */
+
+    $preferred_template = $template;
+    if (! $is_ours) {
+        $preferred_template = icf_preferred_template($template);
+    }
+
+    $test_path = locate_template($preferred_template);
+
+    /**
+     * If the preferred template is empty, try the plugin's default theme.
+     */
+
+    if (trim($test_path) === '') {
+        $test_path = ICF_TEMPLATE_PATH . $preferred_template;
+        if (file_exists($test_path)) {
+            $theme_path = $test_path;
+        }
+    }
+
+    return $theme_path;
+}
+
+/**
+ * Parse the current template name and over-ride it with our preferred
+ * name based on context and post_type.
+ * @param $template
+ *
+ * @return string
+ */
+function icf_preferred_template($template) {
+
+    if (! is_iconfinder()) return $template;
+
+    $pathinfo  = pathinfo(basename($template));
+    $filename  = get_val($pathinfo, 'filename');
+    $extension = get_val($pathinfo, 'extension');
+    if (! empty($filename) && ! empty($extension)) {
+        $post_type = get_query_var('post_type');
+        $template = "{$filename}-{$post_type}.{$extension}";
+    }
+    return $template;
+}
+
+/**
+ * Get the current WP context.
+ * @return string
+ */
+function icf_get_context() {
+
+    $context = 'index';
+
+    if ( is_home() ) {
+        // Blog Posts Index
+        $context = 'home';
+        if ( is_front_page() ) {
+            // Front Page
+            $context = 'front-page';
+        }
+    }
+    else if ( is_date() ) {
+        // Date Archive Index
+        $context = 'date';
+    }
+    else if ( is_author() ) {
+        // Author Archive Index
+        $context = 'author';
+    }
+    else if ( is_category() ) {
+        // Category Archive Index
+        $context = 'category';
+    }
+    else if ( is_tag() ) {
+        // Tag Archive Index
+        $context = 'tag';
+    }
+    else if ( is_tax() ) {
+        // Taxonomy Archive Index
+        $context = 'taxonomy';
+    }
+    else if ( is_archive() ) {
+        // Archive Index
+        $context = 'archive';
+    }
+    else if ( is_search() ) {
+        // Search Results Page
+        $context = 'search';
+    }
+    else if ( is_404() ) {
+        // Error 404 Page
+        $context = '404';
+    }
+    else if ( is_attachment() ) {
+        // Attachment Page
+        $context = 'attachment';
+    }
+    else if ( is_single() ) {
+        // Single Blog Post
+        $context = 'single';
+    }
+    else if ( is_page() ) {
+        // Static Page
+        $context = 'page';
+    }
+    return $context;
 }
 
 /**
@@ -907,7 +1078,7 @@ function is_shortcode($str) {
             && array_key_exists(2, $matches))
     {
         return true;
-        }
+    }
     return false;
 }
 
@@ -933,18 +1104,20 @@ function add_referral_code($link) {
  * @return string
  */
 function coerce_img_size($img_size) {
-    if ($img_size === 'medium') {
-        $img_size = 'medium-2x';
-    }
-    else if (in_array($img_size, array('small', 'normal', 'default'))) {
-        $img_size = 'medium';
-    }
-    else if (! in_array($img_size, array('normal', 'large'))) {
-        $img_size = 'medium';
-    }
+
+    $img_size = get_val(
+        icf_get_setting('image_size_map'),
+        $img_size, $img_size
+    );
     return $img_size;
 }
 
+/**
+ * Coerce style values to Iconfinder system names.
+ * @param $styles
+ *
+ * @return array|string
+ */
 function coerce_style_values($styles) {
     $new_styles = array();
     $aliases = icf_get_setting('style_aliases');
@@ -966,6 +1139,13 @@ function coerce_style_values($styles) {
     return $new_styles;
 }
 
+/**
+ * Create a currency selector element.
+ * @param string $selected
+ * @param string $selector_name
+ *
+ * @return string
+ */
 function icf_currency_selector($selected=ICF_DEFAULT_CURRENCY, $selector_name='currency') {
     $currency_symbols = icf_get_currencies();
     $html  = "\n";
@@ -980,6 +1160,12 @@ function icf_currency_selector($selected=ICF_DEFAULT_CURRENCY, $selector_name='c
         return $html;
 }
 
+/**
+ * Map currency abbreviation to the symbol.
+ * @param $abbrev
+ *
+ * @return mixed|null
+ */
 function icf_get_currency_symbol($abbrev) {
     $currency_symbols = icf_get_currencies();
     if (isset($currency_symbols[$abbrev])) {

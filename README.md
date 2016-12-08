@@ -275,6 +275,12 @@ Iconfinder Portfolio comes with a built-in image slider based on the Owl image s
 * Changed the way API calls are made. Instead of API-first, cache-second, the logic was changed to use the cached version of data first and only call the API if the cache has been purged or is otherwise empty.
 * Added Bogdan Rosu's implementation of the Owl image carousel. Now ships with two themes for front end.
 
+### 06-12-2016
+
+* Removed tags column in Iconset post admin list view
+* Added ability to restrict search box to only search a specific set on single page
+* Change search post_type on iconset single template to 'icons' so searches happen in the set being displayed
+
 ## Credits
 
 * The Iconfinder Portfolio plugin is built on the WordPress Plugin Boilerplate by http://wppb.io

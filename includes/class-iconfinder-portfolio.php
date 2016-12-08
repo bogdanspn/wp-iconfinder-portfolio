@@ -71,7 +71,7 @@ class Iconfinder_Portfolio {
     public function __construct() {
 
         $this->plugin_name = 'iconfinder-portfolio';
-        $this->version = '1.1.0';
+        $this->version = '2.0';
 
         $this->load_dependencies();
         $this->set_locale();
@@ -221,8 +221,8 @@ class Iconfinder_Portfolio {
 
         $plugin_public = new Iconfinder_Portfolio_Public( $this->get_plugin_name(), $this->get_version() );
 
-        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles', null, 11 );
+        $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts', null, 11 );
         $this->loader->add_action( 'init', $plugin_public, 'load_search_engine' );
     }
 
