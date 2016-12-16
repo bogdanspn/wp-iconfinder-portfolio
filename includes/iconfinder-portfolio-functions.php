@@ -714,6 +714,12 @@ function show_iconsets_metabox($post) {
         echo "<p><strong>Icons Count:</strong> {$icons_count}</p>";
         echo "<p><a href=\"https://www.iconfinder.com/iconsets/{$iconset_id}\" target=\"_blank\">View on Iconfinder</a></p>";
         echo "<p><strong>Last Sync:</strong> $latest_sync</p>";
+        $preview = get_post_meta( $post->ID, 'preview_image_medium', true );
+        if (! empty($preview)) {
+            echo "<p><a href=\"https://www.iconfinder.com/iconsets/{$iconset_id}\" target=\"_blank\">";
+            echo "<img src=\"{$preview}\" width=\"250\" />";
+            echo "</a></p>\n";
+        }
     }
     else {
         //TODO: Show default message
@@ -733,20 +739,47 @@ function show_icons_metabox($post) {
     $iconset_identifier = get_post_meta( $post->ID, 'iconset_identifier', true );
     $latest_sync = get_post_meta( $post->ID, 'latest_sync', true );
     if (! empty($iconset_id)) {
-        echo "<p><strong>Iconset:</strong> {$iconset_identifier} (ID: {$iconset_id})</p>";
-        echo "<p><a href=\"" . ICONFINDER_LINK_ICONSETS . "{$iconset_id}\" target=\"_blank\">";
-        echo __('View on Iconfinder', ICF_PLUGIN_NAME);
-        echo "</a></p>";
-        echo "<p><strong>" . __('Last Sync:', ICF_PLUGIN_NAME) . "</strong> {$latest_sync}</p>";
+        echo "<p><strong>Iconset:</strong> <a href=\"https://www.iconfinder.com/iconsets/{$iconset_id}\" target=\"_blank\">{$iconset_identifier}</a></p>";
+
+        $preview = get_post_meta( $post->post_parent, 'preview_image_medium', true );
+        if (! empty($preview)) {
+            echo "<p><a href=\"https://www.iconfinder.com/iconsets/{$iconset_id}\" target=\"_blank\">";
+            echo "<img src=\"{$preview}\" width=\"250\" />";
+            echo "</a></p>\n";
+        }
     }
     if (! empty($icon_id)) {
-        echo "<p><strong>Icon ID: </strong>{$icon_id}</p>";
-        echo "<p><a href=\"" . ICONFINDER_LINK_ICONS . "{$icon_id}\" target=\"_blank\">View on Iconfinder</a></p>";
+        echo "<p><strong>Icon ID: </strong><a href=\"" . ICONFINDER_LINK_ICONS . "{$icon_id}\" target=\"_blank\">{$icon_id}</a></p>";
+        $preview = get_post_meta( $post->ID, 'preview_image_@256', true );
+        if (! empty($preview)) {
+            echo "<p><a href=\"" . ICONFINDER_LINK_ICONS . "{$icon_id}\" target=\"_blank\">";
+            echo "<img src=\"{$preview}\" width=\"250\" />";
+            echo "</a></p>\n";
+        }
+        else {
+            echo "<p><a href=\"" . ICONFINDER_LINK_ICONS . "{$icon_id}\" target=\"_blank\">View on Iconfinder</a></p>";
+        }
     }
-    else {
-        //TODO: Show default message
-    }
+    echo "<p><strong>" . __('Last Sync:', ICF_PLUGIN_NAME) . "</strong> {$latest_sync}</p>";
 }
+
+/**
+ * Move the featured image to the top of the column on Iconset and Icon posts.
+ */
+function move_featured_image_metabox(){
+    /**
+     * Move Iconset featured image.
+     */
+    remove_meta_box( 'postimagediv', 'iconset', 'side' );
+    add_meta_box('postimagediv', __('Iconset Preview'), 'post_thumbnail_meta_box', 'iconset', 'side', 'high');
+
+    /**
+     * Move Icon featured image.
+     */
+    remove_meta_box( 'postimagediv', 'icon', 'side' );
+    add_meta_box('postimagediv', __('Icon Preview'), 'post_thumbnail_meta_box', 'icon', 'side', 'high');
+}
+add_action( 'do_meta_boxes', 'move_featured_image_metabox' );
 
 /**
  * Get an Iconfinder WP iconset custom post type by iconset_id.

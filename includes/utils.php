@@ -240,7 +240,6 @@ function icf_queue_notices($notices, $type='success') {
     return set_transient( ICF_PLUGIN_NAME . '_' . $type, $message, HOUR_IN_SECONDS );
 }
 
-
 /**
  * Show a success notice.
  */
