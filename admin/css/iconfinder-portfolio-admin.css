@@ -312,3 +312,15 @@ body.toplevel_page_iconfinder-portfolio form p {
     margin: 0 5px 0 0;
     text-transform: uppercase;
 }
+
+.post-type-icon .wp-list-table .column-preview {
+
+    width: 100px !important;
+    text-align: center;
+}
+
+.post-type-iconset .wp-list-table .column-preview {
+
+    width: 200px !important;
+    text-align: center;
+}
