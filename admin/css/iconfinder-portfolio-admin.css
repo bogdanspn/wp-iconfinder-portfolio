@@ -324,3 +324,104 @@ body.toplevel_page_iconfinder-portfolio form p {
     width: 200px !important;
     text-align: center;
 }
+
+#image-mapper {
+
+    width: 940px;
+    display: none;
+    padding: 10px 40px;
+    max-height: 960px;
+}
+
+#image-mapper h3 {
+
+    margin: 0 0 30px 0;
+}
+
+#image-mapper .controls {
+
+    padding: 20px 0;
+}
+
+.suggestions,
+#user-uploaded-images,
+#iconfinder-api-images {
+
+    background: #fff;
+    border: 1px solid #aaa;
+    padding: 20px;
+}
+
+.suggestions {
+
+    width: 93%;
+    height: 200px;
+    margin: 0 0 20px 0;
+}
+
+#user-uploaded-images,
+#iconfinder-api-images {
+
+    width: 47.5%;
+    float: left;
+}
+
+#iconfinder-api-images {
+
+    margin-right: 10px;
+}
+
+#user-uploaded-images .content,
+#iconfinder-api-images .content {
+
+    overflow: scroll;
+}
+
+#image-mapper .content ul li {
+
+    display: inline-block;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+#image-mapper .content ul li:hover {
+
+    border: 3px solid #aaa;
+    cursor: pointer;
+    padding: 7px;
+}
+
+#image-mapper .content ul li img {
+
+    width: 100px;
+}
+
+#image-mapper .content ul li.selected {
+
+    border: 3px solid green;
+    padding: 7px;
+}
+
+#image-mapper .content ul li.in-use {
+
+    opacity: 0.25;
+}
+
+#image-mapper-message {
+
+    height: 48px;
+    line-height: 48px;
+}
+
+
+#image-mapper-message.success {
+
+    padding-left: 48px;
+    background: url(../images/success.png) no-repeat center left;
+}
+
+#image-mapper-message.error {
+
+    padding-left: 48px;
+    background: url(../images/error.png) no-repeat center left;
+}

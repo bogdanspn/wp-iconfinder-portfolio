@@ -88,6 +88,7 @@ class Iconfinder_Portfolio_Admin {
          */
 
         wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/iconfinder-portfolio-admin.css', array(), $this->version, 'all' );
+        wp_enqueue_style(  'wp-jquery-ui-dialog' );
 
     }
 
@@ -110,7 +111,16 @@ class Iconfinder_Portfolio_Admin {
          * class.
          */
 
-        wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/iconfinder-portfolio-admin.js', array( 'jquery' ), $this->version, false );
+        wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/iconfinder-portfolio-admin.js', array( 'jquery', 'jquery-ui-dialog' ), $this->version, false );
+        wp_enqueue_script( 'ajax-script', plugin_dir_url( __FILE__ ) . 'js/image-mapper.js', array( 'jquery', 'jquery-ui-dialog' ) );
+        wp_localize_script( 'ajax-script', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => '' ) );
+
+        /**
+         * We need the media uploader.
+         */
+        wp_enqueue_media();
+
+        // add_action("admin_enqueue_scripts", "enqueue_media_uploader");
 
     }
     
@@ -173,7 +183,7 @@ class Iconfinder_Portfolio_Admin {
     public function display_plugin_documentation() {
     
         $_options = get_option( ICF_PLUGIN_NAME );
-        $username = isset($_options['username']) ? $_options['username'] : null;
+        $username = get_val( $_options, 'username' );
 
         $data = null;
 
@@ -197,6 +207,34 @@ class Iconfinder_Portfolio_Admin {
     
         echo $this->apply_admin_theme($data, 'iconfinder-portfolio-documentation.php');
     }
+
+    /**
+     * Display image-mapping tool for pairing user-uploaded images with Iconfinder custom post types.
+     * @since    2.0.1
+     */
+    public function display_image_mapper() {
+
+        $data = array(
+            'items'  => array(),
+            'images' => array()
+        );
+
+        /**
+         * 1. Left-hand side, show all Icon post previews (Iconfinder images) without featured image,
+         *    from a specific iconset.
+         * 2. Right-hand side, show all user-uploaded icon previews not saved as featured image
+         *    A. Group images by iconset.
+         * 3. Two halves are independently scrollable
+         * 4. Best approach is to upload images in batches by iconset, then pair those icons
+         *    with the corresponding iconset before uploading more images.
+         * 5. User clicks Iconfinder image then clicks user-uploaded image to "pair them"
+         * 6. User clicks 'Save' button to update Icon post with their own preview (as featured image)
+         * 7. As images are paired, they disappear from the list
+         * 8. Use Ajax to set featured image so user doesn't have to wait for HTTP round-trip
+         */
+
+        echo $this->apply_admin_theme($data, 'image-mapper.php');
+    }
     
     /**
      * Render the settings page for this plugin.
@@ -208,7 +246,7 @@ class Iconfinder_Portfolio_Admin {
         # Grab the collections from the API
         
         $_options = get_option( ICF_PLUGIN_NAME );
-        $username = isset($_options['username']) ? $_options['username'] : null;
+        $username = get_val( $_options, 'username' );
         
         $data = array('message' => 'Enter your API credentials on the API Settings page to list your collections here');
         
@@ -234,7 +272,7 @@ class Iconfinder_Portfolio_Admin {
         // Grab the iconsets from the API
         
         $_options = get_option( ICF_PLUGIN_NAME );
-        $username = isset( $_options['username'] ) ? $_options['username'] : null;
+        $username = get_val( $_options, 'username' );
 
         $current_page = icf_get_page_number();
 

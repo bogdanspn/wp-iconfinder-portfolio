@@ -412,18 +412,20 @@ function get_api_path($which, $args=array()) {
 
     if (! is_array($args)) $args = array();
 
+    $username = get_val( $args, 'username', api_username() );
+
     $path = array( $which );
     if ($which === 'iconsets') {
         /**
          * https://api.iconfinder.com/v2/users/iconify/iconsets
          */
-        $path = array('users', api_username(), 'iconsets');
+        $path = array('users', $username, 'iconsets');
     }
     else if ($which === 'collections') {
         /**
          * https://api.iconfinder.com/v2/users/iconify/collections
          */
-        $path = array('users', api_username(), 'collections');
+        $path = array('users', $username, 'collections');
     }
     else if ($which === 'collection') {
         /**
@@ -1498,15 +1500,39 @@ function get_one_iconset($iconset_id) {
 }
 
 /**
+ * List N number of iconsets by a specific user.
+ * @param string    $username   The username of the user whose iconsets we want.
+ * @param int       $count      The number of iconsets to list
+ * @return array
+ */
+function icf_get_user_iconsets( $username, $count=-1 ) {
+
+    $result = get_all_iconsets( $username );
+
+    if (isset($result['items'])) {
+        $result = $result['items'];
+        if ($count != -1) {
+            $result = array_slice( $result, 0, $count );
+        }
+    }
+
+    return $result;
+}
+
+/**
  * Get all iconsets.
+ * @param string    $username   Optional username for who to get all iconsets.
  * @return array|mixed|null|object
  */
-function get_all_iconsets() {
+function get_all_iconsets( $username=null ) {
     static $iconsets = array();
     $items    = array();
-    if (empty($iconsets)) {
+    if (empty($iconsets) || ! empty($username)) {
+
+        $path = get_api_path('iconsets', array( 'username' => $username ));
+
         $batch = iconfinder_call_api(
-            get_api_url(get_api_path('iconsets'), array('count' => ICONFINDER_API_MAX_COUNT))
+            get_api_url($path, array('count' => ICONFINDER_API_MAX_COUNT))
         );
         $total_count = get_val($batch, 'total_count') + 1;
         $page_count = ceil($total_count / ICONFINDER_API_MAX_COUNT);
@@ -1517,10 +1543,9 @@ function get_all_iconsets() {
                 $n = count($batch['items'])-1;
                 if (isset($batch['items'][$n]['iconset_id'])) {
                     $last_id = $batch['items'][$n]['iconset_id'];
-                    $count = max(1, $total_count - ( ICONFINDER_API_MAX_COUNT * ($i + 1) ));
-                    $path = get_api_path('iconsets');
+                    # $count = max(1, $total_count - ( ICONFINDER_API_MAX_COUNT * ($i + 1) ));
                     $batch = iconfinder_call_api(
-                        get_api_url($path, array( 'after' => $last_id, 'count' => $count ))
+                        get_api_url($path, array( 'after' => $last_id, 'count' => ICONFINDER_API_MAX_COUNT ))
                     );
                     if (is_array($iconsets['items']) && is_array($batch['items'])) {
                         $iconsets['items'] = array_merge($iconsets['items'], $batch['items']);
@@ -1539,7 +1564,9 @@ function get_all_iconsets() {
             $iconsets['item_count'] = count($iconsets['items']);
         }
     }
-    return $iconsets;
+    $result = $iconsets;
+    if (! empty($username)) $iconsets = array();
+    return $result;
 }
 
 /**
@@ -1554,8 +1581,8 @@ function get_all_iconsets() {
 function icf_get_post($meta_value, $meta_key, $post_type) {
     $result = null;
     $posts = get_posts(array(
-        'numberposts'        => 1,
-        'post_type'                => $post_type,
+        'numberposts'   => 1,
+        'post_type'     => $post_type,
         'meta_key'      => $meta_key,
         'meta_value'    => $meta_value
     ));
@@ -1605,6 +1632,47 @@ function icf_get_all_posts($meta_value, $meta_key, $post_type) {
  */
 function get_icons_by_iconset_id($iconset_id) {
     return icf_get_all_posts($iconset_id, 'iconset_id', 'icon');
+}
+
+/**
+ * Retrieve all icons for a specific iconset.
+ * @param int       $post_parent        The ID of the parent (iconset) post
+ * @param array     $more_args          Keyed array of query arguments to filter the results
+ * @param bool      $refresh            Whether or not to refresh any statically stored results.
+ *
+ * @return mixed
+ */
+function get_icon_posts_by_post_parent( $post_parent, $more_args=array(), $refresh=false ) {
+
+    /** @staticvar  $posts */
+    static $icons;
+
+    /**
+     * If we have previously requested icons for this iconset,
+     * And the set is not empty, and we have not requested to
+     * refresh the static var, we can save some CPU cycles
+     * by returning the previously queried posts.
+     */
+    if ( isset($icons["_{$post_id}"]) && ! $refresh ) {
+        $stored = $icons["_{$post_id}"];
+        if ( count($stored) ) {
+            return $stored;
+        }
+    }
+
+    $query_args = array_merge(array(
+        'post_type'      => 'icon',
+        'post_parent'    => $post_parent,
+        'post_status'    => 'publish',
+        'posts_per_page' => -1
+    ), $more_args);
+
+    /**
+     * Update the staticvar for next time.
+     */
+    $icons = query_posts($query_args);
+
+    return $icons;
 }
 
 /**

@@ -511,7 +511,7 @@ class Iconfinder_Portfolio_Public {
 
         $img_size = coerce_img_size(get_val($attrs, 'img_size', 'normal'));
 
-        /*
+        /**
          * 1. Determine the data type & path
          *    a. iconset > collection > sets
          *    b. categories
