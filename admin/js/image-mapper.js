@@ -291,41 +291,58 @@
         });
     };
 
+    window._resembler = [];
+
     function resembler( $f, $files ) {
 
         var iter = 0;
         var stop  = $files.length;
 
         var distance = 100;
-        var closest  = $files[iter];
+        var closest  = $($files[iter]);
 
         next( $f.attr('src'), $($files[iter]).attr('src') );
 
+        function update_ui( $closest ) {
+
+            $('#user-uploaded-images .content ul li').removeClass('selected');
+            $closest.closest('li').addClass('selected');
+
+            $('.suggestions .content').empty().append(
+                $('<img/>').attr( 'src',  $closest.attr('src') ).css('width', '96px')
+            );
+        };
+
         function next( f1, f2 ) {
-            if ( iter >= stop ) return;
-            resemble(f1).compareTo(f2).scaleToSameSize().onComplete(function(data) {
 
-                if ( data.misMatchPercentage < distance ) {
+            if ( iter >= stop ) {
+                window._resembler[f1] = closest;
+                return;
+            }
 
-                    var $closest = $($files[iter]);
+            if ( typeof(window._resembler[f1]) != 'undefined' ) {
 
-                    distance = data.misMatchPercentage;
-                    closest  = $closest;
+                // We already found this one. No need to do it again.
 
-                    // console.log( 'Mismatch %: ' + data.misMatchPercentage );
-                    // console.log( 'Image: ' + $closest.attr('src') );
+                update_ui( $(window._resembler[f1]) );
+            }
+            else {
+                resemble(f1).compareTo(f2).scaleToSameSize().onComplete(function(data) {
 
-                    $('#user-uploaded-images .content ul li').removeClass('selected');
-                    $closest.closest('li').addClass('selected');
+                    if ( data.misMatchPercentage < distance ) {
 
-                    $('.suggestions .content').empty().append(
-                        $('<img/>').attr( 'src',  $closest.attr('src') ).css('width', '96px')
-                    );
-                }
-                iter++;
-                next( f1, $($files[iter]).attr('src') );
-            });
-        }
+                        var $closest = $($files[iter]);
+
+                        distance = data.misMatchPercentage;
+                        closest  = $closest;
+
+                        update_ui( $closest );
+                    }
+                    iter++;
+                    next( f1, $($files[iter]).attr('src') );
+                });
+            }
+        };
     };
 
     function init_api_images() {
