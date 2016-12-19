@@ -1190,14 +1190,16 @@ add_action( 'wp_ajax_set_icon_preview', 'set_icon_preview' );
  * @param string    $meta_key       The meta data key
  * @param mixed     $meta_value     The meta data value
  */
-function add_attachment_parent( $meta_id, $object_id, $meta_key, $meta_value ) {
+function add_attachment_parent( $meta_id=null, $object_id=null, $meta_key=null, $meta_value=null ) {
+
+    foreach ( array( $object_id, $meta_key, $meta_value ) as $test ) {
+        if ( empty( $test ) ) return;
+    }
 
     /**
      * Let's see if the object is a post.
      */
     $post = get_post( $object_id );
-
-    # debug( $post );
 
     /**
      * Look for the first excuse to not do anything.

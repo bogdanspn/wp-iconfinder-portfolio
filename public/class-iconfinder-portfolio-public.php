@@ -110,9 +110,9 @@ class Iconfinder_Portfolio_Public {
     public function add_shortcode() {
 
         add_shortcode('iconfinder_portfolio', array( __CLASS__, 'iconfinder_portfolio_shortcode' ));
-        add_shortcode('iconfinder_search', array( __CLASS__, 'iconfinder_search_shortcode' ));
-        add_shortcode('icons_searchform', array( __CLASS__, 'shortcode_icons_searchform' ));
-        add_shortcode('iconsets_searchform', array( __CLASS__, 'shortcode_iconsets_searchform' ));
+        add_shortcode('iconfinder_search',    array( __CLASS__, 'iconfinder_search_shortcode' ));
+        add_shortcode('icons_searchform',     array( __CLASS__, 'shortcode_icons_searchform' ));
+        add_shortcode('iconsets_searchform',  array( __CLASS__, 'shortcode_iconsets_searchform' ));
     }
 
     public function load_search_engine() {
@@ -194,8 +194,15 @@ class Iconfinder_Portfolio_Public {
             );
         }
 
+        $search_args = array( 's' => get_query_var('s') );
+
+        //TODO: Update this to accept more than one iconset_id
+        if ( $search_iconset_id = get_val( $attrs, 'iconset' ) ) {
+            $search_args['search_iconset_id'] = $search_iconset_id;
+        }
+
         if (! empty($template)) {
-            $content = do_buffer($template, array('s' => get_query_var('s')));
+            $content = do_buffer( $template, $search_args );
         }
         return $content;
     }
@@ -444,18 +451,18 @@ class Iconfinder_Portfolio_Public {
      * Outputs the shortcode for the icon search form
      * @return void
      */
-    public static function shortcode_icons_searchform() {
+    public static function shortcode_icons_searchform( $attrs=array() ) {
 
-        icon_searchform();
+        icon_searchform( $attrs );
     }
 
     /**
      * Outputs the shortcode for the iconset search form
      * @return void
      */
-    public static function shortcode_iconsets_searchform() {
+    public static function shortcode_iconsets_searchform( $attrs=array() ) {
 
-        iconset_searchform();
+        iconset_searchform( $attrs );
     }
 
     /**
