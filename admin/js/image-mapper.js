@@ -1,6 +1,53 @@
 ;(function( $ ) {
     'use strict';
 
+    var image_hider = {
+
+        $button: $('.hide-in-use'),
+
+        ss_kay: 'mapper.hide-in-use',
+
+        is_hidden: function() {
+            return parseInt(sessionStorage.getItem(this.ss_key)) == 1;
+        },
+
+        show_used_images: function() {
+            $('.in-use').show();
+            image_hider.$button.text('Hide Used Images');
+            sessionStorage.setItem( image_hider.ss_key, 0 );
+        },
+
+        hide_used_images: function() {
+            $('.in-use').hide();
+            image_hider.$button.text('Show Hidden');
+            sessionStorage.setItem( image_hider.ss_key, 1 );
+        },
+
+        init: function() {
+
+            image_hider.$button = $('.hide-in-use');
+
+            if ( image_hider.is_hidden() ) {
+                image_hider.hide_used_images();
+            }
+            else {
+                image_hider.show_used_images();
+            }
+
+            image_hider.$button.on( 'click', function(e) {
+                e.preventDefault();
+                if ( image_hider.is_hidden() ) {
+                    image_hider.show_used_images();
+                }
+                else {
+                    image_hider.hide_used_images();
+                }
+            });
+        }
+    };
+
+    image_hider.init();
+
     function clear_dialog( event, ui ) {
 
         $('#image-mapper li').removeClass('selected');
@@ -104,6 +151,8 @@
             $mapper.dialog('open');
 
             resize_mapper();
+            image_hider.init();
+            $('.suggestions .content').empty();
 
             var $user_images = $('#user-uploaded-images');
             var $user_items  = $('.content ul li', $user_images);
@@ -124,6 +173,7 @@
             // init_user_images();
             init_api_images();
         });
+
 
         /**
          * Attach behavior to Image Mapper 'Update' button.
@@ -187,6 +237,10 @@
                 var $user_image = $('.selected', $user_images);
                 $user_image.removeClass('selected');
                 $user_image.css('opacity', '0.25');
+                if ( image_hider.is_hidden() ) {
+                    $user_image.fadeOut();
+                }
+
             });
         });
     });
@@ -237,6 +291,43 @@
         });
     };
 
+    function resembler( $f, $files ) {
+
+        var iter = 0;
+        var stop  = $files.length;
+
+        var distance = 100;
+        var closest  = $files[iter];
+
+        next( $f.attr('src'), $($files[iter]).attr('src') );
+
+        function next( f1, f2 ) {
+            if ( iter >= stop ) return;
+            resemble(f1).compareTo(f2).scaleToSameSize().onComplete(function(data) {
+
+                if ( data.misMatchPercentage < distance ) {
+
+                    var $closest = $($files[iter]);
+
+                    distance = data.misMatchPercentage;
+                    closest  = $closest;
+
+                    // console.log( 'Mismatch %: ' + data.misMatchPercentage );
+                    // console.log( 'Image: ' + $closest.attr('src') );
+
+                    $('#user-uploaded-images .content ul li').removeClass('selected');
+                    $closest.closest('li').addClass('selected');
+
+                    $('.suggestions .content').empty().append(
+                        $('<img/>').attr( 'src',  $closest.attr('src') ).css('width', '96px')
+                    );
+                }
+                iter++;
+                next( f1, $($files[iter]).attr('src') );
+            });
+        }
+    };
+
     function init_api_images() {
         var $api_images = $('#iconfinder-api-images');
         var $api_items  = $('.content ul li', $api_images);
@@ -244,6 +335,11 @@
         $api_items.on('click', function(e) {
 
             var $this = $(this);
+
+            resembler(
+                $('img', $this),
+                $('#user-uploaded-images .content ul li.not-in-use img')
+            );
 
             if ($this.hasClass('selected')) {
                 $this.removeClass('selected');

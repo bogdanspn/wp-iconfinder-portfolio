@@ -112,6 +112,7 @@ class Iconfinder_Portfolio_Admin {
          */
 
         wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/iconfinder-portfolio-admin.js', array( 'jquery', 'jquery-ui-dialog' ), $this->version, false );
+        wp_enqueue_script( 'resemble-js', plugin_dir_url( __FILE__ ) . 'js/resemble.js' );
         wp_enqueue_script( 'ajax-script', plugin_dir_url( __FILE__ ) . 'js/image-mapper.js', array( 'jquery', 'jquery-ui-dialog' ) );
         wp_localize_script( 'ajax-script', 'ajax_object', array( 'ajax_url' => admin_url( 'admin-ajax.php' ), 'we_value' => '' ) );
 

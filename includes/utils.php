@@ -1094,27 +1094,33 @@ function get_icon_previews() {
 
         $icons = get_icon_posts_by_post_parent( $iconset_post_id, $meta_query, true );
 
-        foreach ($icons as $icon) {
+        if ( count( $icons ) ) {
+            foreach ($icons as $icon) {
 
-            $icon->preview = get_post_meta( $icon->ID, 'preview_image_@128', true );
+                $icon->preview = get_post_meta( $icon->ID, 'preview_image_@128', true );
 
-            /**
-             * This is a bit of a hack to make sure all attachments for our custom posts
-             * have a post_parent. By default, WordPress does not save this value but
-             * we need it for some of our functionality. This spot was chosen because
-             * every icon post type will go through this function and it allows us
-             * to avoid calling the same logic elsewhere.
-             */
-            if ( $_thumbnail_id = get_post_thumbnail_id( $icon->ID ) ) {
+                /**
+                 * This is a bit of a hack to make sure all attachments for our custom posts
+                 * have a post_parent. By default, WordPress does not save this value but
+                 * we need it for some of our functionality. This spot was chosen because
+                 * every icon post type will go through this function and it allows us
+                 * to avoid calling the same logic elsewhere.
+                 */
+                if ( $_thumbnail_id = get_post_thumbnail_id( $icon->ID ) ) {
 
-                add_attachment_parent( null, $icon->ID, '_thumbnail_id', $_thumbnail_id );
+                    add_attachment_parent( null, $icon->ID, '_thumbnail_id', $_thumbnail_id );
+                }
+
+                $html .= "<li><img data-properties='{\"post_id\": \"{$icon->ID}\" }' src=\"{$icon->preview}\"/></li>\n";
             }
-
-            $html .= "<li><img data-properties='{\"post_id\": \"{$icon->ID}\" }' src=\"{$icon->preview}\"/></li>\n";
+            $html = "<ul>{$html}</ul>";
+        }
+        else {
+            $html .= "<p>" . __( 'No results found', ICF_PLUGIN_NAME ) . "</p>\n";
         }
     }
 
-    echo "<ul>{$html}</ul>";
+    echo $html;
 
     wp_die();
 }

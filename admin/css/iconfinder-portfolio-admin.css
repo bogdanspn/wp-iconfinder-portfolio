@@ -356,9 +356,21 @@ body.toplevel_page_iconfinder-portfolio form p {
 
 .suggestions {
 
-    width: 93%;
-    height: 200px;
-    margin: 0 0 20px 0;
+    width: 130px;
+    height: 130px;
+    float: left;
+    margin: 0 20px 20px 0;
+    padding: 5px;
+    text-align: center;
+}
+
+.suggestions h3 {
+
+    font-size: 11px;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-transform: uppercase;
+    text-align: center;
 }
 
 #user-uploaded-images,
