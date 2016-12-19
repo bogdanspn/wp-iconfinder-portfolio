@@ -47,7 +47,8 @@ if ( ! defined( 'ABSPATH' ) ) exit;
                                     <th valign="top" align="left" width="35%">Links</th>
                                     <td>
                                         <a href="<?php echo @$iconset['post_view_link']; ?>" target="_blank">View Post</a>&nbsp;|&nbsp;
-                                        <a href="<?php echo @$iconset['post_edit_link']; ?>" target="_blank">Edit Post</a>
+                                        <a href="<?php echo @$iconset['post_edit_link']; ?>" target="_blank">Edit Post</a> |
+                                        <a href="javascript:void(0);" class="image-mapper" data-properties='{"iconset": "<?php echo $iconset['post_id']; ?>"}'>Icons</a>
                                     </td>
                                 </tr>
                             <?php endif; ?>
@@ -88,3 +89,4 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         </div>
     <?php endif; ?>
 </div>
+<?php add_image_mapper(); ?>

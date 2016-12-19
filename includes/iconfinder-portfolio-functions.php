@@ -412,18 +412,20 @@ function get_api_path($which, $args=array()) {
 
     if (! is_array($args)) $args = array();
 
+    $username = get_val( $args, 'username', api_username() );
+
     $path = array( $which );
     if ($which === 'iconsets') {
         /**
          * https://api.iconfinder.com/v2/users/iconify/iconsets
          */
-        $path = array('users', api_username(), 'iconsets');
+        $path = array('users', $username, 'iconsets');
     }
     else if ($which === 'collections') {
         /**
          * https://api.iconfinder.com/v2/users/iconify/collections
          */
-        $path = array('users', api_username(), 'collections');
+        $path = array('users', $username, 'collections');
     }
     else if ($which === 'collection') {
         /**
@@ -674,79 +676,6 @@ function iconfinder_conditional_actions() {
     }
 }
 add_action( 'init', 'iconfinder_conditional_actions' );
-
-/**
- * Add the different metabox actions.
- */
-function add_iconfinder_meta_boxes() {
-    
-    add_meta_box( 'collections_metabox', 'Iconsets', 'show_collections_metabox', 'collection', 'side', 'high');
-    add_meta_box( 'iconsets_metabox', 'Collection', 'show_iconsets_metabox', 'iconset', 'side', 'high' );
-    add_meta_box( 'icons_metabox', 'Iconset', 'show_icons_metabox', 'icon', 'side', 'high' );
-}
-add_action( 'add_meta_boxes', 'add_iconfinder_meta_boxes' );
-
-/**
- * Show the collections metabox on the edit post page.
- * @param object $post
- * 
- * @since 1.1.0
- */
-function show_collections_metabox($post) {
-  
-    // TODO: Add collections metabox data.
-}
-
-/**
- * Show the iconsets metabox on the edit post page.
- * @param object $post
- * 
- * @since 1.1.0
- */
-function show_iconsets_metabox($post) {
-  
-    $iconset_id = get_post_meta( $post->ID, 'iconset_id', true );
-    $iconset_identifier = get_post_meta( $post->ID, 'iconset_identifier', true );
-    $latest_sync = get_post_meta( $post->ID, 'latest_sync', true );
-    $icons_count = get_post_meta( $post->ID, 'icons_count', true );
-    if (! empty($iconset_id)) {
-        echo "<p><strong>Iconset:</strong> {$iconset_identifier} (ID: {$iconset_id})</p>";
-        echo "<p><strong>Icons Count:</strong> {$icons_count}</p>";
-        echo "<p><a href=\"https://www.iconfinder.com/iconsets/{$iconset_id}\" target=\"_blank\">View on Iconfinder</a></p>";
-        echo "<p><strong>Last Sync:</strong> $latest_sync</p>";
-    }
-    else {
-        //TODO: Show default message
-    }
-}
-
-/**
- * Show the icons metabox on the edit post page.
- * @param object $post
- * 
- * @since 1.1.0
- */
-function show_icons_metabox($post) {
-  
-    $icon_id    = get_post_meta( $post->ID, 'icon_id', true );
-    $iconset_id = get_post_meta( $post->ID, 'iconset_id', true );
-    $iconset_identifier = get_post_meta( $post->ID, 'iconset_identifier', true );
-    $latest_sync = get_post_meta( $post->ID, 'latest_sync', true );
-    if (! empty($iconset_id)) {
-        echo "<p><strong>Iconset:</strong> {$iconset_identifier} (ID: {$iconset_id})</p>";
-        echo "<p><a href=\"" . ICONFINDER_LINK_ICONSETS . "{$iconset_id}\" target=\"_blank\">";
-        echo __('View on Iconfinder', ICF_PLUGIN_NAME);
-        echo "</a></p>";
-        echo "<p><strong>" . __('Last Sync:', ICF_PLUGIN_NAME) . "</strong> {$latest_sync}</p>";
-    }
-    if (! empty($icon_id)) {
-        echo "<p><strong>Icon ID: </strong>{$icon_id}</p>";
-        echo "<p><a href=\"" . ICONFINDER_LINK_ICONS . "{$icon_id}\" target=\"_blank\">View on Iconfinder</a></p>";
-    }
-    else {
-        //TODO: Show default message
-    }
-}
 
 /**
  * Get an Iconfinder WP iconset custom post type by iconset_id.
@@ -1571,15 +1500,39 @@ function get_one_iconset($iconset_id) {
 }
 
 /**
+ * List N number of iconsets by a specific user.
+ * @param string    $username   The username of the user whose iconsets we want.
+ * @param int       $count      The number of iconsets to list
+ * @return array
+ */
+function icf_get_user_iconsets( $username, $count=-1 ) {
+
+    $result = get_all_iconsets( $username );
+
+    if (isset($result['items'])) {
+        $result = $result['items'];
+        if ($count != -1) {
+            $result = array_slice( $result, 0, $count );
+        }
+    }
+
+    return $result;
+}
+
+/**
  * Get all iconsets.
+ * @param string    $username   Optional username for who to get all iconsets.
  * @return array|mixed|null|object
  */
-function get_all_iconsets() {
+function get_all_iconsets( $username=null ) {
     static $iconsets = array();
     $items    = array();
-    if (empty($iconsets)) {
+    if (empty($iconsets) || ! empty($username)) {
+
+        $path = get_api_path('iconsets', array( 'username' => $username ));
+
         $batch = iconfinder_call_api(
-            get_api_url(get_api_path('iconsets'), array('count' => ICONFINDER_API_MAX_COUNT))
+            get_api_url($path, array('count' => ICONFINDER_API_MAX_COUNT))
         );
         $total_count = get_val($batch, 'total_count') + 1;
         $page_count = ceil($total_count / ICONFINDER_API_MAX_COUNT);
@@ -1590,10 +1543,9 @@ function get_all_iconsets() {
                 $n = count($batch['items'])-1;
                 if (isset($batch['items'][$n]['iconset_id'])) {
                     $last_id = $batch['items'][$n]['iconset_id'];
-                    $count = max(1, $total_count - ( ICONFINDER_API_MAX_COUNT * ($i + 1) ));
-                    $path = get_api_path('iconsets');
+                    # $count = max(1, $total_count - ( ICONFINDER_API_MAX_COUNT * ($i + 1) ));
                     $batch = iconfinder_call_api(
-                        get_api_url($path, array( 'after' => $last_id, 'count' => $count ))
+                        get_api_url($path, array( 'after' => $last_id, 'count' => ICONFINDER_API_MAX_COUNT ))
                     );
                     if (is_array($iconsets['items']) && is_array($batch['items'])) {
                         $iconsets['items'] = array_merge($iconsets['items'], $batch['items']);
@@ -1612,7 +1564,9 @@ function get_all_iconsets() {
             $iconsets['item_count'] = count($iconsets['items']);
         }
     }
-    return $iconsets;
+    $result = $iconsets;
+    if (! empty($username)) $iconsets = array();
+    return $result;
 }
 
 /**
@@ -1627,8 +1581,8 @@ function get_all_iconsets() {
 function icf_get_post($meta_value, $meta_key, $post_type) {
     $result = null;
     $posts = get_posts(array(
-        'numberposts'        => 1,
-        'post_type'                => $post_type,
+        'numberposts'   => 1,
+        'post_type'     => $post_type,
         'meta_key'      => $meta_key,
         'meta_value'    => $meta_value
     ));
@@ -1678,6 +1632,47 @@ function icf_get_all_posts($meta_value, $meta_key, $post_type) {
  */
 function get_icons_by_iconset_id($iconset_id) {
     return icf_get_all_posts($iconset_id, 'iconset_id', 'icon');
+}
+
+/**
+ * Retrieve all icons for a specific iconset.
+ * @param int       $post_parent        The ID of the parent (iconset) post
+ * @param array     $more_args          Keyed array of query arguments to filter the results
+ * @param bool      $refresh            Whether or not to refresh any statically stored results.
+ *
+ * @return mixed
+ */
+function get_icon_posts_by_post_parent( $post_parent, $more_args=array(), $refresh=false ) {
+
+    /** @staticvar  $posts */
+    static $icons;
+
+    /**
+     * If we have previously requested icons for this iconset,
+     * And the set is not empty, and we have not requested to
+     * refresh the static var, we can save some CPU cycles
+     * by returning the previously queried posts.
+     */
+    if ( isset($icons["_{$post_id}"]) && ! $refresh ) {
+        $stored = $icons["_{$post_id}"];
+        if ( count($stored) ) {
+            return $stored;
+        }
+    }
+
+    $query_args = array_merge(array(
+        'post_type'      => 'icon',
+        'post_parent'    => $post_parent,
+        'post_status'    => 'publish',
+        'posts_per_page' => -1
+    ), $more_args);
+
+    /**
+     * Update the staticvar for next time.
+     */
+    $icons = query_posts($query_args);
+
+    return $icons;
 }
 
 /**
@@ -1916,181 +1911,3 @@ function icf_set_categories($post_id, $categories) {
     }
     return wp_set_post_terms( $post_id, $post_categories, 'icon_category', false);
 }
-
-/**
- * @param array $columns The array of column names.
- * @return mixed
- *
- * @see https://code.tutsplus.com/articles/quick-tip-make-your-custom-column-sortable--wp-25095
- */
-function icf_columns_head($columns) {
-
-    $columns['iconset_style'] = 'Style';
-    $columns['iconset_identifier'] = 'Identifier';
-    $columns['iconset_id'] = 'Iconset ID';
-    $columns['iconset_icons_count'] = 'Icons Count';
-    $columns['iconset_is_premium'] = 'License Type';
-    if ( isset($columns['taxonomy-icon_tag']) ) {
-        unset($columns['taxonomy-icon_tag']);
-    }
-    return $columns;
-}
-
-/**
- * @param $column_name
- * @param $post_id
- */
-function icf_columns_content($column_name, $post_id) {
-
-    if ($column_name == 'iconset_style') {
-        echo get_post_meta($post_id, 'iconset_style_name', true);
-    }
-    if ($column_name == 'iconset_icons_count') {
-        echo get_post_meta($post_id, 'icons_count', true);
-    }
-    if ($column_name == 'iconset_is_premium') {
-        $is_premium = get_post_meta($post_id, 'is_premium', true);
-        echo is_true($is_premium) ? 'Premium' : 'Free' ;
-    }
-    if ($column_name == 'iconset_identifier') {
-        $link = get_post_meta($post_id, 'guid', true);
-        $text = get_post_meta($post_id, 'iconset_identifier', true);
-        echo "<a href=\"{$link}\" target=\"_blank\">{$text}</a>";
-    }
-    if ($column_name == 'iconset_id') {
-        $link = get_post_meta($post_id, 'guid', true);
-        $text = get_post_meta($post_id, 'iconset_id', true);
-        echo "<a href=\"{$link}\" target=\"_blank\">{$text}</a>";
-    }
-}
-
-/**
- * @param $columns
- * @return mixed
- */
-function iconset_sortable_columns( $columns ) {
-    $columns['iconset_style'] = 'style';
-    $columns['iconset_identifier'] = 'identifier';
-    $columns['iconset_id'] = 'iconset_id';
-    $columns['iconset_icons_count'] = 'icons_count';
-    $columns['iconset_is_premium'] = 'is_premium';
-    return $columns;
-}
-
-/**
- * @param \WP_Query $query
- */
-function iconset_orderby( $query ) {
-
-    if ( ! is_admin() ) { return; }
- 
-    $orderby = $query->get( 'orderby');
- 
-    if ( 'style' == $orderby ) {
-        $query->set('meta_key','iconset_style_name');
-        $query->set('orderby', 'meta_value');
-    }
-    if ( 'identifier' == $orderby ) {
-        $query->set('meta_key','iconset_identifier');
-        $query->set('orderby', 'meta_value');
-    }
-    if ( 'iconset_id' == $orderby ) {
-        $query->set('meta_key','iconset_id');
-        $query->set('orderby', 'meta_value');
-    }
-    if ( 'icons_count' == $orderby ) {
-        $query->set('meta_key','icons_count');
-        $query->set('orderby', 'meta_value_num');
-    }
-    if ( 'is_premium' == $orderby ) {
-        $query->set('meta_key','is_premium');
-        $query->set('orderby', 'meta_value');
-    }
-}
-
-add_filter( 'manage_iconset_posts_columns', 'icf_columns_head' );
-add_action( 'manage_iconset_posts_custom_column', 'icf_columns_content', 10, 2 );
-add_filter( 'manage_edit-iconset_sortable_columns', 'iconset_sortable_columns' );
-add_action( 'pre_get_posts', 'iconset_orderby' );
-
-/**
- * Make columns sortable.
- * @param array $defaults
- *
- * @return mixed
- *
- * @see https://code.tutsplus.com/articles/quick-tip-make-your-custom-column-sortable--wp-25095
- */
-function icf_icon_columns_head($defaults) {
-
-    $defaults['iconset_identifier'] = 'Identifier';
-    $defaults['iconset_id'] = 'Iconset ID';
-    $defaults['iconset_is_premium'] = 'License Type';
-    return $defaults;
-}
-
-/**
- * Add out custom columns content.
- * @param string $column_name
- * @param int $post_id
- */
-function icf_icon_columns_content($column_name, $post_id) {
-
-    if ($column_name == 'iconset_is_premium') {
-        $is_premium = get_post_meta($post_id, 'is_premium', true);
-        echo is_true($is_premium) ? 'Premium' : 'Free' ;
-    }
-    if ($column_name == 'iconset_identifier') {
-        $link = get_post_meta($post_id, 'guid', true);
-        $text = get_post_meta($post_id, 'iconset_identifier', true);
-        echo "<a href=\"{$link}\" target=\"_blank\">{$text}</a>";
-    }
-    if ($column_name == 'iconset_id') {
-        $link = get_post_meta($post_id, 'guid', true);
-        $text = get_post_meta($post_id, 'iconset_id', true);
-        echo "<a href=\"{$link}\" target=\"_blank\">{$text}</a>";
-    }
-}
-
-/**
- * Make the icon list table sortable.
- * @param $columns
- *
- * @return mixed
- */
-function icon_sortable_columns( $columns ) {
-    
-    $columns['iconset_identifier'] = 'identifier';
-    $columns['iconset_id'] = 'iconset_id';
-    $columns['iconset_is_premium'] = 'is_premium';
-    return $columns;
-}
-
-/**
- * @param \WP_Query $query
- */
-function icon_orderby( $query ) {
-
-    if( ! is_admin() )
-        return;
- 
-    $orderby = $query->get( 'orderby');
-
-    if ( 'identifier' == $orderby ) {
-        $query->set('meta_key','iconset_identifier');
-        $query->set('orderby', 'meta_value');
-    }
-    if ( 'iconset_id' == $orderby ) {
-        $query->set('meta_key','iconset_id');
-        $query->set('orderby', 'meta_value');
-    }
-    if ( 'is_premium' == $orderby ) {
-        $query->set('meta_key','is_premium');
-        $query->set('orderby', 'meta_value');
-    }
-}
-
-add_filter( 'manage_icon_posts_columns', 'icf_icon_columns_head' );
-add_action( 'manage_icon_posts_custom_column', 'icf_icon_columns_content', 10, 2 );
-add_filter( 'manage_edit-icon_sortable_columns', 'icon_sortable_columns' );
-add_action( 'pre_get_posts', 'icon_orderby' );

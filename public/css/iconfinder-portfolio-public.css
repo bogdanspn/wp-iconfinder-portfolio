@@ -1204,3 +1204,77 @@ body.single-iconset #content {
 
   width: 100%;
 }
+
+
+.iconfinder-author-profile.vcard {
+
+    background: #eee;
+    border-radius: 4px;
+    border: 1px solid #aaa;
+    margin: 20px;
+    padding: 30px;
+    float: none !important;
+    width: auto;
+}
+
+.iconfinder-author-profile p,
+.iconfinder-author-profile .fn,
+.iconfinder-author-profile.vcard ul {
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.iconfinder-author-profile.vcard li {
+
+    list-style-type: none;
+    display: inline-block !important;
+    margin: 0 5px 0 0;
+}
+
+.iconfinder-author-profile.vcard a {
+
+    display: block;
+}
+
+.iconfinder-author-profile.vcard img {
+
+    float: none !important;
+    display: block;
+    width: auto;
+    height: auto;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.iconfinder-author-profile.vcard .iconsets.col-3 li {
+
+    width: 33%;
+}
+
+.iconfinder-author-profile.vcard .iconsets.col-4 li {
+
+    width: 24%;
+}
+
+.iconfinder-author-profile .avatar,
+.iconfinder-author-profile .bio {
+
+    float: left;
+}
+
+.iconfinder-author-profile .avatar {
+
+    width: auto;
+    margin: 0 10px 10px 0;
+}
+
+.iconfinder-author-profile .bio {
+
+    width: 75%;
+}
+
+.iconfinder-author-profile .iconsets {
+
+    clear: both;
+}

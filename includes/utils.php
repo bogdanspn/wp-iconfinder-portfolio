@@ -240,7 +240,6 @@ function icf_queue_notices($notices, $type='success') {
     return set_transient( ICF_PLUGIN_NAME . '_' . $type, $message, HOUR_IN_SECONDS );
 }
 
-
 /**
  * Show a success notice.
  */
@@ -529,9 +528,12 @@ function icf_adjust_query( $query ) {
 
     if ( is_iconfinder() ) {
         if ( is_archive() || is_search() ) {
-            set_query_var( 'posts_per_page', icf_get_option(
+            $posts_per_page = icf_get_option(
                 'posts_per_page', icf_get_setting('posts_per_page')
-            ));
+            );
+            if ( get_query_var( 'posts_per_page' ) != -1 ) {
+                set_query_var( 'posts_per_page', $posts_per_page);
+            }
         }
     }
 
@@ -543,6 +545,35 @@ function icf_adjust_query( $query ) {
     return $query;
 }
 add_action( 'pre_get_posts', 'icf_adjust_query' );
+
+/**
+ * This function only needs to run once. WP does not set post_parent on custom post types
+ * when an attachment is set. I have fixed this elsewhere in the code so that when an
+ * attachment is added to one of our custom post types, post_parent is set, but this
+ * function was necessary to update already-saved icon, iconset, and collection posts.
+ */
+//function synch_attachment_post_parents( $query ) {
+//
+//    $icons = get_icon_posts_by_post_parent( $iconset_post_id, $meta_query, true );
+//
+//    foreach ($icons as $icon) {
+//
+//        /**
+//         * This is a bit of a hack to make sure all attachments for our custom posts
+//         * have a post_parent. By default, WordPress does not save this value but
+//         * we need it for some of our functionality. This spot was chosen because
+//         * every icon post type will go through this function and it allows us
+//         * to avoid calling the same logic elsewhere.
+//         */
+//        if ( $_thumbnail_id = get_post_thumbnail_id( $icon->ID ) ) {
+//
+//            add_attachment_parent( null, $icon->ID, '_thumbnail_id', $_thumbnail_id );
+//        }
+//    }
+//
+//    return $query;
+//}
+//add_action( 'admin_init', 'icf_adjust_query' );
 
 /**
  * Checks to see if the current request is a search limited to a specific iconset or collection.
@@ -1037,6 +1068,208 @@ function icf_get_permalink( $post_id ) {
     }
 
     return add_referral_code( $permalink );
+}
+
+/**
+ * Ajax callback to display previews of icons in selected iconset.
+ */
+function get_icon_previews() {
+
+    check_ajax_referer( 'image-mapper-nonce', 'security' );
+
+    $iconset_post_id = sanitize_text_field(
+        get_val( $_POST, 'iconset_post_id', -1 )
+    );
+
+    $html = "";
+
+    if ( $iconset_post_id != -1 ) {
+
+        $meta_query = array('meta_query' => array(
+            array(
+                'key' => '_thumbnail_id',
+                'compare' => 'NOT EXISTS'
+            ),
+        ));
+
+        $icons = get_icon_posts_by_post_parent( $iconset_post_id, $meta_query, true );
+
+        foreach ($icons as $icon) {
+
+            $icon->preview = get_post_meta( $icon->ID, 'preview_image_@128', true );
+
+            /**
+             * This is a bit of a hack to make sure all attachments for our custom posts
+             * have a post_parent. By default, WordPress does not save this value but
+             * we need it for some of our functionality. This spot was chosen because
+             * every icon post type will go through this function and it allows us
+             * to avoid calling the same logic elsewhere.
+             */
+            if ( $_thumbnail_id = get_post_thumbnail_id( $icon->ID ) ) {
+
+                add_attachment_parent( null, $icon->ID, '_thumbnail_id', $_thumbnail_id );
+            }
+
+            $html .= "<li><img data-properties='{\"post_id\": \"{$icon->ID}\" }' src=\"{$icon->preview}\"/></li>\n";
+        }
+    }
+
+    echo "<ul>{$html}</ul>";
+
+    wp_die();
+}
+
+add_action( 'wp_ajax_get_icon_previews', 'get_icon_previews' );
+
+/**
+ * Ajax callback to set selected image as featured image on selected icon.
+ */
+function set_icon_preview() {
+
+    check_ajax_referer( 'image-mapper-nonce', 'security' );
+
+    $icon_post_id = sanitize_text_field(
+        get_val( $_POST, 'icon_post_id', -1 )
+    );
+
+    $attachment_id = sanitize_text_field(
+        get_val( $_POST, 'attachment_id', -1 )
+    );
+
+    if ( empty( $icon_post_id ) ) {
+        echo json_encode(array(
+            'status'  => 'success',
+            'message' => __( 'No Icon Post ID specified', ICF_PLUGIN_NAME )
+        ));
+    }
+    else if ( empty( $attachment_id ) ) {
+        echo json_encode(array(
+            'status'  => 'error',
+            'message' => __( 'No Attachment ID specified', ICF_PLUGIN_NAME )
+        ));
+    }
+    else if ( ! get_post( $icon_post_id ) ) {
+        echo json_encode(array(
+            'status'  => 'error',
+            'message' => __( 'Invalid Icon Post ID specified', ICF_PLUGIN_NAME )
+        ));
+    }
+    else if ( ! get_post( $attachment_id ) ) {
+        echo 'Invalid Attachment ID specified';
+    }
+    else {
+        // This is where the magic happens.
+
+        $result = set_post_thumbnail( $icon_post_id, $attachment_id );
+
+        if (is_wp_error( $result )) {
+            echo json_encode(array(
+                'status'  => 'error',
+                'message' => $result->get_error_message()
+            ));
+        }
+        else {
+            update_post( get_post( $attachment_id ),
+                array( 'post_parent' => $icon_post_id )
+            );
+            echo json_encode(array(
+                'status'  => 'success',
+                'message' => __( "The preview was saved for Icon {$icon_post_id}", ICF_PLUGIN_NAME )
+            ));
+        }
+    }
+
+    wp_die();
+}
+add_action( 'wp_ajax_set_icon_preview', 'set_icon_preview' );
+
+/**
+ * Add the post_parent to our custom post types when the post thumbnail is set.
+ * @param int       $meta_id        The meta data row ID
+ * @param int       $object_id      The object ID to which the meta data belongs
+ * @param string    $meta_key       The meta data key
+ * @param mixed     $meta_value     The meta data value
+ */
+function add_attachment_parent( $meta_id, $object_id, $meta_key, $meta_value ) {
+
+    /**
+     * Let's see if the object is a post.
+     */
+    $post = get_post( $object_id );
+
+    # debug( $post );
+
+    /**
+     * Look for the first excuse to not do anything.
+     */
+    /**
+     * It's not a post.
+     */
+    if (! $post ) return;
+
+    /**
+     * It's not one of our post types.
+     */
+    if (! in_array( $post->post_type, array('icon', 'iconset', 'collection') ) ) return;
+
+    /**
+     * The thumbnail isn't being updated
+     */
+    if ( $meta_key !== '_thumbnail_id' ) return;
+
+    /**
+     * Is there an attachment?
+     */
+    $attachment = get_post( $meta_value );
+
+    /**
+     * No attachment? Don't do anything.
+     */
+    if (! $attachment ) return;
+
+    /**
+     * We passed all the tests, update the attachment.
+     */
+    update_post(
+        $attachment,
+        array( 'post_parent' => $object_id )
+    );
+}
+add_filter( 'updated_postmeta' , 'add_attachment_parent' , '99', 2 );
+
+/**
+ * Display image-mapping tool for pairing user-uploaded images with Iconfinder custom post types.
+ * @since    2.0.1
+ */
+function add_image_mapper() {
+
+    $images = query_posts(array(
+        'post_type'      => 'attachment',
+        'post_status'    => 'inherit',
+        'post_mime_type' => 'image',
+        'posts_per_page' => -1
+    ));
+
+    $data = array(
+        'icons'  => array(),
+        'images' => $images
+    );
+
+    /**
+     * 1. Left-hand side, show all Icon post previews (Iconfinder images) without featured image,
+     *    from a specific iconset.
+     * 2. Right-hand side, show all user-uploaded icon previews not saved as featured image
+     *    A. Group images by iconset.
+     * 3. Two halves are independently scrollable
+     * 4. Best approach is to upload images in batches by iconset, then pair those icons
+     *    with the corresponding iconset before uploading more images.
+     * 5. User clicks Iconfinder image then clicks user-uploaded image to "pair them"
+     * 6. User clicks 'Save' button to update Icon post with their own preview (as featured image)
+     * 7. As images are paired, they disappear from the list
+     * 8. Use Ajax to set featured image so user doesn't have to wait for HTTP round-trip
+     */
+
+    echo do_buffer( ICF_TEMPLATE_PATH_ADMIN . 'image-mapper.php', $data );
 }
 
 /**
