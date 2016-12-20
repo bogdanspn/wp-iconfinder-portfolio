@@ -1195,6 +1195,7 @@ add_action( 'wp_ajax_set_icon_preview', 'set_icon_preview' );
  * @param int       $object_id      The object ID to which the meta data belongs
  * @param string    $meta_key       The meta data key
  * @param mixed     $meta_value     The meta data value
+ *
  */
 function add_attachment_parent( $meta_id=null, $object_id=null, $meta_key=null, $meta_value=null ) {
 
