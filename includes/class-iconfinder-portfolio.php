@@ -139,7 +139,6 @@ class Iconfinder_Portfolio {
         /**
          * Global utility functions file.
          */
-        require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/author-box.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/icf-theme.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/utils.php';
         require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/iconfinder-portfolio-functions.php';

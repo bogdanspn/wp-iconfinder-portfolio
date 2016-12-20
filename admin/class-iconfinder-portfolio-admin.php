@@ -120,9 +120,6 @@ class Iconfinder_Portfolio_Admin {
          * We need the media uploader.
          */
         wp_enqueue_media();
-
-        // add_action("admin_enqueue_scripts", "enqueue_media_uploader");
-
     }
     
     /**
