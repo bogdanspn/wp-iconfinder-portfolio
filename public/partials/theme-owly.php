@@ -13,7 +13,7 @@
  */
 ?>
 
-<div class="owl-carousel owl-theme" id="owl-carousel1">
+<div class="owl-carousel owl-theme">
 <?php foreach ($items as $iconset) : ?>
   <div class="item">
       <a href="<?php echo $iconset['permalink']; ?>" rel="external" class="screenshot">
@@ -29,7 +29,7 @@
 
 
 <script type="text/javascript">
-    jQuery('#owl-carousel1').owlCarousel({
+    jQuery('.owl-carousel').owlCarousel({
     loop:true,
     margin:22,
     dots:true,
